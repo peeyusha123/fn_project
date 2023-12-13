@@ -1,0 +1,36 @@
+<!-- Include jQuery library -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+  // Function to open the modal
+  function openModal() {
+    const modal = $('#myModal');
+    modal.css('display', 'block');
+  }
+
+  // Function to save data and print request payload
+  function saveData() {
+    const age = $('#age').val();
+    const date = $('#date').val();
+    const organization = $('#organization').val();
+
+    // Dummy endpoint - Replace with your actual endpoint
+    const dummyEndpoint = 'https://example.com/api/saveData';
+
+    // Dummy API call for demonstration
+    $.ajax({
+      url: dummyEndpoint,
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ age, date, organization }),
+      success: function(data) {
+        console.log('Response from server:', data);
+        // Close the modal after saving data
+        $('#myModal').css('display', 'none');
+      },
+      error: function(error) {
+        console.error('Error:', error);
+      }
+    });
+  }
+</script>
