@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kendo UI Grid with Modal</title>
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2022.2.1103/styles/kendo.common.min.css">
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2022.2.1103/styles/kendo.rtl.min.css">
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2022.2.1103/styles/kendo.default.min.css">
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2022.2.1103/styles/kendo.mobile.all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2022.2.1103/js/kendo.all.min.js"></script>
+</head>
+<body>
+
+<div id="grid"></div>
+
+<script>
+    $(document).ready(function () {
+        // Sample data for the pick list
+        var organizationData = ["Organization A", "Organization B", "Organization C"];
+
+        // Kendo UI Grid configuration
+        $("#grid").kendoGrid({
+            columns: [
+                { field: "name", title: "Name" },
+                { command: { text: "Edit", click: showDetails }, title: " ", width: "120px" }
+            ],
+            dataSource: {
+                data: [
+                    { name: "John Doe" },
+                    { name: "Jane Doe" }
+                ],
+                schema: {
+                    model: { id: "name" }
+                }
+            }
+        });
+
+        // Function to show details in a modal
+        function showDetails(e) {
+            e.preventDefault();
+
+            var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+            var modal = $("<div></div>").kendoWindow({
+                title: "Edit Details",
+                modal: true,
+                visible: false,
+                width: 300
+            }).data("kendoWindow");
+
+            modal.content("<label>Age: <input type='number' id='age'></label><br>" +
+                "<label>Date: <input type='date' id='date'></label><br>" +
+                "<label>Organization: <input id='organization' /></label><br>" +
+                "<button class='k-button' id='save'>Save</button>");
+
+            // Initialize the organization pick list
+            $("#organization").kendoDropDownList({
+                dataSource: organizationData
+            });
+
+            modal.center().open();
+
+            // Save button click event
+            $("#save").click(function () {
+                var age = $("#age").val();
+                var date = $("#date").val();
+                var organization = $("#organization").data("kendoDropDownList").value();
+
+                // Dummy endpoint - print request payload
+                console.log("Payload: ", { age: age, date: date, organization: organization });
+
+                modal.close();
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
