@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modal Example</title>
+  <style>
+    /* Style for the modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .modal label {
+      text-align: right;
+      padding-right: 10px;
+    }
+
+    .modal input,
+    .modal select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 5px;
+    }
+
+    .modal button {
+      grid-column: span 2;
+      margin-top: 10px;
+    }
+
+    /* Style for the grid */
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Button to open the modal -->
+<button onclick="openModal()">Open Modal</button>
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+  <label for="age">Age:</label>
+  <input type="number" id="age" name="age" required>
+
+  <label for="date">Date:</label>
+  <input type="date" id="date" name="date" required>
+
+  <label for="organization">Organization:</label>
+  <select id="organization" name="organization">
+    <option value="company1">Company 1</option>
+    <option value="company2">Company 2</option>
+    <option value="company3">Company 3</option>
+    <!-- Add more options as needed -->
+  </select>
+
+  <button onclick="saveData()">Save</button>
+</div>
+
+<!-- Data Grid -->
+<div class="data-grid" id="dataGrid"></div>
+
+<script>
+  // Function to open the modal
+  function openModal() {
+    const modal = document.getElementById('myModal');
+    modal.style.display = 'block';
+  }
+
+  // Function to save data and print request payload
+  function saveData() {
+    const age = document.getElementById('age').value;
+    const date = document.getElementById('date').value;
+    const organization = document.getElementById('organization').value;
+
+    // Dummy endpoint - Replace with your actual endpoint
+    const dummyEndpoint = 'https://example.com/api/saveData';
+
+    // Dummy API call for demonstration
+    fetch(dummyEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ age, date, organization }),
+      mode: 'cors', // Add this line for cross-origin requests
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Response from server:', data);
+        // Display saved data in the grid
+        displayDataGrid(data);
+        // Close the modal after saving data
+        document.getElementById('myModal').style.display = 'none';
+      })
+      .catch(error => console.error('Error:', error));
+  }
+
+  // Function to display saved data in the grid
+  function displayDataGrid(data) {
+    const dataGrid = document.getElementById('dataGrid');
+    
+    // Clear previous data
+    dataGrid.innerHTML = '';
+
+    // Add new data to the grid
+    Object.keys(data).forEach(key => {
+      const cell = document.createElement('div');
+      cell.textContent = `${key}: ${data[key]}`;
+      dataGrid.appendChild(cell);
+    });
+  }
+</script>
+
+</body>
+</html>
