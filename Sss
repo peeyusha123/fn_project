@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal Example</title>
+    <!-- Kendo UI Styles -->
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2023.1.119/styles/kendo.common.min.css" />
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2023.1.119/styles/kendo.rtl.min.css" />
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2023.1.119/styles/kendo.default.min.css" />
+    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2023.1.119/styles/kendo.mobile.all.min.css" />
+    <!-- Kendo UI JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://kendo.cdn.telerik.com/2023.1.119/js/kendo.all.min.js"></script>
+</head>
+<body>
+
+<button id="openModal">Open Modal</button>
+
+<div id="modal"></div>
+
+<script>
+    // Sample organization values
+    var organizationValues = ["Org1", "Org2", "Org3"];
+
+    // Create Kendo Modal
+    $("#modal").kendoWindow({
+        visible: false,
+        modal: true,
+        title: "Input Modal",
+        width: "400px",
+        actions: ["Close"]
+    });
+
+    // Create input fields
+    var ageInput = $("<input type='number' placeholder='Age' />");
+    var dateInput = $("<input type='date' placeholder='Date' />");
+    var organizationDropdown = $("<select></select>");
+    $.each(organizationValues, function (index, value) {
+        organizationDropdown.append($("<option></option>").text(value));
+    });
+
+    // Create Save button
+    var saveButton = $("<button>Save</button>").click(function () {
+        // Dummy endpoint - replace with your actual endpoint
+        var dummyEndpoint = "https://jsonplaceholder.typicode.com/posts";
+        
+        // Get input values
+        var age = ageInput.val();
+        var date = dateInput.val();
+        var organization = organizationDropdown.val();
+
+        // Dummy data to send to the endpoint
+        var dataToSend = {
+            age: age,
+            date: date,
+            organization: organization
+        };
+
+        // Send data to the dummy endpoint
+        $.ajax({
+            url: dummyEndpoint,
+            type: "POST",
+            data: JSON.stringify(dataToSend),
+            contentType: "application/json; charset=utf-8",
+            success: function () {
+                alert("Data saved successfully!");
+            },
+            error: function () {
+                alert("Error saving data.");
+            }
+        });
+
+        // Close the modal
+        $("#modal").data("kendoWindow").close();
+    });
+
+    // Append input fields and Save button to the modal
+    $("#modal").html(ageInput).append("<br />")
+        .append(dateInput).append("<br />")
+        .append(organizationDropdown).append("<br />")
+        .append(saveButton);
+
+    // Open modal on button click
+    $("#openModal").click(function () {
+        $("#modal").data("kendoWindow").open().center();
+    });
+</script>
+
+</body>
+</html>
