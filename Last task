@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2021.3.1207/styles/kendo.common.min.css" />
+  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2021.3.1207/styles/kendo.rtl.min.css" />
+  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2021.3.1207/styles/kendo.default.min.css" />
+  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2021.3.1207/styles/kendo.mobile.all.min.css" />
+
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://kendo.cdn.telerik.com/2021.3.1207/js/kendo.all.min.js"></script>
+
+  <style>
+    #grid {
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <button id="openModalBtn">Open Modal</button>
+
+  <div id="modal" style="display: none;">
+    <label for="age">Age:</label>
+    <input type="number" id="age" />
+
+    <label for="date">Date:</label>
+    <input type="date" id="date" />
+
+    <label for="organization">Organization:</label>
+    <input type="text" id="organization" />
+
+    <button id="saveBtn">Save</button>
+  </div>
+
+  <div id="grid"></div>
+
+  <script>
+    // Dummy endpoint function
+    function saveData(data) {
+      console.log("Saved data:", data);
+    }
+
+    // Open modal on button click
+    $("#openModalBtn").on("click", function () {
+      $("#modal").show();
+    });
+
+    // Save button click event
+    $("#saveBtn").on("click", function () {
+      // Get input values
+      var age = $("#age").val();
+      var date = $("#date").val();
+      var organization = $("#organization").val();
+
+      // Create payload
+      var payload = {
+        age: age,
+        date: date,
+        organization: organization
+      };
+
+      // Call dummy endpoint
+      saveData(payload);
+
+      // Close modal
+      $("#modal").hide();
+
+      // Display data in Kendo UI Grid
+      var grid = $("#grid").kendoGrid({
+        dataSource: {
+          data: [payload],
+          pageSize: 5
+        },
+        height: 300,
+        pageable: true,
+        columns: [
+          { field: "age", title: "Age" },
+          { field: "date", title: "Date" },
+          { field: "organization", title: "Organization" }
+        ]
+      }).data("kendoGrid");
+    });
+  </script>
+
+</body>
+</html>
