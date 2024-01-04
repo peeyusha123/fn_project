@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="script.js"></script>
+  <title>Login Page</title>
+</head>
+<body>
+  <div class="container">
+    <form id="loginForm">
+      <label for="username">Username</label>
+      <input type="text" id="username" placeholder="Enter the User Name" onblur="validateEmpty('username')">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Enter the Password" onblur="validateEmpty('password')">
+      <button type="button" id="submitBtn" onclick="submitForm()" disabled>Submit</button>
+      <button type="button" id="resetBtn" onclick="resetForm()">Reset</button>
+      <button type="button" id="signUpBtn" onclick="signUp()">Sign Up</button>
+      <button type="button" id="passwordResetBtn" onclick="passwordReset()">Password Reset</button>
+    </form>
+  </div>
+</body>
+</html>
+
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.container {
+  width: 300px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-bottom: 5px;
+}
+
+input {
+  margin-bottom: 10px;
+  padding: 5px;
+}
+
+button {
+  padding: 8px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+#resetBtn {
+  display: none;
+}
+
+function submitForm() {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+
+  if (!username || !password) {
+    alert('Username and password are mandatory');
+    
+    if (!username) {
+      document.getElementById('username').focus();
+    } else {
+      document.getElementById('password').focus();
+    }
+    
+    return;
+  }
+
+  const userObject = { userName: username, pwd: password };
+  console.log('Username and password JSON Data:', JSON.stringify(userObject));
+}
+
+function resetForm() {
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+  updateResetButtonVisibility();
+}
+
+function validateEmpty(field) {
+  const element = document.getElementById(field);
+  if (!element.value) {
+    element.style.border = '2px solid red';
+  } else {
+    element.style.border = '';
+  }
+
+  updateSubmitButtonStatus();
+}
+
+function updateResetButtonVisibility() {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+
+  const resetBtn = document.getElementById('resetBtn');
+  resetBtn.style.display = (username || password) ? 'inline-block' : 'none';
+}
+
+function updateSubmitButtonStatus() {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+
+  const submitBtn = document.getElementById('submitBtn');
+  submitBtn.disabled = !(username && password);
+}
