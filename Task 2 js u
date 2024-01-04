@@ -362,3 +362,93 @@ new..
 </body>
 </html>
 
+new 2
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Existing styles ... */
+
+        #signupModal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+            z-index: 1000;
+        }
+    </style>
+    <!-- ... (existing head content) ... -->
+</head>
+<body>
+
+<!-- Login Form -->
+<form id="loginForm">
+    <!-- ... (existing form content) ... -->
+    <button type="button" id="signupBtn">Sign Up</button>
+</form>
+
+<!-- Sign Up Modal -->
+<div id="signupModal">
+    <form id="signupForm">
+        <label for="signupUsername">Username:</label>
+        <input type="text" id="signupUsername" placeholder="Enter the User Name">
+
+        <label for="signupPassword">Password:</label>
+        <input type="password" id="signupPassword" placeholder="Enter the Password">
+
+        <button type="button" id="signupSubmitBtn">Submit</button>
+        <button type="button" id="signupResetBtn">Reset Storage</button>
+    </form>
+</div>
+
+<script>
+    // ... (existing script content) ...
+
+    document.getElementById('signupBtn').addEventListener('click', function () {
+        openSignupModal();
+    });
+
+    document.getElementById('signupSubmitBtn').addEventListener('click', function () {
+        signup();
+    });
+
+    document.getElementById('signupResetBtn').addEventListener('click', function () {
+        resetSignupStorage();
+    });
+
+    function openSignupModal() {
+        document.getElementById('signupModal').style.display = 'block';
+        document.getElementById('signupUsername').value = ''; // Clear previous input
+        document.getElementById('signupPassword').value = ''; // Clear previous input
+    }
+
+    function closeSignupModal() {
+        document.getElementById('signupModal').style.display = 'none';
+    }
+
+    function resetSignupStorage() {
+        // Clear the stored local storage list for sign-up
+        localStorage.removeItem('userList');
+    }
+
+    function signup() {
+        // ... (existing signup logic) ...
+    }
+
+    // ... (existing functions) ...
+</script>
+
+</body>
+</html>
+
+
