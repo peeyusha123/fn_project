@@ -1,3 +1,29 @@
+1	Create a simple Login Screen with User Name, Password fields and Submit,Reset,Sign Up and Password Reset Button.
+2	Once the User Clicks on Submit Button then Log the Username and password data in the Console.
+3	Once the User Clicks on Reset Button then clear the Username and password fields in the UI.
+4	Create a User Object and store the entered User Name in a key called userName and Password into pwd key inside the User Object.
+5	Once the User Clicks on Submit Button then Log the Username and password JSON Data in the Console.
+6	Add a place holder in the User Name box as Enter the User Name and in password box as Enter the Password.
+7	If the user clicks on the username and moves out of the username box by clicking or on tab then run a validation to check if the field is empty and add a Red Color to the Border.
+8	If the user clicks on the username and moves out of the Password box by clicking or on tab then run a validation to check if the field is empty and add a Red Color to the Border.
+9	If the User Clicks on Submit Button without entering either the username or password then Show a Window Alert Message stating that username and password is mandatory.
+10	If the User Clicks on Submit Button without entering either the username or password then place the cursor on the first empty Field, i.e if username is empty then focus should go to username field on clicking on Submit Button and if password is empty and username is not empty then only focus should go to password field.
+11	Disable the Submit Button if Both Username and Password is empty.
+12	Hide the Reset Button if either the Username and Password is empty.
+13	Add a place holder in the User Name box as Enter the User Name and in password box as Enter the Password.
+14	DO AFTER SIGN UP Page is Completed - Validate the UserName and Password if its present in the Local Storage on Submit Button and if the UserName is not present then throw an Boot Strap Error Message Stating  "User Name not Present"  and if username is present and Password is wrong then throw an error message stating that "Password Wrong Please try Again" 
+
+
+please write a code in different file html css js < please don't miss any step also don't miss to add reset button and functionality
+?
+
+
+
+
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
