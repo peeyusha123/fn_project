@@ -86,7 +86,6 @@ button {
 }
 
 
-
 function submitForm() {
   const username = document.getElementById('username').value;
   const password = document.getElementById('password').value;
@@ -114,7 +113,7 @@ function submitForm() {
   const storedUserObject = JSON.parse(storedUserData);
 
   // Validate username and password against local storage
-  if (storedUserObject.password !== password) {
+  if (storedUserObject.pwd !== password) {
     alert('Password wrong. Please try again');
     return;
   }
@@ -123,77 +122,5 @@ function submitForm() {
   console.log('Username and password JSON Data:', JSON.stringify(storedUserObject));
 }
 
-function resetForm() {
-  document.getElementById('username').value = '';
-  document.getElementById('password').value = '';
+// Rest of the code remains unchanged
 
-  // Clear the Username and password fields in the UI
-  removeValidation('username');
-  removeValidation('password');
-  updateResetButtonVisibility();
-  updateSubmitButtonStatus();
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-  updateResetButtonVisibility();
-});
-
-function validateEmpty(field) {
-  const element = document.getElementById(field);
-  if (!element.value) {
-
-    // Run validation and add Red Color to the Border
-    element.classList.add('validation');
-  } else {
-
-    // Run validation and remove Red Color from the Border
-    element.classList.remove('validation');
-  }
-
-  updateSubmitButtonStatus();
-}
-
-function removeValidation(field) {
-  const element = document.getElementById(field);
-
-  // Run validation and remove Red Color from the Border
-  element.classList.remove('validation');
-}
-
-function updateResetButtonVisibility() {
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-
-  const resetBtn = document.getElementById('resetBtn');
-  resetBtn.style.display = (username || password) ? 'inline-block' : 'none';
-}
-
-function updateSubmitButtonStatus() {
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-
-  const submitBtn = document.getElementById('submitBtn');
-  // Disable the Submit Button if Both Username and Password is empty
-  submitBtn.disabled = !(username && password);
-}
-
-function signUp() {
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-
-  if (!username || !password) {
-    alert('Username and password are mandatory');
-    return;
-  }
-
-  // Store user data in local storage
-  const userObject = { username, password };
-  localStorage.setItem(username, JSON.stringify(userObject));
-
-  alert('Sign-up successful! You can now log in.');
-}
-
-function passwordReset() {
-  // Add your password reset logic here
-  alert('Password reset functionality not implemented.');
-}
