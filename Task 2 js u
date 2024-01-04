@@ -1,2 +1,29 @@
 
+function submitForm() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    if (username === '' || password === '') {
+        alert('Username and password are mandatory');
+        if (username === '') {
+            document.getElementById('username').style.border = '2px solid red';
+            document.getElementById('username').focus();
+        } else {
+            document.getElementById('username').style.border = '1px solid #ccc';
+            document.getElementById('password').style.border = '2px solid red';
+            document.getElementById('password').focus();
+        }
+        return;
+    }
+
+    const userObject = {
+        userName: username,
+        pwd: password
+    };
+
+    console.log('Username and password data:', username, password);
+    console.log('Username and password JSON data:', JSON.stringify(userObject));
+
+    // Additional logic for local storage validation can be added here
+}
 
