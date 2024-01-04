@@ -1,4 +1,4 @@
-hijiye
+whyhijiye
 function submitForm() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
@@ -600,4 +600,12 @@ function submitSignUpForm() {
 }
 
 
+new new 2...
+const uniqueFormId = 'signUpForm_' + Date.now();
+const signUpForm = document.createElement('form');
+signUpForm.id = uniqueFormId;
+signUpForm.innerHTML = `
+    <!-- Rest of your form code -->
+`;
+document.getElementById('signUpModal').appendChild(signUpForm);
 
