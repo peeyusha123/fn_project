@@ -1,4 +1,4 @@
-jiji1	Create a simple Login Screen with User Name, Password fields and Submit,Reset,Sign Up and Password Reset Button.
+jijiji1	Create a simple Login Screen with User Name, Password fields and Submit,Reset,Sign Up and Password Reset Button.
 2	Once the User Clicks on Submit Button then Log the Username and password data in the Console.
 3	Once the User Clicks on Reset Button then clear the Username and password fields in the UI.
 4	Create a User Object and store the entered User Name in a key called userName and Password into pwd key inside the User Object.
@@ -777,6 +777,164 @@ new 4...
 
     <button type="button" id="submitBtn">Submit</button>
     <button type="button" id="resetBtn">Reset</button>
+    <button type="button" id="signupBtn">Sign Up</button>
+    <button type="button" id="resetPasswordBtn">Password Reset</button>
+
+    <script>
+        document.getElementById('username').addEventListener('blur', function () {
+            validateField('username');
+            updateResetButtonVisibility();
+        });
+
+        document.getElementById('password').addEventListener('blur', function () {
+            validateField('password');
+            updateResetButtonVisibility();
+        });
+
+        document.getElementById('submitBtn').addEventListener('click', function () {
+            submitForm();
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', function () {
+            resetForm();
+        });
+
+        function validateField(field) {
+            const element = document.getElementById(field);
+            if (element.value.trim() === '') {
+                element.style.border = '2px solid red';
+            } else {
+                element.style.border = '1px solid #ccc';
+            }
+        }
+
+        function updateResetButtonVisibility() {
+            const usernameField = document.getElementById('username');
+            const passwordField = document.getElementById('password');
+            const resetButton = document.getElementById('resetBtn');
+
+            if (usernameField.value === '' && passwordField.value === '') {
+                resetButton.style.display = 'none';
+            } else {
+                resetButton.style.display = 'inline-block';
+            }
+        }
+
+        function submitForm() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (username === '' || password === '') {
+                alert('Username and password are mandatory');
+                if (username === '') {
+                    document.getElementById('username').style.border = '2px solid red';
+                    document.getElementById('username').focus();
+                } else {
+                    document.getElementById('username').style.border = '1px solid #ccc';
+                    document.getElementById('password').style.border = '2px solid red';
+                    document.getElementById('password').focus();
+                }
+                return;
+            }
+
+            const userObject = {
+                userName: username,
+                pwd: password
+            };
+
+            console.log('Username and password data:', username, password);
+            console.log('Username and password JSON data:', JSON.stringify(userObject));
+
+            // Additional logic for local storage validation can be added here
+        }
+
+        function resetForm() {
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            updateResetButtonVisibility();
+        }
+
+        function signup() {
+            // Additional logic for sign up can be added here
+        }
+
+        function resetPassword() {
+            // Additional logic for password reset can be added here
+        }
+    </script>
+</form>
+
+</body>
+</html>
+
+
+
+new 5..
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+    <title>Login Page</title>
+</head>
+<body>
+
+<form id="loginForm">
+    <label for="username">Username:</label>
+    <input type="text" id="username" placeholder="Enter the User Name">
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" placeholder="Enter the Password">
+
+    <button type="button" id="submitBtn">Submit</button>
+    <button type="button" id="resetBtn" style="display:none;">Reset</button>
     <button type="button" id="signupBtn">Sign Up</button>
     <button type="button" id="resetPasswordBtn">Password Reset</button>
 
