@@ -12,6 +12,11 @@
 12	Hide the Reset Button if either the Username and Password is empty.
 13	Add a place holder in the User Name box as Enter the User Name and in password box as Enter the Password.
 14	DO AFTER SIGN UP Page is Completed - Validate the UserName and Password if its present in the Local Storage on Submit Button and if the UserName is not present then throw an Boot Strap Error Message Stating  "User Name not Present"  and if username is present and Password is wrong then throw an error message stating that "Password Wrong Please try Again" 
+ 
+
+
+
+
 
 
 please write a code in different file html css js < please don't miss any step also don't miss to add reset button and functionality
@@ -122,5 +127,4 @@ function submitForm() {
   console.log('Username and password JSON Data:', JSON.stringify(storedUserObject));
 }
 
-// Rest of the code remains unchanged
-
+// Rest of the code remains
