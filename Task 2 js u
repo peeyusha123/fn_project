@@ -1,4 +1,4 @@
-
+ye
 function submitForm() {
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
@@ -215,3 +215,150 @@ new..
 11	Add Validation to check if Password has 8 Characters, Min 1 Lower Case, Min 1 Upper Case and Min 1 Special Character
 12	Allowed Special Characters in Password (!@#$%^) and anything out of this then throw an Error Message stating that the Special Character should be within this.
 13	Disable Copy, Paste using ShortCuts and Right Click on Password Field.
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Existing styles remain unchanged */
+
+        /* Additional styles for modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+    <title>Login Page</title>
+</head>
+<body>
+
+<form id="loginForm">
+    <!-- Existing form fields remain unchanged -->
+
+    <button type="button" id="signupBtn" onclick="openSignUpModal()">Sign Up</button>
+    <button type="button" id="resetPasswordBtn">Password Reset</button>
+
+    <!-- SignUp Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSignUpModal()">&times;</span>
+            <label for="signupUsername">Username:</label>
+            <input type="text" id="signupUsername" placeholder="Enter the User Name">
+
+            <label for="signupPassword">Password:</label>
+            <input type="password" id="signupPassword" placeholder="Enter the Password">
+
+            <button type="button" onclick="submitSignUp()">Submit</button>
+            <button type="button" onclick="resetLocalStorage()">Reset Storage</button>
+        </div>
+    </div>
+
+    <script>
+        // Existing script remains unchanged
+
+        function openSignUpModal() {
+            document.getElementById('signupModal').style.display = 'block';
+        }
+
+        function closeSignUpModal() {
+            document.getElementById('signupModal').style.display = 'none';
+        }
+
+        function submitSignUp() {
+            const newUsername = document.getElementById('signupUsername').value;
+            const newPassword = document.getElementById('signupPassword').value;
+
+            // Validation checks for username and password (conditions 10, 11, 12)
+
+            // Check if username already exists in Local Storage (condition 7)
+            const userList = JSON.parse(localStorage.getItem('userList')) || [];
+
+            if (userList.some(user => user.userName === newUsername)) {
+                alert('Username already taken. Choose another name and try again.');
+                document.getElementById('signupUsername').style.border = '2px solid red';
+                document.getElementById('signupUsername').focus();
+                return;
+            }
+
+            // Check if password has allowed special characters (condition 12)
+            const specialChars = '!@#$%^';
+            if (![...newPassword].every(char => /[a-zA-Z\d]/.test(char) || specialChars.includes(char))) {
+                alert('Special characters in password should be within (!@#$%^).');
+                document.getElementById('signupPassword').style.border = '2px solid red';
+                document.getElementById('signupPassword').focus();
+                return;
+            }
+
+            // Check if password meets criteria (condition 11)
+            if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^]).{8,}$/.test(newPassword)) {
+                alert('Password should have 8 characters, at least 1 lowercase, 1 uppercase, and 1 special character.');
+                document.getElementById('signupPassword').style.border = '2px solid red';
+                document.getElementById('signupPassword').focus();
+                return;
+            }
+
+            const newUser = {
+                userName: newUsername,
+                pwd: newPassword
+            };
+
+            // Log data to console (condition 4)
+            console.log('New user data:', newUsername, newPassword);
+            console.log('New user JSON data:', JSON.stringify(newUser));
+
+            // Store new user in Local Storage (condition 5)
+            userList.push(newUser);
+            localStorage.setItem('userList', JSON.stringify(userList));
+
+            // Display success alert (condition 8)
+            alert('User created successfully!');
+
+            // Close SignUp modal
+            closeSignUpModal();
+        }
+
+        function resetLocalStorage() {
+            // Clear Local Storage (condition 6)
+            localStorage.removeItem('userList');
+            alert('Local Storage reset successfully.');
+        }
+    </script>
+</form>
+
+</body>
+</html>
+
