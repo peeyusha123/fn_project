@@ -18,7 +18,8 @@ please write a code in different file html css js < please don't miss any step a
 ?
 
 
-<!DOCTYPE html>
+
+    <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -78,13 +79,11 @@ button {
 
 #resetBtn {
   display: none;
-  margin-right: 5px;
 }
 
 .validation {
   border: 2px solid red;
 }
-
 
 
 
@@ -94,19 +93,17 @@ function submitForm() {
 
   if (!username || !password) {
     alert('Username and password are mandatory');
-    
+
     if (!username) {
       document.getElementById('username').focus();
     } else {
       document.getElementById('password').focus();
     }
-    
+
     return;
   }
 
-  const userObject = { userName: username, pwd: password };
-
-  // Step 12: Check local storage for user data
+  // Check local storage for user data
   const storedUserData = localStorage.getItem(username);
 
   if (!storedUserData) {
@@ -116,21 +113,21 @@ function submitForm() {
 
   const storedUserObject = JSON.parse(storedUserData);
 
-  // Step 14: Validate username and password against local storage
-  if (storedUserObject.pwd !== password) {
+  // Validate username and password against local storage
+  if (storedUserObject.password !== password) {
     alert('Password wrong. Please try again');
     return;
   }
 
-  // Step 5: Log the Username and password JSON Data in the Console
-  console.log('Username and password JSON Data:', JSON.stringify(userObject));
+  // Log the Username and password JSON Data in the Console
+  console.log('Username and password JSON Data:', JSON.stringify(storedUserObject));
 }
 
 function resetForm() {
   document.getElementById('username').value = '';
   document.getElementById('password').value = '';
 
-  // Step 3: Clear the Username and password fields in the UI
+  // Clear the Username and password fields in the UI
   removeValidation('username');
   removeValidation('password');
   updateResetButtonVisibility();
@@ -145,11 +142,11 @@ function validateEmpty(field) {
   const element = document.getElementById(field);
   if (!element.value) {
 
-    // Steps 7 and 8: Run validation and add Red Color to the Border
+    // Run validation and add Red Color to the Border
     element.classList.add('validation');
   } else {
 
-    // Steps 7 and 8: Run validation and remove Red Color from the Border
+    // Run validation and remove Red Color from the Border
     element.classList.remove('validation');
   }
 
@@ -159,7 +156,7 @@ function validateEmpty(field) {
 function removeValidation(field) {
   const element = document.getElementById(field);
 
-  // Steps 7 and 8: Run validation and remove Red Color from the Border
+  // Run validation and remove Red Color from the Border
   element.classList.remove('validation');
 }
 
@@ -176,18 +173,27 @@ function updateSubmitButtonStatus() {
   const password = document.getElementById('password').value;
 
   const submitBtn = document.getElementById('submitBtn');
-  // Steps 11: Disable the Submit Button if Both Username and Password is empty
+  // Disable the Submit Button if Both Username and Password is empty
   submitBtn.disabled = !(username && password);
 }
 
+function signUp() {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
 
+  if (!username || !password) {
+    alert('Username and password are mandatory');
+    return;
+  }
 
+  // Store user data in local storage
+  const userObject = { username, password };
+  localStorage.setItem(username, JSON.stringify(userObject));
 
+  alert('Sign-up successful! You can now log in.');
+}
 
-
-
-
-
-
-
-
+function passwordReset() {
+  // Add your password reset logic here
+  alert('Password reset functionality not implemented.');
+}
