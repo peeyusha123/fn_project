@@ -84,6 +84,7 @@ function resetForm() {
   document.getElementById('username').value = '';
   document.getElementById('password').value = '';
   updateResetButtonVisibility();
+  updateSubmitButtonStatus();
 }
 
 function validateEmpty(field) {
