@@ -1,20 +1,25 @@
-//index.html file
+//login.html file
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="login.css" />
-    <script defer src="login.js"></script>
+
     <title>Login Page</title>
   </head>
   <body>
     <form id="loginForm">
       <label for="username">Username:</label>
-      <input type="text" id="username" placeholder="Enter the User Name" />
+      <input type="text" id="newUsername" placeholder="Enter the User Name" />
 
       <label for="password">Password:</label>
-      <input type="password" id="password" placeholder="Enter the Password" />
+      <input
+        type="password"
+        id="newPassword"
+        placeholder="Enter the Password"
+      />
 
       <button type="button" id="submitBtn" disabled>Submit</button>
       <button type="button" id="resetBtn" style="display: none">Reset</button>
@@ -24,10 +29,11 @@
 
       <button type="button" id="resetPasswordBtn">Password Reset</button>
     </form>
+    <script defer src="login.js"></script>
   </body>
 </html>
 
-//styles.css file
+//login.css file
 
 body {
   font-family: Arial, sans-serif;
@@ -74,8 +80,8 @@ button:disabled {
   color: red;
 }
 
+//login.js file
 
-//script.js file...
 document.getElementById("username").addEventListener("blur", function () {
   validateField("username");
   updateResetButtonVisibility();
