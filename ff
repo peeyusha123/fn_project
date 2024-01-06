@@ -18,10 +18,6 @@ document.getElementById("resetBtn").addEventListener("click", function () {
   resetForm();
 });
 
-document.getElementById("signupBtn").addEventListener("click", function () {
-  openSignUpModal();
-});
-
 function validateField(field) {
   const element = document.getElementById(field);
   if (element.value.trim() === "") {
@@ -72,39 +68,15 @@ function submitForm() {
     return;
   }
 
-  const newUserObject = {
-    username: username,
-    password: password,
+  const userObject = {
+    userName: username,
+    pwd: password,
   };
 
-  // Retrieve the existing user list from local storage
-  const userList = JSON.parse(localStorage.getItem("userList")) || [];
+  console.log("Username and password data:", username, password);
+  console.log("Username and password JSON data:", JSON.stringify(userObject));
 
-  // Check if the new username is already taken
-  const isUsernameTaken = userList.some(
-    (user) => user.username === newUserObject.username
-  );
-
-  if (isUsernameTaken) {
-    alert("User Name already taken. Choose another Name and Try Again");
-    document.getElementById("newUsername").focus();
-    return;
-  }
-
-  // Add the new user to the list
-  userList.push(newUserObject);
-
-  // Store the updated user list back in local storage
-  localStorage.setItem("userList", JSON.stringify(userList));
-
-  // Close the modal
-  document.getElementById("signUpModal").remove();
-
-  // Show success alert on the login screen
-  showSuccessAlert("User is Created");
-
-  // Log the updated user list
-  console.log("Updated User List:", userList);
+  // Additional logic for local storage validation can be added here
 }
 
 function resetForm() {
@@ -113,6 +85,12 @@ function resetForm() {
   updateResetButtonVisibility();
   updateSubmitButtonState();
 }
+
+// new code sign up
+
+document.getElementById("signupBtn").addEventListener("click", function () {
+  openSignUpModal();
+});
 
 function openSignUpModal() {
   const signUpModal = document.createElement("div");
@@ -150,12 +128,13 @@ function submitSignUpForm() {
   const newUsername = document.getElementById("newUsername").value;
   const newPassword = document.getElementById("newPassword").value;
 
-  // Retrieve the existing user list from local storage
-  const userList = JSON.parse(localStorage.getItem("userList")) || [];
+  // Validate username and password
+  // Implement conditions 10, 11, and 12 here
 
   // Check if the new username is already taken
+  const userList = JSON.parse(localStorage.getItem("userList")) || [];
   const isUsernameTaken = userList.some(
-    (user) => user.username === newUsername
+    (user) => user.userName === newUsername
   );
 
   if (isUsernameTaken) {
@@ -165,14 +144,17 @@ function submitSignUpForm() {
   }
 
   const newUserObject = {
-    username: newUsername,
-    password: newPassword,
+    username: newUsername, // Use 'username' instead of 'userName'
+    pwd: newPassword,
   };
 
-  // Add the new user to the list
   userList.push(newUserObject);
 
-  // Store the updated user list back in local storage
+  // Log the data and store in local storage
+  console.log("New User Data:", newUsername, newPassword);
+  console.log("New User JSON Data:", JSON.stringify(newUserObject));
+  console.log("Updated User List:", userList);
+
   localStorage.setItem("userList", JSON.stringify(userList));
 
   // Close the modal
@@ -181,8 +163,11 @@ function submitSignUpForm() {
   // Show success alert on the login screen
   showSuccessAlert("User is Created");
 
-  // Log the updated user list
-  console.log("Updated User List:", userList);
+  // Log the username and password JSON list data
+  console.log(
+    "Username and password JSON List Data:",
+    JSON.stringify(userList)
+  );
 }
 
 function resetLocalStorage() {
@@ -211,4 +196,7 @@ function showSuccessAlert(message) {
     successAlert.remove();
   }, 5000);
 }
+
+// Implement validations for username and password (conditions 10, 11, and 12) as needed.
+// Disable Copy, Paste using ShortCuts and Right Click on Password Field (condition 13).
 
