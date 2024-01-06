@@ -301,3 +301,89 @@ Add Validation to check if Password has 8 Characters, Min 1 Lower Case, Min 1 Up
 Allowed Special Characters in Password (!@#$%^) and anything out of this then throw an Error Message stating that the Special Character should be within this.
 Disable Copy, Paste using ShortCuts and Right Click on Password Field.
 
+
+
+new...
+
+// login.js file
+
+// ... existing code ...
+
+function submitSignUpForm() {
+  const newUsername = document.getElementById("newUsername").value;
+  const newPassword = document.getElementById("newPassword").value;
+
+  // Validate username and password
+  if (!validateUsername(newUsername) || !validatePassword(newPassword)) {
+    return;
+  }
+
+  // Check if the new username is already taken
+  const userList = JSON.parse(localStorage.getItem("userList")) || [];
+  const isUsernameTaken = userList.some(
+    (user) => user.username === newUsername
+  );
+
+  if (isUsernameTaken) {
+    alert("User Name already taken. Choose another Name and Try Again");
+    document.getElementById("newUsername").focus();
+    return;
+  }
+
+  const newUserObject = {
+    username: newUsername,
+    pwd: newPassword,
+  };
+
+  userList.push(newUserObject);
+
+  // Log the data and store in local storage
+  console.log("New User Data:", newUsername, newPassword);
+  console.log("New User JSON Data:", JSON.stringify(newUserObject));
+  console.log("Updated User List:", userList);
+
+  localStorage.setItem("userList", JSON.stringify(userList));
+
+  // Close the modal
+  document.getElementById("signUpModal").remove();
+
+  // Show success alert on the login screen
+  showSuccessAlert("User is Created");
+
+  // Log the username and password JSON list data
+  console.log(
+    "Username and password JSON List Data:",
+    JSON.stringify(userList)
+  );
+}
+
+function validateUsername(username) {
+  // Validation not to get Special Characters in User Name
+  const regex = /^[a-zA-Z0-9]+$/;
+  if (!regex.test(username)) {
+    alert("Invalid characters in User Name. Use alphanumeric characters only.");
+    document.getElementById("newUsername").focus();
+    return false;
+  }
+  return true;
+}
+
+function validatePassword(password) {
+  // Validation to check if Password has 8 Characters, Min 1 Lower Case, Min 1 Upper Case,
+  // and Min 1 Special Character (!@#$%^)
+  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^]).{8,}$/;
+  if (!regex.test(password)) {
+    alert("Invalid password. Ensure it has 8 characters, 1 lowercase, 1 uppercase, and 1 special character (!@#$%^).");
+    document.getElementById("newPassword").focus();
+    return false;
+  }
+  return true;
+}
+
+// ... existing code ...
+
+// Implement validations for username and password (conditions 10, 11, and 12) as needed.
+// Disable Copy, Paste using ShortCuts and Right Click on Password Field (condition 13).
+
+// ... existing code ...
+
