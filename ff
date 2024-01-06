@@ -1,1 +1,214 @@
+document.getElementById("newUsername").addEventListener("blur", function () {
+  validateField("newUsername");
+  updateResetButtonVisibility();
+  updateSubmitButtonState();
+});
+
+document.getElementById("newPassword").addEventListener("blur", function () {
+  validateField("newPassword");
+  updateResetButtonVisibility();
+  updateSubmitButtonState();
+});
+
+document.getElementById("submitBtn").addEventListener("click", function () {
+  submitForm();
+});
+
+document.getElementById("resetBtn").addEventListener("click", function () {
+  resetForm();
+});
+
+document.getElementById("signupBtn").addEventListener("click", function () {
+  openSignUpModal();
+});
+
+function validateField(field) {
+  const element = document.getElementById(field);
+  if (element.value.trim() === "") {
+    element.style.border = "2px solid red";
+  } else {
+    element.style.border = "1px solid #ccc";
+  }
+}
+
+function updateResetButtonVisibility() {
+  const usernameField = document.getElementById("newUsername");
+  const passwordField = document.getElementById("newPassword");
+  const resetButton = document.getElementById("resetBtn");
+
+  if (usernameField.value !== "" && passwordField.value !== "") {
+    resetButton.style.display = "inline-block";
+  } else {
+    resetButton.style.display = "none";
+  }
+}
+
+function updateSubmitButtonState() {
+  const usernameField = document.getElementById("newUsername");
+  const passwordField = document.getElementById("newPassword");
+  const submitButton = document.getElementById("submitBtn");
+
+  if (usernameField.value === "" && passwordField.value === "") {
+    submitButton.disabled = true;
+  } else {
+    submitButton.disabled = false;
+  }
+}
+
+function submitForm() {
+  const username = document.getElementById("newUsername").value;
+  const password = document.getElementById("newPassword").value;
+
+  if (username === "" || password === "") {
+    alert("Username and password are mandatory");
+    if (username === "") {
+      document.getElementById("newUsername").style.border = "2px solid red";
+      document.getElementById("newUsername").focus();
+    } else {
+      document.getElementById("newUsername").style.border = "1px solid #ccc";
+      document.getElementById("newPassword").style.border = "2px solid red";
+      document.getElementById("newPassword").focus();
+    }
+    return;
+  }
+
+  const newUserObject = {
+    username: username,
+    password: password,
+  };
+
+  // Retrieve the existing user list from local storage
+  const userList = JSON.parse(localStorage.getItem("userList")) || [];
+
+  // Check if the new username is already taken
+  const isUsernameTaken = userList.some(
+    (user) => user.username === newUserObject.username
+  );
+
+  if (isUsernameTaken) {
+    alert("User Name already taken. Choose another Name and Try Again");
+    document.getElementById("newUsername").focus();
+    return;
+  }
+
+  // Add the new user to the list
+  userList.push(newUserObject);
+
+  // Store the updated user list back in local storage
+  localStorage.setItem("userList", JSON.stringify(userList));
+
+  // Close the modal
+  document.getElementById("signUpModal").remove();
+
+  // Show success alert on the login screen
+  showSuccessAlert("User is Created");
+
+  // Log the updated user list
+  console.log("Updated User List:", userList);
+}
+
+function resetForm() {
+  document.getElementById("newUsername").value = "";
+  document.getElementById("newPassword").value = "";
+  updateResetButtonVisibility();
+  updateSubmitButtonState();
+}
+
+function openSignUpModal() {
+  const signUpModal = document.createElement("div");
+  signUpModal.innerHTML = `
+      <div id="signUpModal" style="display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5);">
+          <form class="signUpForm" style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); width: 300px; text-align: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+              <label for="newUsername">User Name:</label>
+              <input type="text" id="newUsername" placeholder="Enter the User Name">
+
+              <label for="newPassword">Password:</label>
+              <input type="password" id="newPassword" placeholder="Enter the Password">
+
+              <button type="button" id="submitSignUpBtn">Submit</button>
+              <button type="button" id="resetStorageBtn">Reset Storage</button>
+          </form>
+      </div>
+  `;
+  document.body.appendChild(signUpModal);
+
+  // Attach event listeners for the new modal
+  document
+    .getElementById("submitSignUpBtn")
+    .addEventListener("click", function () {
+      submitSignUpForm();
+    });
+
+  document
+    .getElementById("resetStorageBtn")
+    .addEventListener("click", function () {
+      resetLocalStorage();
+    });
+}
+
+function submitSignUpForm() {
+  const newUsername = document.getElementById("newUsername").value;
+  const newPassword = document.getElementById("newPassword").value;
+
+  // Retrieve the existing user list from local storage
+  const userList = JSON.parse(localStorage.getItem("userList")) || [];
+
+  // Check if the new username is already taken
+  const isUsernameTaken = userList.some(
+    (user) => user.username === newUsername
+  );
+
+  if (isUsernameTaken) {
+    alert("User Name already taken. Choose another Name and Try Again");
+    document.getElementById("newUsername").focus();
+    return;
+  }
+
+  const newUserObject = {
+    username: newUsername,
+    password: newPassword,
+  };
+
+  // Add the new user to the list
+  userList.push(newUserObject);
+
+  // Store the updated user list back in local storage
+  localStorage.setItem("userList", JSON.stringify(userList));
+
+  // Close the modal
+  document.getElementById("signUpModal").remove();
+
+  // Show success alert on the login screen
+  showSuccessAlert("User is Created");
+
+  // Log the updated user list
+  console.log("Updated User List:", userList);
+}
+
+function resetLocalStorage() {
+  // Clear stored local storage list
+  localStorage.removeItem("userList");
+
+  // Close the modal
+  document.getElementById("signUpModal").remove();
+}
+
+function showSuccessAlert(message) {
+  // Display a success alert with a close button
+  const successAlert = document.createElement("div");
+  successAlert.innerHTML = `
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+          ${message}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+  `;
+  document.body.appendChild(successAlert);
+
+  // Automatically close the alert after 5 seconds
+  setTimeout(function () {
+    successAlert.remove();
+  }, 5000);
+}
 
