@@ -1,3 +1,212 @@
+//login.html code
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="login.css" />
+
+    <title>Login Page</title>
+  </head>
+  <body>
+    <form id="loginForm">
+      <label for="username">Username:</label>
+      <input type="text" id="newUsername" placeholder="Enter the User Name" />
+
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        id="newPassword"
+        placeholder="Enter the Password"
+        autocomplete="new-password"
+      />
+
+      <button type="button" id="submitBtn" disabled>Submit</button>
+      <button type="button" id="resetBtn" style="display: none">Reset</button>
+      <button type="button" id="signupBtn" onclick="openSignUpModal()">
+        Sign Up
+      </button>
+
+      <button type="button" id="resetPasswordBtn">Password Reset</button>
+    </form>
+    <script defer src="login.js"></script>
+  </body>
+</html>
+
+//login.css file..
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.error {
+  color: red;
+}
+
+// login.js file
+document.getElementById("newUsername").addEventListener("blur", function () {
+  validateField("newUsername");
+  updateResetButtonVisibility();
+  updateSubmitButtonState();
+});
+
+document.getElementById("newPassword").addEventListener("blur", function () {
+  validateField("newPassword");
+  updateResetButtonVisibility();
+  updateSubmitButtonState();
+});
+
+document.getElementById("submitBtn").addEventListener("click", function () {
+  submitForm();
+});
+
+document.getElementById("resetBtn").addEventListener("click", function () {
+  resetForm();
+});
+
+function validateField(field) {
+  const element = document.getElementById(field);
+  if (element.value.trim() === "") {
+    element.style.border = "2px solid red";
+  } else {
+    element.style.border = "1px solid #ccc";
+  }
+}
+
+function updateResetButtonVisibility() {
+  const usernameField = document.getElementById("newUsername");
+  const passwordField = document.getElementById("newPassword");
+  const resetButton = document.getElementById("resetBtn");
+
+  if (usernameField.value !== "" && passwordField.value !== "") {
+    resetButton.style.display = "inline-block";
+  } else {
+    resetButton.style.display = "none";
+  }
+}
+
+function updateSubmitButtonState() {
+  const usernameField = document.getElementById("newUsername");
+  const passwordField = document.getElementById("newPassword");
+  const submitButton = document.getElementById("submitBtn");
+
+  if (usernameField.value === "" && passwordField.value === "") {
+    submitButton.disabled = true;
+  } else {
+    submitButton.disabled = false;
+  }
+}
+
+function submitForm() {
+  const username = document.getElementById("newUsername").value;
+  const password = document.getElementById("newPassword").value;
+
+  if (username === "" || password === "") {
+    alert("Username and password are mandatory");
+    if (username === "") {
+      document.getElementById("newUsername").style.border = "2px solid red";
+      document.getElementById("newUsername").focus();
+    } else {
+      document.getElementById("newUsername").style.border = "1px solid #ccc";
+      document.getElementById("newPassword").style.border = "2px solid red";
+      document.getElementById("newPassword").focus();
+    }
+    return;
+  }
+
+  const userObject = {
+    userName: username,
+    pwd: password,
+  };
+
+  console.log("Username and password data:", username, password);
+  console.log("Username and password JSON data:", JSON.stringify(userObject));
+
+  // Additional logic for local storage validation can be added here
+}
+
+function resetForm() {
+  document.getElementById("newUsername").value = "";
+  document.getElementById("newPassword").value = "";
+  updateResetButtonVisibility();
+  updateSubmitButtonState();
+}
+
+// new code sign up
+
+document.getElementById("signupBtn").addEventListener("click", function () {
+  openSignUpModal();
+});
+
+function openSignUpModal() {
+  const signUpModal = document.createElement("div");
+  signUpModal.innerHTML = `
+      <div id="signUpModal" style="display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5);">
+          <form class="signUpForm" style="background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); width: 300px; text-align: center; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+              <label for="newUsername">User Name:</label>
+              <input type="text" id="newUsername" placeholder="Enter the User Name">
+
+              <label for="newPassword">Password:</label>
+              <input type="password" id="newPassword" placeholder="Enter the Password">
+
+              <button type="button" id="submitSignUpBtn">Submit</button>
+              <button type="button" id="resetStorageBtn">Reset Storage</button>
+          </form>
+      </div>
+  `;
+  document.body.appendChild(signUpModal);
+
+  // Attach event listeners for the new modal
+  document
+    .getElementById("submitSignUpBtn")
+    .addEventListener("click", function () {
+      submitSignUpForm();
+    });
+
+  document
+    .getElementById("resetStorageBtn")
+    .addEventListener("click", function () {
+      resetLocalStorage();
+    });
+}
+
 function submitSignUpForm() {
   const newUsername = document.getElementById("newUsername").value;
   const newPassword = document.getElementById("newPassword").value;
@@ -7,7 +216,9 @@ function submitSignUpForm() {
 
   // Check if the new username is already taken
   const userList = JSON.parse(localStorage.getItem("userList")) || [];
-  const isUsernameTaken = userList.some((user) => user.username === newUsername);
+  const isUsernameTaken = userList.some(
+    (user) => user.username === newUsername
+  );
 
   if (isUsernameTaken) {
     alert("User Name already taken. Choose another Name and Try Again");
@@ -27,7 +238,7 @@ function submitSignUpForm() {
   console.log("New User JSON Data:", JSON.stringify(newUserObject));
   console.log("Updated User List:", userList);
 
-  localStorage.setItem("userList", JSON.stringify(userList)); // Store the list in local storage
+  localStorage.setItem("userList", JSON.stringify(userList));
 
   // Close the modal
   document.getElementById("signUpModal").remove();
@@ -36,6 +247,57 @@ function submitSignUpForm() {
   showSuccessAlert("User is Created");
 
   // Log the username and password JSON list data
-  console.log("Username and password JSON List Data:", JSON.stringify(userList));
+  console.log(
+    "Username and password JSON List Data:",
+    JSON.stringify(userList)
+  );
 }
+
+function resetLocalStorage() {
+  // Clear stored local storage list
+  localStorage.removeItem("userList");
+
+  // Close the modal
+  document.getElementById("signUpModal").remove();
+}
+
+function showSuccessAlert(message) {
+  // Display a success alert with a close button
+  const successAlert = document.createElement("div");
+  successAlert.innerHTML = `
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+          ${message}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+  `;
+  document.body.appendChild(successAlert);
+
+  // Automatically close the alert after 5 seconds
+  setTimeout(function () {
+    successAlert.remove();
+  }, 5000);
+}
+
+// Implement validations for username and password (conditions 10, 11, and 12) as needed.
+// Disable Copy, Paste using ShortCuts and Right Click on Password Field (condition 13).
+
+
+above is my all html css js file for login page you should add sign up page code , when you adding sign up page code you should statisfied 
+all 1 to 13 conditions that i mentioned below...
+
+Create a Sign Up Modal with User Name, Password and Submit and Reset Storage Button which will open on clicking of Sign Up Button from the Login Page
+Add a place holder in the User Name box as Enter the User Name and in password box as Enter the Password.
+Create a User List Object and store the entered User Name in a key called userName and Password into pwd key inside the User Object.
+Once the User Clicks on Submit Button then Log the Username and password JSON List Data in the Console.
+Now Store the List to the Browser Local Storage
+On Click on the Reset Storage Button clear the Stored Local Storage List.
+On Submit check if the new username entered is present in the existing Local Storage List and incase if its present then throw an BootStrap Error alert in the Modal   Stating  "User Name already taken choose another Name and Try Again"  and place the Cursor in the Username Field.
+On Submit check if the new username entered is not present in the existing Local Storage List then close the SignUp modal and show BootStrap Success alert in the Modal  Stating  "User is Created" on the Top of  Login Screen 
+BootStrap alert should have a X Mark to close also the message should disappear automatically in 5 seconds or by clicking the X Mark.
+Add Validation not to get Special Characters in User Name
+Add Validation to check if Password has 8 Characters, Min 1 Lower Case, Min 1 Upper Case and Min 1 Special Character
+Allowed Special Characters in Password (!@#$%^) and anything out of this then throw an Error Message stating that the Special Character should be within this.
+Disable Copy, Paste using ShortCuts and Right Click on Password Field.
 
