@@ -545,3 +545,12 @@ function submitSignUpForm() {
   );
 }
 
+new2..
+
+// Check if the user list exists in local storage
+const storedUserList = localStorage.getItem("userList");
+const userList = storedUserList ? JSON.parse(storedUserList) : [];
+
+// Now continue with the rest of the code
+
+
