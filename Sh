@@ -1,5 +1,8 @@
-//login.html file
- <meta charset="UTF-8" />
+//login.html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="login.css" />
 
@@ -35,7 +38,7 @@
   </body>
 </html>
 
-//login.css file
+//login.css
 body {
   font-family: Arial, sans-serif;
   background-color: #f4f4f4;
@@ -81,9 +84,7 @@ button:disabled {
   color: red;
 }
 
-
 //login.js file
-
 document.getElementById("newUsername").addEventListener("blur", function () {
   validateField("newUsername");
   updateResetButtonVisibility();
@@ -215,8 +216,7 @@ function submitSignUpForm() {
   const newPassword = document.getElementById("newPassword").value;
 
   // Check if the user list exists in local storage
-  const storedUserList = localStorage.getItem("userList");
-  const userList = storedUserList ? JSON.parse(storedUserList) : [];
+  let userList = JSON.parse(localStorage.getItem("userList")) || [];
 
   // Validate username and password
   if (!validateUsername(newUsername) || !validatePassword(newPassword)) {
@@ -254,6 +254,11 @@ function submitSignUpForm() {
   console.log("User List before storage:", userList);
 
   localStorage.setItem("userList", JSON.stringify(userList));
+
+  console.log(
+    "Updated User List:",
+    JSON.parse(localStorage.getItem("userList"))
+  );
 
   // Close the modal
   document.getElementById("signUpModal").remove();
@@ -321,17 +326,3 @@ function showSuccessAlert(message) {
 
 // Implement validations for username and password (conditions 10, 11, and 12) as needed.
 // Disable Copy, Paste using ShortCuts and Right Click on Password Field (condition 13).
-
-1	Create a Sign Up Modal with User Name, Password and Submit and Reset Storage Button which will open on clicking of Sign Up Button from the Login Page
-2	Add a place holder in the User Name box as Enter the User Name and in password box as Enter the Password.
-3	Create a User List Object and store the entered User Name in a key called userName and Password into pwd key inside the User Object.
-4	Once the User Clicks on Submit Button then Log the Username and password JSON List Data in the Console.
-5	Now Store the List to the Browser Local Storage
-6	On Click on the Reset Storage Button clear the Stored Local Storage List.
-7	On Submit check if the new username entered is present in the existing Local Storage List and incase if its present then throw an BootStrap Error alert in the Modal   Stating  "User Name already taken choose another Name and Try Again"  and place the Cursor in the Username Field.
-8	On Submit check if the new username entered is not present in the existing Local Storage List then close the SignUp modal and show BootStrap Success alert in the Modal  Stating  "User is Created" on the Top of  Login Screen 
-9	BootStrap alert should have a X Mark to close also the message should disappear automatically in 5 seconds or by clicking the X Mark.
-10	Add Validation not to get Special Characters in User Name
-11	Add Validation to check if Password has 8 Characters, Min 1 Lower Case, Min 1 Upper Case and Min 1 Special Character
-12	Allowed Special Characters in Password (!@#$%^) and anything out of this then throw an Error Message stating that the Special Character should be within this.
-13	Disable Copy, Paste using ShortCuts and Right Click on Password Field.
