@@ -1,4 +1,181 @@
+//login.html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="login.css" />
 
+    <title>Login Page</title>
+  </head>
+  <body>
+    <form id="loginForm">
+      <label for="username">Username:</label>
+      <input
+        type="text"
+        id="newUsername"
+        placeholder="Enter the User Name"
+        autocomplete="newUsername"
+      />
+
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        id="newPassword"
+        placeholder="Enter the Password"
+        autocomplete="newPassword"
+      />
+
+      <button type="button" id="submitBtn" disabled>Submit</button>
+      <button type="button" id="resetBtn" style="display: none">Reset</button>
+      <button type="button" id="signupBtn" onclick="openSignUpModal()">
+        Sign Up
+      </button>
+
+      <button type="button" id="resetPasswordBtn">Password Reset</button>
+    </form>
+    <script defer src="login.js"></script>
+    <script>
+      if (!localStorage.getItem("userList")) {
+        localStorage.setItem("userList", "[]");
+      }
+    </script>
+  </body>
+</html>
+
+//login.css file
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.error {
+  color: red;
+}
+//login.js file
+document.getElementById("newUsername").addEventListener("blur", function () {
+  validateField("newUsername");
+  updateResetButtonVisibility();
+  updateSubmitButtonState();
+});
+
+document.getElementById("newPassword").addEventListener("blur", function () {
+  validateField("newPassword");
+  updateResetButtonVisibility();
+  updateSubmitButtonState();
+});
+
+document.getElementById("submitBtn").addEventListener("click", function () {
+  submitForm();
+});
+
+document.getElementById("resetBtn").addEventListener("click", function () {
+  resetForm();
+});
+
+function validateField(field) {
+  const element = document.getElementById(field);
+  if (element.value.trim() === "") {
+    element.style.border = "2px solid red";
+  } else {
+    element.style.border = "1px solid #ccc";
+  }
+}
+
+function updateResetButtonVisibility() {
+  const usernameField = document.getElementById("newUsername");
+  const passwordField = document.getElementById("newPassword");
+  const resetButton = document.getElementById("resetBtn");
+
+  if (usernameField.value !== "" && passwordField.value !== "") {
+    resetButton.style.display = "inline-block";
+  } else {
+    resetButton.style.display = "none";
+  }
+}
+
+function updateSubmitButtonState() {
+  const usernameField = document.getElementById("newUsername");
+  const passwordField = document.getElementById("newPassword");
+  const submitButton = document.getElementById("submitBtn");
+
+  if (usernameField.value === "" && passwordField.value === "") {
+    submitButton.disabled = true;
+  } else {
+    submitButton.disabled = false;
+  }
+}
+
+function submitForm() {
+  const username = document.getElementById("newUsername").value;
+  const password = document.getElementById("newPassword").value;
+
+  if (username === "" || password === "") {
+    alert("Username and password are mandatory");
+    if (username === "") {
+      document.getElementById("newUsername").style.border = "2px solid red";
+      document.getElementById("newUsername").focus();
+    } else {
+      document.getElementById("newUsername").style.border = "1px solid #ccc";
+      document.getElementById("newPassword").style.border = "2px solid red";
+      document.getElementById("newPassword").focus();
+    }
+    return;
+  }
+
+  const userObject = {
+    userName: username,
+    pwd: password,
+  };
+
+  console.log("Username and password data:", username, password);
+  console.log("Username and password JSON data:", JSON.stringify(userObject));
+
+  // Additional logic for local storage validation can be added here
+}
+
+function resetForm() {
+  document.getElementById("newUsername").value = "";
+  document.getElementById("newPassword").value = "";
+  updateResetButtonVisibility();
+  updateSubmitButtonState();
+}
 
 
  
