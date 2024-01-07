@@ -1,8 +1,5 @@
-//login.html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
+//login.html file
+ <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="login.css" />
 
@@ -30,11 +27,15 @@
       <button type="button" id="resetPasswordBtn">Password Reset</button>
     </form>
     <script defer src="login.js"></script>
+    <script>
+      if (!localStorage.getItem("userList")) {
+        localStorage.setItem("userList", "[]");
+      }
+    </script>
   </body>
 </html>
 
-//login.css
-
+//login.css file
 body {
   font-family: Arial, sans-serif;
   background-color: #f4f4f4;
@@ -80,7 +81,9 @@ button:disabled {
   color: red;
 }
 
+
 //login.js file
+
 document.getElementById("newUsername").addEventListener("blur", function () {
   validateField("newUsername");
   updateResetButtonVisibility();
@@ -221,7 +224,7 @@ function submitSignUpForm() {
   }
 
   // Check if the new username is already taken
-  const userList = JSON.parse(localStorage.getItem("userList")) || [];
+  userList = JSON.parse(localStorage.getItem("userList")) || [];
   const isUsernameTaken = userList.some(
     (user) => user.username === newUsername
   );
@@ -318,4 +321,5 @@ function showSuccessAlert(message) {
 
 // Implement validations for username and password (conditions 10, 11, and 12) as needed.
 // Disable Copy, Paste using ShortCuts and Right Click on Password Field (condition 13).
+
 
