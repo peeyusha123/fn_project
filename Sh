@@ -326,3 +326,68 @@ function showSuccessAlert(message) {
 
 // Implement validations for username and password (conditions 10, 11, and 12) as needed.
 // Disable Copy, Paste using ShortCuts and Right Click on Password Field (condition 13).
+
+
+new..
+
+function submitSignUpForm() {
+  const newUsername = document.getElementById("newUsername").value;
+  const newPassword = document.getElementById("newPassword").value;
+
+  // Check if the user list exists in local storage
+  let userList = JSON.parse(localStorage.getItem("userList")) || [];
+
+  // Log the user list before pushing the new user
+  console.log("User List before push:", userList);
+
+  // Validate username and password
+  if (!validateUsername(newUsername) || !validatePassword(newPassword)) {
+    return;
+  }
+
+  // Check if the new username is already taken
+  const isUsernameTaken = userList.some(
+    (user) => user.username === newUsername
+  );
+
+  if (isUsernameTaken) {
+    alert("User Name already taken. Choose another Name and Try Again");
+    document.getElementById("newUsername").focus();
+    return;
+  }
+
+  const newUserObject = {
+    username: newUsername,
+    pwd: newPassword,
+  };
+
+  userList.push(newUserObject);
+
+  // Log the data and updated user list
+  console.log("New User Data:", newUsername, newPassword);
+  console.log("New User JSON Data:", JSON.stringify(newUserObject));
+  console.log("Updated User List:", userList);
+
+  // Log the user list before storing in local storage
+  console.log("User List before storage:", userList);
+
+  localStorage.setItem("userList", JSON.stringify(userList));
+
+  // Log the updated user list after storing in local storage
+  console.log(
+    "Updated User List:",
+    JSON.parse(localStorage.getItem("userList"))
+  );
+
+  // Close the modal
+  document.getElementById("signUpModal").remove();
+
+  // Show success alert on the login screen
+  showSuccessAlert("User is Created");
+
+  // Log the username and password JSON list data
+  console.log(
+    "Username and password JSON List Data:",
+    JSON.stringify(userList)
+  );
+}
