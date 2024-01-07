@@ -1,3 +1,38 @@
 
+function submitForm() {
+  const username = document.getElementById("newUsername").value;
+  const password = document.getElementById("newPassword").value;
+
+  if (username === "" || password === "") {
+    alert("Username and password are mandatory");
+    if (username === "") {
+      document.getElementById("newUsername").style.border = "2px solid red";
+      document.getElementById("newUsername").focus();
+    } else {
+      document.getElementById("newUsername").style.border = "1px solid #ccc";
+      document.getElementById("newPassword").style.border = "2px solid red";
+      document.getElementById("newPassword").focus();
+    }
+    return;
+  }
+
+  const userObject = {
+    userName: username,
+    pwd: password,
+  };
+
+  // Retrieve the existing user list from local storage
+  let userList = JSON.parse(localStorage.getItem("userList")) || [];
+
+  // Push the new user object to the user list
+  userList.push(userObject);
+
+  // Store the updated user list back to local storage
+  localStorage.setItem("userList", JSON.stringify(userList));
+
+  console.log("User List after submission:", userList);
+
+  // Additional logic for local storage validation can be added here
+}
 
  
