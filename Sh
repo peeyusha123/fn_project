@@ -178,6 +178,7 @@ function resetForm() {
 }
 
 
- 
+ above is login page code so we start building sign up page frist task is to Create a Sign Up Modal with User Name, Password and Submit and Reset Storage Button which will open on clicking of Sign Up Button from the Login Page
+so note that you should add code of frist task in existing one  and share total file
  
  
