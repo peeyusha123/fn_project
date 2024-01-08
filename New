@@ -109,3 +109,42 @@ function closeResetPasswordModal() {
   const resetPasswordModal = document.getElementById("resetPasswordModal");
   resetPasswordModal.style.display = "none";
 }
+condi 3...
+// p4.js
+
+// Function to open the password reset modal
+function openResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "block";
+}
+
+// Function to close the password reset modal
+function closeResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "none";
+}
+
+// Function to handle input in the reset username field
+document.getElementById("resetUsername").addEventListener("input", function () {
+  updateResetButtonState();
+});
+
+// Function to update the state of the reset button
+function updateResetButtonState() {
+  const resetUsernameField = document.getElementById("resetUsername");
+  const resetButton = document.getElementById("resetPasswordBtn");
+
+  // Disable the reset button if the username field is empty
+  resetButton.disabled = resetUsernameField.value.trim() === "";
+}
+
+// Function to perform the password reset
+document.getElementById("resetPasswordBtn").addEventListener("click", function () {
+  const resetUsername = document.getElementById("resetUsername").value.trim();
+
+  // Perform password reset logic here...
+
+  // After reset, you may close the modal
+  closeResetPasswordModal();
+});
+
