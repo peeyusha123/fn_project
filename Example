@@ -1,2 +1,224 @@
 
+//p1.html...
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="p2.css" />
+
+    <title>Login Page</title>
+  </head>
+  <body>
+    <form id="loginForm">
+      <label for="username">Username:</label>
+      <input
+        type="text"
+        id="newUsername"
+        placeholder="Enter the User Name"
+        autocomplete="newUsername"
+      />
+
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        id="newPassword"
+        placeholder="Enter the Password"
+        autocomplete="newPassword"
+      />
+
+      <button type="button" id="submitBtn" disabled>Submit</button>
+      <button type="button" id="resetBtn" style="display: none">Reset</button>
+      <button type="button" id="signupBtn" onclick="openSignUpModal()">
+        Sign Up
+      </button>
+
+      <button type="button" id="resetPasswordBtn">Password Reset</button>
+    </form>
+    <div id="signUpModalContainer"></div>
+    <script defer src="p3.js"></script>
+    <script></script>
+  </body>
+</html>
+
+//p2.css...
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.error {
+  color: red;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+  padding-top: 60px;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+//p3.js...
+
+document.getElementById("newUsername").addEventListener("blur", function () {
+  validateField("newUsername");
+  updateResetButtonVisibility();
+  updateSubmitButtonState();
+});
+
+document.getElementById("newPassword").addEventListener("blur", function () {
+  validateField("newPassword");
+  updateResetButtonVisibility();
+  updateSubmitButtonState();
+});
+
+document.getElementById("submitBtn").addEventListener("click", function () {
+  submitForm();
+});
+
+document.getElementById("resetBtn").addEventListener("click", function () {
+  resetForm();
+});
+
+function validateField(field) {
+  const element = document.getElementById(field);
+  if (element.value.trim() === "") {
+    element.style.border = "2px solid red";
+  } else {
+    element.style.border = "1px solid #ccc";
+  }
+}
+
+function updateResetButtonVisibility() {
+  const usernameField = document.getElementById("newUsername");
+  const passwordField = document.getElementById("newPassword");
+  const resetButton = document.getElementById("resetBtn");
+
+  if (usernameField.value !== "" && passwordField.value !== "") {
+    resetButton.style.display = "inline-block";
+  } else {
+    resetButton.style.display = "none";
+  }
+}
+
+function updateSubmitButtonState() {
+  const usernameField = document.getElementById("newUsername");
+  const passwordField = document.getElementById("newPassword");
+  const submitButton = document.getElementById("submitBtn");
+
+  if (usernameField.value === "" && passwordField.value === "") {
+    submitButton.disabled = true;
+  } else {
+    submitButton.disabled = false;
+  }
+}
+
+function submitForm() {
+  const username = document.getElementById("newUsername").value;
+  const password = document.getElementById("newPassword").value;
+
+  if (username === "" || password === "") {
+    alert("Username and password are mandatory");
+    if (username === "") {
+      document.getElementById("newUsername").style.border = "2px solid red";
+      document.getElementById("newUsername").focus();
+    } else {
+      document.getElementById("newUsername").style.border = "1px solid #ccc";
+      document.getElementById("newPassword").style.border = "2px solid red";
+      document.getElementById("newPassword").focus();
+    }
+    return;
+  }
+
+  const userObject = {
+    userName: username,
+    pwd: password,
+  };
+
+  // Retrieve the existing user list from local storage
+  let userList = JSON.parse(localStorage.getItem("userList")) || [];
+
+  // Push the new user object to the user list
+  userList.push(userObject);
+
+  // Store the updated user list back to local storage
+  localStorage.setItem("userList", JSON.stringify(userList));
+
+  console.log("User List after submission:", userList);
+
+  // Additional logic for local storage validation can be added here
+}
+
+function resetForm() {
+  document.getElementById("newUsername").value = "";
+  document.getElementById("newPassword").value = "";
+  updateResetButtonVisibility();
+  updateSubmitButtonState();
+}
+
 
