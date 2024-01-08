@@ -599,3 +599,22 @@ function checkUsernameInLocalStorage() {
     resetButton.disabled = true;
   }
 }
+
+update3..
+// p6.js
+
+const resetUsernameField = document.getElementById("resetUsername");
+const resetButton = document.getElementById("resetPasswordBtn");
+
+// Disable the reset button by default
+resetButton.disabled = true;
+
+resetUsernameField.addEventListener("input", function () {
+  updateResetButtonState();
+});
+
+function updateResetButtonState() {
+  // Disable the reset button if the username field is empty
+  resetButton.disabled = resetUsernameField.value.trim() === "";
+}
+
