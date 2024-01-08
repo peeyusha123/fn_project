@@ -521,3 +521,46 @@ function checkUsernameInLocalStorage() {
 }
 
 // ... Existing code ...
+
+
+update....
+
+// p6.js
+
+// Ensure the reset button is disabled by default
+updateResetButtonState();
+
+document.getElementById("resetUsername").addEventListener("input", function () {
+  updateResetButtonState();
+  checkUsernameInLocalStorage();
+});
+
+function updateResetButtonState() {
+  const resetUsernameField = document.getElementById("resetUsername");
+  const resetButton = document.getElementById("resetPasswordBtn");
+
+  resetButton.disabled = resetUsernameField.value.trim() === "";
+}
+
+function checkUsernameInLocalStorage() {
+  const resetUsernameField = document.getElementById("resetUsername");
+  const username = resetUsernameField.value.trim();
+
+  if (username !== "") {
+    // Check if the entered username is present in Local Storage
+    const userList = JSON.parse(localStorage.getItem("userList")) || [];
+    const usernameExists = userList.some((user) => user.userName === username);
+
+    if (!usernameExists) {
+      // Disable the reset button if the username is not found in Local Storage
+      document.getElementById("resetPasswordBtn").disabled = true;
+    } else {
+      // Enable the reset button if the username is found
+      document.getElementById("resetPasswordBtn").disabled = false;
+    }
+  } else {
+    // Disable the reset button if the username is empty
+    document.getElementById("resetPasswordBtn").disabled = true;
+  }
+}
+
