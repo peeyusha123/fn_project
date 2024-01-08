@@ -628,3 +628,42 @@ function submitSignUpForm() {
 }
 
 
+condition no 12..
+//p3.js
+
+// Add the following code at the beginning of your p3.js file
+
+document.getElementById("signupPassword").addEventListener("cut", function (e) {
+  e.preventDefault();
+  showDisabledAlert();
+});
+
+document.getElementById("signupPassword").addEventListener("copy", function (e) {
+  e.preventDefault();
+  showDisabledAlert();
+});
+
+document.getElementById("signupPassword").addEventListener("paste", function (e) {
+  e.preventDefault();
+  showDisabledAlert();
+});
+
+document.getElementById("signupPassword").addEventListener("contextmenu", function (e) {
+  e.preventDefault();
+  showDisabledAlert();
+});
+
+function showDisabledAlert() {
+  // Show Bootstrap Error alert in the Modal
+  const signUpModalContent = document.querySelector("#signUpModal .modal-content");
+  signUpModalContent.innerHTML += `
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      Copy, paste, and right-click disabled for the password field.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  `;
+}
+
+// Existing event listeners and functions continue below...
