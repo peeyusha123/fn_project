@@ -432,4 +432,57 @@ function submitSignUpForm() {
 11	On Click of the Submit Button in Password Reset Modal check if New Password and Reset Password Values martch and if not and show BootStrap Success alert in the Modal  Stating  "Password does not match" on the Top of  Password Reset Screen 
 12	BootStrap alert should have a X Mark to close also the message should disappear automatically in 5 seconds or by clicking the X Mark.
 13	If all Validations are good then close the Password Reset Modal and show BootStrap Success alert in the Modal  Stating  "User Password Reset Success" on the Top of  Login Screen 
-	
+
+condition 1,2..
+
+<!-- p1.html -->
+
+<!-- Existing sign-up modal -->
+<div id="signUpModalContainer"></div>
+<div id="signUpModal" class="modal">
+  <div class="modal-content">
+    <!-- ... Existing sign-up modal content ... -->
+  </div>
+</div>
+
+<!-- New password reset modal -->
+<div id="resetPasswordModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeResetPasswordModal()">&times;</span>
+    <h2>Password Reset</h2>
+    <form id="resetPasswordForm">
+      <label for="resetUsername">Username:</label>
+      <input
+        type="text"
+        id="resetUsername"
+        placeholder="Enter the User Name"
+        autocomplete="resetUsername"
+      />
+      <button type="button" id="resetPasswordBtn">Reset Password</button>
+    </form>
+  </div>
+</div>
+
+<!-- ... The rest of your existing HTML code ... -->
+
+
+
+
+js...
+
+// p6.js
+
+// Function to open the password reset modal
+function openResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "block";
+}
+
+// Function to close the password reset modal
+function closeResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "none";
+}
+
+// Add any additional logic for password reset modal if needed
+
