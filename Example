@@ -221,4 +221,16 @@ function resetForm() {
   updateSubmitButtonState();
 }
 
-
+Create a Sign Up Modal with User Name, Password and Submit and Reset Storage Button which will open on clicking of Sign Up Button from the Login Page
+Add a place holder in the User Name box as Enter the User Name and in password box as Enter the Password.
+Create a User List Object and store the entered User Name in a key called userName and Password into pwd key inside the User Object.
+Once the User Clicks on Submit Button then Log the Username and password JSON List Data in the Console.
+Now Store the List to the Browser Local Storage
+On Click on the Reset Storage Button clear the Stored Local Storage List.
+On Submit check if the new username entered is present in the existing Local Storage List and incase if its present then throw an BootStrap Error alert in the Modal   Stating  "User Name already taken choose another Name and Try Again"  and place the Cursor in the Username Field.
+On Submit check if the new username entered is not present in the existing Local Storage List then close the SignUp modal and show BootStrap Success alert in the Modal  Stating  "User is Created" on the Top of  Login Screen 
+BootStrap alert should have a X Mark to close also the message should disappear automatically in 5 seconds or by clicking the X Mark.
+Add Validation not to get Special Characters in User Name
+Add Validation to check if Password has 8 Characters, Min 1 Lower Case, Min 1 Upper Case and Min 1 Special Character
+Allowed Special Characters in Password (!@#$%^) and anything out of this then throw an Error Message stating that the Special Character should be within this.
+Disable Copy, Paste using ShortCuts and Right Click on Password Field.
