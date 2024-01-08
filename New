@@ -358,3 +358,24 @@ function submitSignUpForm() {
   }, 5000);
 }
 
+
+update...
+if (!/^[a-zA-Z]+$/.test(username)) {
+  // Show Bootstrap Error alert in the Modal
+  const signUpModalContent = document.querySelector(
+    "#signUpModal .modal-content"
+  );
+  signUpModalContent.innerHTML += `
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      User Name cannot contain special characters or numbers. Choose another name and try again.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  `;
+  // Place the cursor in the Username Field
+  document.getElementById("signupUsername").focus();
+  return;
+}
+
+
