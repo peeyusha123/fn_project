@@ -329,3 +329,61 @@ document.getElementById("resetStorageBtn").addEventListener("click", function ()
 <button type="button" id="resetStorageBtn">Reset Storage</button>
 
 
+condition 7,8..
+
+
+
+function submitSignUpForm() {
+  const username = document.getElementById("signupUsername").value;
+  const password = document.getElementById("signupPassword").value;
+
+  if (username === "" || password === "") {
+    alert("Username and password are mandatory");
+    return;
+  }
+
+  // Retrieve the existing user list from local storage
+  let userList = JSON.parse(localStorage.getItem("userList")) || [];
+
+  // Check if the username already exists
+  if (userList.some(user => user.userName === username)) {
+    // Show Bootstrap Error alert in the Modal
+    const signUpModalContent = document.querySelector("#signUpModal .modal-content");
+    signUpModalContent.innerHTML += `
+      <div class="alert alert-danger" role="alert">
+        User Name already taken. Choose another name and try again.
+      </div>
+    `;
+    // Place the cursor in the Username Field
+    document.getElementById("signupUsername").focus();
+    return;
+  }
+
+  const userObject = {
+    userName: username,
+    pwd: password,
+  };
+
+  // Push the new user object to the user list
+  userList.push(userObject);
+
+  // Store the updated user list back to local storage
+  localStorage.setItem("userList", JSON.stringify(userList));
+
+  console.log("User List after signup:", userList);
+
+  // Close the modal after successful signup
+  closeSignUpModal();
+
+  // Show Bootstrap Success alert in the Modal on the Top of Login Screen
+  const loginForm = document.getElementById("loginForm");
+  loginForm.insertAdjacentHTML(
+    "afterbegin",
+    `
+      <div class="alert alert-success" role="alert">
+        User is created.
+      </div>
+    `
+  );
+}
+
