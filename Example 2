@@ -1,3 +1,5 @@
+...cond,1.2
+html
 
 <!-- Add this within the body tag, after the login form -->
 <div id="signUpModal" class="modal">
@@ -26,3 +28,56 @@
     </form>
   </div>
 </div>
+
+js..
+// Add these functions after your existing functions in p3.js
+
+function openSignUpModal() {
+  const signUpModal = document.getElementById("signUpModal");
+  signUpModal.style.display = "block";
+}
+
+function closeSignUpModal() {
+  const signUpModal = document.getElementById("signUpModal");
+  signUpModal.style.display = "none";
+}
+
+function submitSignUpForm() {
+  const username = document.getElementById("signupUsername").value;
+  const password = document.getElementById("signupPassword").value;
+
+  if (username === "" || password === "") {
+    alert("Username and password are mandatory");
+    return;
+  }
+
+  const userObject = {
+    userName: username,
+    pwd: password,
+  };
+
+  // Retrieve the existing user list from local storage
+  let userList = JSON.parse(localStorage.getItem("userList")) || [];
+
+  // Check if the username already exists
+  if (userList.some(user => user.userName === username)) {
+    alert("Username already exists. Please choose a different one.");
+    return;
+  }
+
+  // Push the new user object to the user list
+  userList.push(userObject);
+
+  // Store the updated user list back to local storage
+  localStorage.setItem("userList", JSON.stringify(userList));
+
+  console.log("User List after signup:", userList);
+
+  // Close the modal after successful signup
+  closeSignUpModal();
+}
+
+function resetSignUpForm() {
+  document.getElementById("signupUsername").value = "";
+  document.getElementById("signupPassword").value = "";
+}
