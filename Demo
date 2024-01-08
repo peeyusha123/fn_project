@@ -496,3 +496,48 @@ function handleUserNameInputChange() {
   resetButton.disabled = !userNameInput.value.trim();
 }
 
+
+
+new...
+
+// Existing code in your p4.js file
+
+// Function to open the password reset modal
+function openResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "block";
+
+  // Add event listener to the input field for real-time validation
+  const userNameInput = document.getElementById("enterUserName");
+  userNameInput.addEventListener("input", handleUserNameInputChange);
+
+  // Initially disable the Reset Button
+  const resetButton = document.getElementById("resetPasswordButton");
+  resetButton.disabled = true;
+}
+
+// Function to close the password reset modal
+function closeResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "none";
+}
+
+// Function to handle input change in the User Name field
+function handleUserNameInputChange() {
+  const userNameInput = document.getElementById("enterUserName");
+  const resetButton = document.getElementById("resetPasswordButton");
+
+  // Enable the Reset Button only if the User Name field is not empty
+  resetButton.disabled = !userNameInput.value.trim();
+
+  // Update button style based on disabled state
+  if (resetButton.disabled) {
+    resetButton.style.backgroundColor = "#d3d3d3"; /* Light gray background color */
+    resetButton.style.color = "#a9a9a9"; /* Dark gray text color */
+    resetButton.style.cursor = "not-allowed"; /* Display not-allowed cursor when disabled */
+  } else {
+    resetButton.style.backgroundColor = "#4caf50"; /* Green background color */
+    resetButton.style.color = "white"; /* White text color */
+    resetButton.style.cursor = "pointer"; /* Change cursor on hover */
+  }
+}
