@@ -1,4 +1,4 @@
-//p1.html..
+hu//p1.html..
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -564,3 +564,38 @@ function checkUsernameInLocalStorage() {
   }
 }
 
+update2...
+
+// p6.js
+
+document.getElementById("resetPasswordBtn").disabled = true;
+
+document.getElementById("resetUsername").addEventListener("input", function () {
+  updateResetButtonState();
+  checkUsernameInLocalStorage();
+});
+
+function updateResetButtonState() {
+  const resetUsernameField = document.getElementById("resetUsername");
+  const resetButton = document.getElementById("resetPasswordBtn");
+
+  resetButton.disabled = resetUsernameField.value.trim() === "";
+}
+
+function checkUsernameInLocalStorage() {
+  const resetUsernameField = document.getElementById("resetUsername");
+  const resetButton = document.getElementById("resetPasswordBtn");
+  const username = resetUsernameField.value.trim();
+
+  if (username !== "") {
+    // Check if the entered username is present in Local Storage
+    const userList = JSON.parse(localStorage.getItem("userList")) || [];
+    const usernameExists = userList.some((user) => user.userName === username);
+
+    // Enable or disable the reset button based on username existence
+    resetButton.disabled = !usernameExists;
+  } else {
+    // Disable the reset button if the username is empty
+    resetButton.disabled = true;
+  }
+}
