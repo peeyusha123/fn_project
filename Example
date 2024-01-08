@@ -1,5 +1,4 @@
-ji
-//p1.html...
+//p1.html..
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -35,13 +34,49 @@ ji
 
       <button type="button" id="resetPasswordBtn">Password Reset</button>
     </form>
+
     <div id="signUpModalContainer"></div>
+    <div id="signUpModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeSignUpModal()">&times;</span>
+        <h2>Sign Up</h2>
+        <form id="signUpForm">
+          <label for="signupUsername">Username:</label>
+          <input
+            type="text"
+            id="signupUsername"
+            placeholder="Enter the User Name"
+            autocomplete="signupUsername"
+          />
+
+          <label for="signupPassword">Password:</label>
+          <input
+            type="password"
+            id="signupPassword"
+            placeholder="Enter the Password"
+            autocomplete="signupPassword"
+          />
+
+          <button
+            type="button"
+            id="signupSubmitBtn"
+            onclick="submitSignUpForm()"
+          >
+            Submit
+          </button>
+          <button type="button" id="signupResetBtn" onclick="resetSignUpForm()">
+            Reset
+          </button>
+          <button type="button" id="resetStorageBtn">Reset Storage</button>
+        </form>
+      </div>
+    </div>
     <script defer src="p3.js"></script>
     <script></script>
   </body>
 </html>
 
-//p2.css...
+//p2.css..
 body {
   font-family: Arial, sans-serif;
   background-color: #f4f4f4;
@@ -123,7 +158,47 @@ button:disabled {
   cursor: pointer;
 }
 
-//p3.js...
+//p3.js..
+document.getElementById("signupPassword").addEventListener("cut", function (e) {
+  e.preventDefault();
+  showDisabledAlert();
+});
+
+document
+  .getElementById("signupPassword")
+  .addEventListener("copy", function (e) {
+    e.preventDefault();
+    showDisabledAlert();
+  });
+
+document
+  .getElementById("signupPassword")
+  .addEventListener("paste", function (e) {
+    e.preventDefault();
+    showDisabledAlert();
+  });
+
+document
+  .getElementById("signupPassword")
+  .addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+    showDisabledAlert();
+  });
+
+function showDisabledAlert() {
+  // Show Bootstrap Error alert in the Modal
+  const signUpModalContent = document.querySelector(
+    "#signUpModal .modal-content"
+  );
+  signUpModalContent.innerHTML += `
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      Copy, paste, and right-click disabled for the password field.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  `;
+}
 
 document.getElementById("newUsername").addEventListener("blur", function () {
   validateField("newUsername");
@@ -212,6 +287,12 @@ function submitForm() {
   console.log("User List after submission:", userList);
 
   // Additional logic for local storage validation can be added here
+
+  // Log the username and password JSON list data in the console
+  console.log(
+    "Username and Password JSON List Data:",
+    JSON.stringify(userList)
+  );
 }
 
 function resetForm() {
@@ -220,315 +301,28 @@ function resetForm() {
   updateResetButtonVisibility();
   updateSubmitButtonState();
 }
+document
+  .getElementById("resetStorageBtn")
+  .addEventListener("click", function () {
+    // Clear the stored local storage list
+    localStorage.removeItem("userList");
+    console.log("Local Storage List cleared");
+  });
 
-Create a Sign Up Modal with User Name, Password and Submit and Reset Storage Button which will open on clicking of Sign Up Button from the Login Page
-Add a place holder in the User Name box as Enter the User Name and in password box as Enter the Password.
-Create a User List Object and store the entered User Name in a key called userName and Password into pwd key inside the User Object.
-Once the User Clicks on Submit Button then Log the Username and password JSON List Data in the Console.
-Now Store the List to the Browser Local Storage
-On Click on the Reset Storage Button clear the Stored Local Storage List.
-On Submit check if the new username entered is present in the existing Local Storage List and incase if its present then throw an BootStrap Error alert in the Modal   Stating  "User Name already taken choose another Name and Try Again"  and place the Cursor in the Username Field.
-On Submit check if the new username entered is not present in the existing Local Storage List then close the SignUp modal and show BootStrap Success alert in the Modal  Stating  "User is Created" on the Top of  Login Screen 
-BootStrap alert should have a X Mark to close also the message should disappear automatically in 5 seconds or by clicking the X Mark.
-Add Validation not to get Special Characters in User Name
-Add Validation to check if Password has 8 Characters, Min 1 Lower Case, Min 1 Upper Case and Min 1 Special Character
-Allowed Special Characters in Password (!@#$%^) and anything out of this then throw an Error Message stating that the Special Character should be within this.
-Disable Copy, Paste using ShortCuts and Right Click on Password Field.
-
-
-
-condition 3,4
-function submitForm() {
-  const username = document.getElementById("newUsername").value;
-  const password = document.getElementById("newPassword").value;
-
-  if (username === "" || password === "") {
-    alert("Username and password are mandatory");
-    if (username === "") {
-      document.getElementById("newUsername").style.border = "2px solid red";
-      document.getElementById("newUsername").focus();
-    } else {
-      document.getElementById("newUsername").style.border = "1px solid #ccc";
-      document.getElementById("newPassword").style.border = "2px solid red";
-      document.getElementById("newPassword").focus();
-    }
-    return;
-  }
-
-  const userObject = {
-    userName: username,
-    pwd: password,
-  };
-
-  // Retrieve the existing user list from local storage
-  let userList = JSON.parse(localStorage.getItem("userList")) || [];
-
-  // Push the new user object to the user list
-  userList.push(userObject);
-
-  // Store the updated user list back to local storage
-  localStorage.setItem("userList", JSON.stringify(userList));
-
-  console.log("User List after submission:", userList);
-
-  // Additional logic for local storage validation can be added here
-
-  // Log the username and password JSON list data in the console
-  console.log("Username and Password JSON List Data:", JSON.stringify(userList));
+function openSignUpModal() {
+  const signUpModal = document.getElementById("signUpModal");
+  signUpModal.style.display = "block";
 }
 
-condition 5,6..
-function submitForm() {
-  const username = document.getElementById("newUsername").value;
-  const password = document.getElementById("newPassword").value;
-
-  if (username === "" || password === "") {
-    alert("Username and password are mandatory");
-    if (username === "") {
-      document.getElementById("newUsername").style.border = "2px solid red";
-      document.getElementById("newUsername").focus();
-    } else {
-      document.getElementById("newUsername").style.border = "1px solid #ccc";
-      document.getElementById("newPassword").style.border = "2px solid red";
-      document.getElementById("newPassword").focus();
-    }
-    return;
-  }
-
-  const userObject = {
-    userName: username,
-    pwd: password,
-  };
-
-  // Retrieve the existing user list from local storage
-  let userList = JSON.parse(localStorage.getItem("userList")) || [];
-
-  // Push the new user object to the user list
-  userList.push(userObject);
-
-  // Store the updated user list back to local storage
-  localStorage.setItem("userList", JSON.stringify(userList));
-
-  console.log("User List after submission:", userList);
-
-  // Additional logic for local storage validation can be added here
-
-  // Log the username and password JSON list data in the console
-  console.log("Username and Password JSON List Data:", JSON.stringify(userList));
+function closeSignUpModal() {
+  const signUpModal = document.getElementById("signUpModal");
+  signUpModal.style.display = "none";
 }
-// Add this function after your existing functions in p3.js
-
-document.getElementById("resetStorageBtn").addEventListener("click", function () {
-  // Clear the stored local storage list
-  localStorage.removeItem("userList");
-  console.log("Local Storage List cleared");
-});
-
-
-<!-- Update this button in your HTML -->
-<button type="button" id="resetStorageBtn">Reset Storage</button>
-
-
-condition 7,8..
-
-
 
 function submitSignUpForm() {
   const username = document.getElementById("signupUsername").value;
   const password = document.getElementById("signupPassword").value;
 
-  if (username === "" || password === "") {
-    alert("Username and password are mandatory");
-    return;
-  }
-
-  // Retrieve the existing user list from local storage
-  let userList = JSON.parse(localStorage.getItem("userList")) || [];
-
-  // Check if the username already exists
-  if (userList.some(user => user.userName === username)) {
-    // Show Bootstrap Error alert in the Modal
-    const signUpModalContent = document.querySelector("#signUpModal .modal-content");
-    signUpModalContent.innerHTML += `
-      <div class="alert alert-danger" role="alert">
-        User Name already taken. Choose another name and try again.
-      </div>
-    `;
-    // Place the cursor in the Username Field
-    document.getElementById("signupUsername").focus();
-    return;
-  }
-
-  const userObject = {
-    userName: username,
-    pwd: password,
-  };
-
-  // Push the new user object to the user list
-  userList.push(userObject);
-
-  // Store the updated user list back to local storage
-  localStorage.setItem("userList", JSON.stringify(userList));
-
-  console.log("User List after signup:", userList);
-
-  // Close the modal after successful signup
-  closeSignUpModal();
-
-  // Show Bootstrap Success alert in the Modal on the Top of Login Screen
-  const loginForm = document.getElementById("loginForm");
-  loginForm.insertAdjacentHTML(
-    "afterbegin",
-    `
-      <div class="alert alert-success" role="alert">
-        User is created.
-      </div>
-    `
-  );
-}
-
-condition 9,10....
-
-function submitSignUpForm() {
-  const username = document.getElementById("signupUsername").value;
-  const password = document.getElementById("signupPassword").value;
-
-  // Validate username for special characters
-  if (!/^[a-zA-Z0-9]+$/.test(username)) {
-    // Show Bootstrap Error alert in the Modal
-    const signUpModalContent = document.querySelector("#signUpModal .modal-content");
-    signUpModalContent.innerHTML += `
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        User Name cannot contain special characters. Choose another name and try again.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    `;
-    // Place the cursor in the Username Field
-    document.getElementById("signupUsername").focus();
-    return;
-  }
-
-  // Retrieve the existing user list from local storage
-  let userList = JSON.parse(localStorage.getItem("userList")) || [];
-
-  // Check if the username already exists
-  if (userList.some(user => user.userName === username)) {
-    // Show Bootstrap Error alert in the Modal
-    const signUpModalContent = document.querySelector("#signUpModal .modal-content");
-    signUpModalContent.innerHTML += `
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        User Name already taken. Choose another name and try again.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    `;
-    // Place the cursor in the Username Field
-    document.getElementById("signupUsername").focus();
-    return;
-  }
-
-  const userObject = {
-    userName: username,
-    pwd: password,
-  };
-
-  // Push the new user object to the user list
-  userList.push(userObject);
-
-  // Store the updated user list back to local storage
-  localStorage.setItem("userList", JSON.stringify(userList));
-
-  console.log("User List after signup:", userList);
-
-  // Close the modal after successful signup
-  closeSignUpModal();
-
-  // Show Bootstrap Success alert in the Modal on the Top of Login Screen
-  const loginForm = document.getElementById("loginForm");
-  loginForm.insertAdjacentHTML(
-    "afterbegin",
-    `
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
-        User is created.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    `
-  );
-
-  // Set timeout to remove the success alert after 5 seconds
-  setTimeout(() => {
-    document.querySelector(".alert-success").remove();
-  }, 5000);
-}
-
-
-if (!/^[a-zA-Z0-9]+$/.test(username)) {
-  // Show Bootstrap Error alert in the Modal
-  const signUpModalContent = document.querySelector("#signUpModal .modal-content");
-  signUpModalContent.insertAdjacentHTML(
-    "beforeend",
-    `
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        User Name cannot contain special characters. Choose another name and try again.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    `
-  );
-  // Place the cursor in the Username Field
-  document.getElementById("signupUsername").focus();
-  return;
-}
-
-if (!/^[a-zA-Z0-9]+$/.test(username)) {
-  // Show Bootstrap Error alert in the Modal
-  const signUpModalContent = document.querySelector("#signUpModal .modal-content");
-  signUpModalContent.innerHTML += `
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-      User Name cannot contain special characters. Choose another name and try again.
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-  `;
-  // Place the cursor in the Username Field
-  document.getElementById("signupUsername").focus();
-  return;
-}
-
-condition 11,12..
-
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^])(?=.*\d)[a-zA-Z\d!@#$%^]{8,}$/;
-if (!passwordRegex.test(password)) {
-  // Show Bootstrap Error alert in the Modal
-  const signUpModalContent = document.querySelector(
-    "#signUpModal .modal-content"
-  );
-  signUpModalContent.innerHTML += `
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-      Password must have at least 8 characters, including at least 1 lowercase letter, 1 uppercase letter, 1 digit, and 1 special character (!@#$%^).
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-  `;
-  // Place the cursor in the Password Field
-  document.getElementById("signupPassword").focus();
-  return;
-}
-
-condition 11,12
-function submitSignUpForm() {
-  const username = document.getElementById("signupUsername").value;
-  const password = document.getElementById("signupPassword").value;
-
-  // Validate username
   if (!/^[a-zA-Z]+$/.test(username)) {
     // Show Bootstrap Error alert in the Modal
     const signUpModalContent = document.querySelector(
@@ -546,27 +340,26 @@ function submitSignUpForm() {
     document.getElementById("signupUsername").focus();
     return;
   }
-
   // Validate password
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^])(?=.*\d)[a-zA-Z\d!@#$%^]{8,}$/;
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^])(?=.*\d)[a-zA-Z\d!@#$%^]{8,}$/;
   if (!passwordRegex.test(password)) {
     // Show Bootstrap Error alert in the Modal
     const signUpModalContent = document.querySelector(
       "#signUpModal .modal-content"
     );
     signUpModalContent.innerHTML += `
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        Password must have at least 8 characters, including at least 1 lowercase letter, 1 uppercase letter, 1 digit, and 1 special character (!@#$%^).
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    `;
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      Password must have at least 8 characters, including at least 1 lowercase letter, 1 uppercase letter, 1 digit, and 1 special character (!@#$%^).
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  `;
     // Place the cursor in the Password Field
     document.getElementById("signupPassword").focus();
     return;
   }
-
   // Retrieve the existing user list from local storage
   let userList = JSON.parse(localStorage.getItem("userList")) || [];
 
@@ -589,8 +382,6 @@ function submitSignUpForm() {
     return;
   }
 
-  // Continue with the rest of your sign-up logic...
-
   const userObject = {
     userName: username,
     pwd: password,
@@ -626,44 +417,3 @@ function submitSignUpForm() {
     document.querySelector(".alert-success").remove();
   }, 5000);
 }
-
-
-condition no 12..
-//p3.js
-
-// Add the following code at the beginning of your p3.js file
-
-document.getElementById("signupPassword").addEventListener("cut", function (e) {
-  e.preventDefault();
-  showDisabledAlert();
-});
-
-document.getElementById("signupPassword").addEventListener("copy", function (e) {
-  e.preventDefault();
-  showDisabledAlert();
-});
-
-document.getElementById("signupPassword").addEventListener("paste", function (e) {
-  e.preventDefault();
-  showDisabledAlert();
-});
-
-document.getElementById("signupPassword").addEventListener("contextmenu", function (e) {
-  e.preventDefault();
-  showDisabledAlert();
-});
-
-function showDisabledAlert() {
-  // Show Bootstrap Error alert in the Modal
-  const signUpModalContent = document.querySelector("#signUpModal .modal-content");
-  signUpModalContent.innerHTML += `
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-      Copy, paste, and right-click disabled for the password field.
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-  `;
-}
-
-// Existing event listeners and functions continue below...
