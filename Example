@@ -1,4 +1,4 @@
-
+ji
 //p1.html...
 <!DOCTYPE html>
 <html lang="en">
@@ -485,4 +485,21 @@ if (!/^[a-zA-Z0-9]+$/.test(username)) {
   document.getElementById("signupUsername").focus();
   return;
 }
+
+if (!/^[a-zA-Z0-9]+$/.test(username)) {
+  // Show Bootstrap Error alert in the Modal
+  const signUpModalContent = document.querySelector("#signUpModal .modal-content");
+  signUpModalContent.innerHTML += `
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      User Name cannot contain special characters. Choose another name and try again.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  `;
+  // Place the cursor in the Username Field
+  document.getElementById("signupUsername").focus();
+  return;
+}
+
 
