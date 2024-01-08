@@ -502,4 +502,25 @@ if (!/^[a-zA-Z0-9]+$/.test(username)) {
   return;
 }
 
+condition 11,12..
+
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^])(?=.*\d)[a-zA-Z\d!@#$%^]{8,}$/;
+if (!passwordRegex.test(password)) {
+  // Show Bootstrap Error alert in the Modal
+  const signUpModalContent = document.querySelector(
+    "#signUpModal .modal-content"
+  );
+  signUpModalContent.innerHTML += `
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      Password must have at least 8 characters, including at least 1 lowercase letter, 1 uppercase letter, 1 digit, and 1 special character (!@#$%^).
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  `;
+  // Place the cursor in the Password Field
+  document.getElementById("signupPassword").focus();
+  return;
+}
+
 
