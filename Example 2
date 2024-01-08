@@ -1,1 +1,28 @@
 
+<!-- Add this within the body tag, after the login form -->
+<div id="signUpModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeSignUpModal()">&times;</span>
+    <h2>Sign Up</h2>
+    <form id="signUpForm">
+      <label for="signupUsername">Username:</label>
+      <input
+        type="text"
+        id="signupUsername"
+        placeholder="Enter the User Name"
+        autocomplete="signupUsername"
+      />
+
+      <label for="signupPassword">Password:</label>
+      <input
+        type="password"
+        id="signupPassword"
+        placeholder="Enter the Password"
+        autocomplete="signupPassword"
+      />
+
+      <button type="button" id="signupSubmitBtn" onclick="submitSignUpForm()">Submit</button>
+      <button type="button" id="signupResetBtn" onclick="resetSignUpForm()">Reset</button>
+    </form>
+  </div>
+</div>
