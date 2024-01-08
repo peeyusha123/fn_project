@@ -148,3 +148,29 @@ document.getElementById("resetPasswordBtn").addEventListener("click", function (
   closeResetPasswordModal();
 });
 
+up....
+// p4.js
+
+document.getElementById("resetPasswordBtn").disabled = true;
+
+document.getElementById("resetUsername").addEventListener("input", function () {
+  const resetUsernameField = document.getElementById("resetUsername");
+  const resetButton = document.getElementById("resetPasswordBtn");
+
+  // Disable the reset button if the username field is empty
+  resetButton.disabled = resetUsernameField.value.trim() === "";
+});
+
+// Function to open the password reset modal
+function openResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "block";
+}
+
+// Function to close the password reset modal
+function closeResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "none";
+}
+
+// Rest of your existing code...
