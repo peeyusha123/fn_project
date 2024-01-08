@@ -466,3 +466,33 @@ function closeResetPasswordModal() {
   const resetPasswordModal = document.getElementById("resetPasswordModal");
   resetPasswordModal.style.display = "none";
 }
+
+// Function to open the password reset modal
+function openResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "block";
+
+  // Add event listener to the input field for real-time validation
+  const userNameInput = document.getElementById("userNameInput");
+  userNameInput.addEventListener("input", handleUserNameInputChange);
+
+  // Initially disable the Reset Button
+  const resetButton = document.getElementById("resetButton");
+  resetButton.disabled = true;
+}
+
+// Function to close the password reset modal
+function closeResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "none";
+}
+
+// Function to handle input change in the User Name field
+function handleUserNameInputChange() {
+  const userNameInput = document.getElementById("userNameInput");
+  const resetButton = document.getElementById("resetButton");
+
+  // Enable the Reset Button only if the User Name field is not empty
+  resetButton.disabled = !userNameInput.value.trim();
+}
+
