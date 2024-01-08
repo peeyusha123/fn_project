@@ -453,3 +453,16 @@ Disable Copy, Paste using ShortCuts and Right Click on Password Field.
 On Click of the Submit Button in Password Reset Modal check if New Password and Reset Password Values martch and if not and show BootStrap Success alert in the Modal  Stating  "Password does not match" on the Top of  Password Reset Screen 
 BootStrap alert should have a X Mark to close also the message should disappear automatically in 5 seconds or by clicking the X Mark.
 If all Validations are good then close the Password Reset Modal and show BootStrap Success alert in the Modal  Stating  "User Password Reset Success" on the Top of  Login Screen 
+
+
+// Function to open the password reset modal
+function openResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "block";
+}
+
+// Function to close the password reset modal
+function closeResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "none";
+}
