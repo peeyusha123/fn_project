@@ -161,3 +161,35 @@ function handleResetUsernameInputChange() {
     console.log("Username not found in Local Storage:", enteredUsername);
   }
 }
+
+u...
+// Function to handle input change in the Reset Username field
+function handleResetUsernameInputChange() {
+  const resetUsernameInput = document.getElementById("resetUsername");
+  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
+
+  // Enable the Reset Buttons only if the Reset Username field is not empty
+  const isUsernameEmpty = !resetUsernameInput.value.trim();
+  resetPasswordBtns.forEach(btn => {
+    btn.disabled = isUsernameEmpty;
+  });
+
+  // Check if the entered username is present in Local Storage
+  const enteredUsername = resetUsernameInput.value.trim();
+  const storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
+
+  const isUsernameInLocalStorage = storedUsernames.includes(enteredUsername);
+
+  if (isUsernameInLocalStorage) {
+    console.log("Username found in Local Storage:", enteredUsername);
+  } else {
+    console.log("Username not found in Local Storage:", enteredUsername);
+
+    // If the username is not found, you can add it to Local Storage
+    storedUsernames.push(enteredUsername);
+    localStorage.setItem("usernames", JSON.stringify(storedUsernames));
+
+    console.log("Username added to Local Storage:", enteredUsername);
+  }
+}
+
