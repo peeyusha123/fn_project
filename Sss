@@ -1,91 +1,204 @@
+//p1.html..
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modal Example</title>
-    <!-- Kendo UI Styles -->
-    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2023.1.119/styles/kendo.common.min.css" />
-    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2023.1.119/styles/kendo.rtl.min.css" />
-    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2023.1.119/styles/kendo.default.min.css" />
-    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2023.1.119/styles/kendo.mobile.all.min.css" />
-    <!-- Kendo UI JavaScript -->
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://kendo.cdn.telerik.com/2023.1.119/js/kendo.all.min.js"></script>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="p2.css" />
 
-<button id="openModal">Open Modal</button>
+    <title>Login Page</title>
+  </head>
+  <body>
+    <form id="loginForm">
+      <label for="username">Username:</label>
+      <input
+        type="text"
+        id="newUsername"
+        placeholder="Enter the User Name"
+        autocomplete="newUsername"
+      />
 
-<div id="modal"></div>
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        id="newPassword"
+        placeholder="Enter the Password"
+        autocomplete="newPassword"
+      />
 
-<script>
-    // Sample organization values
-    var organizationValues = ["Org1", "Org2", "Org3"];
+      <button type="button" id="submitBtn" disabled>Submit</button>
+      <button type="button" id="resetBtn" style="display: none">Reset</button>
+      <button type="button" id="signupBtn" onclick="openSignUpModal()">
+        Sign Up
+      </button>
 
-    // Create Kendo Modal
-    $("#modal").kendoWindow({
-        visible: false,
-        modal: true,
-        title: "Input Modal",
-        width: "400px",
-        actions: ["Close"]
-    });
+      <button
+        type="button"
+        class="resetPasswordBtn"
+        onclick="openResetPasswordModal()"
+      >
+        Password Reset
+      </button>
+    </form>
 
-    // Create input fields
-    var ageInput = $("<input type='number' placeholder='Age' />");
-    var dateInput = $("<input type='date' placeholder='Date' />");
-    var organizationDropdown = $("<select></select>");
-    $.each(organizationValues, function (index, value) {
-        organizationDropdown.append($("<option></option>").text(value));
-    });
+    <div id="signUpModalContainer"></div>
+    <div id="signUpModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeSignUpModal()">&times;</span>
+        <h2>Sign Up</h2>
+        <form id="signUpForm">
+          <label for="signupUsername">Username:</label>
+          <input
+            type="text"
+            id="signupUsername"
+            placeholder="Enter the User Name"
+            autocomplete="signupUsername"
+          />
 
-    // Create Save button
-    var saveButton = $("<button>Save</button>").click(function () {
-        // Dummy endpoint - replace with your actual endpoint
-        var dummyEndpoint = "https://jsonplaceholder.typicode.com/posts";
-        
-        // Get input values
-        var age = ageInput.val();
-        var date = dateInput.val();
-        var organization = organizationDropdown.val();
+          <label for="signupPassword">Password:</label>
+          <input
+            type="password"
+            id="signupPassword"
+            placeholder="Enter the Password"
+            autocomplete="signupPassword"
+          />
 
-        // Dummy data to send to the endpoint
-        var dataToSend = {
-            age: age,
-            date: date,
-            organization: organization
-        };
+          <button
+            type="button"
+            id="signupSubmitBtn"
+            onclick="submitSignUpForm()"
+          >
+            Submit
+          </button>
+          <button type="button" id="signupResetBtn" onclick="resetSignUpForm()">
+            Reset
+          </button>
+          <button type="button" id="resetStorageBtn">Reset Storage</button>
+        </form>
+      </div>
+    </div>
+    <div id="passwordResetModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closePasswordResetModal()">&times;</span>
+        <h2>Password Reset Modal</h2>
+        <form id="passwordResetForm">
+          <!-- Non-editable username -->
+          <p>Username: <span id="modalUsername"></span></p>
 
-        // Send data to the dummy endpoint
-        $.ajax({
-            url: dummyEndpoint,
-            type: "POST",
-            data: JSON.stringify(dataToSend),
-            contentType: "application/json; charset=utf-8",
-            success: function () {
-                alert("Data saved successfully!");
-            },
-            error: function () {
-                alert("Error saving data.");
-            }
-        });
+          <!-- New Password Input -->
+          <label for="newPassword">New Password:</label>
+          <input
+            type="password"
+            id="newPassword"
+            placeholder="Enter new password"
+            autocomplete="new-password"
+          />
 
-        // Close the modal
-        $("#modal").data("kendoWindow").close();
-    });
+          <!-- Retype New Password Input -->
+          <label for="retypePassword">Retype New Password:</label>
+          <input
+            type="password"
+            id="retypePassword"
+            placeholder="Retype new password"
+            autocomplete="new-password"
+          />
 
-    // Append input fields and Save button to the modal
-    $("#modal").html(ageInput).append("<br />")
-        .append(dateInput).append("<br />")
-        .append(organizationDropdown).append("<br />")
-        .append(saveButton);
-
-    // Open modal on button click
-    $("#openModal").click(function () {
-        $("#modal").data("kendoWindow").open().center();
-    });
-</script>
-
-</body>
+          <!-- Submit Button -->
+          <button type="button" onclick="submitPasswordReset()">Submit</button>
+        </form>
+      </div>
+    </div>
+    <script defer src="p3.js"></script>
+    <script defer src="p4.js"></script>
+  </body>
 </html>
+
+
+//p4.js...
+// Function to open the password reset modal
+function openResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "block";
+
+  // Add event listener to the input field for real-time validation
+  const resetUsernameInput = document.getElementById("resetUsername");
+  resetUsernameInput.addEventListener("input", handleResetUsernameInputChange);
+
+  // Initially disable the Reset Buttons
+  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
+  resetPasswordBtns.forEach((btn) => {
+    btn.disabled = true;
+  });
+}
+
+// Function to close the password reset modal
+function closeResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "none";
+}
+
+// Function to handle input change in the Reset Username field
+function handleResetUsernameInputChange() {
+  const resetUsernameInput = document.getElementById("resetUsername");
+  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
+
+  // Enable the Reset Buttons only if the Reset Username field is not empty
+  const isUsernameEmpty = !resetUsernameInput.value.trim();
+  resetPasswordBtns.forEach((btn) => {
+    btn.disabled = isUsernameEmpty;
+  });
+
+  // Check if the entered username is present in Local Storage
+  const enteredUsername = resetUsernameInput.value.trim();
+  // Validation: Ensure that special characters are not present
+  const containsSpecialCharacters = /[!@#$%^&*(),.?":{}|<>]/.test(
+    enteredUsername
+  );
+
+  if (containsSpecialCharacters) {
+    console.log("Special characters are not allowed in the username");
+    // Optionally, you can clear the input field or display an error message
+    resetUsernameInput.value = "";
+  } else {
+    console.log("Username is valid:", enteredUsername);
+  }
+  const storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
+
+  const isUsernameInLocalStorage = storedUsernames.includes(enteredUsername);
+
+  if (isUsernameInLocalStorage) {
+    console.log("Username found in Local Storage:", enteredUsername);
+  } else {
+    console.log("Username not found in Local Storage:", enteredUsername);
+
+    // If the username is not found, you can add it to Local Storage
+    storedUsernames.push(enteredUsername);
+    localStorage.setItem("usernames", JSON.stringify(storedUsernames));
+
+    console.log("Username added to Local Storage:", enteredUsername);
+  }
+}
+
+// Function to open the password reset modal with non-editable fields
+function openPasswordResetModal() {
+  const passwordResetModal = document.getElementById("passwordResetModal");
+  const modalUsername = document.getElementById("modalUsername");
+  const newPasswordInput = document.getElementById("newPassword");
+  const retypePasswordInput = document.getElementById("retypePassword");
+
+  // Set non-editable username
+  modalUsername.textContent = username;
+
+  // Clear input fields
+  newPasswordInput.value = "";
+  retypePasswordInput.value = "";
+
+  // Open the modal
+  passwordResetModal.style.display = "block";
+}
+
+// Function to close the password reset modal
+function closePasswordResetModal() {
+  const passwordResetModal = document.getElementById("passwordResetModal");
+  passwordResetModal.style.display = "none";
+}
