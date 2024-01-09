@@ -115,7 +115,8 @@
   </body>
 </html>
 
-//p4.js..
+
+//p4.js...
 // Function to open the password reset modal
 function openResetPasswordModal() {
   const resetPasswordModal = document.getElementById("resetPasswordModal");
@@ -186,7 +187,7 @@ function openPasswordResetModal() {
   const modalUsername = document.getElementById("modalUsername");
   const newPasswordInput = document.getElementById("resetNewPassword");
   const retypePasswordInput = document.getElementById("retypePassword");
-
+  const resetUsernameInput = document.getElementById("reset");
   // Set non-editable username
   modalUsername.textContent = username;
 
@@ -208,13 +209,6 @@ function closePasswordResetModal() {
   const passwordResetModal = document.getElementById("resetPasswordModal");
   passwordResetModal.style.display = "none";
 }
-function submitPasswordReset() {
-  console.log("New password submitted !");
-  closeResetPasswordModal();
-}
-
-
-condition 6...
 // Function to handle the submission of the new password in the password reset modal
 function submitPasswordReset() {
   const resetUsernameInput = document.getElementById("resetUsername");
@@ -249,3 +243,6 @@ function submitPasswordReset() {
   // Optionally, you can close the password reset modal here
   closeResetPasswordModal();
 }
+
+
+i have shareed html and css code .. please check line by line code both element id used in both html and js file .. also resolve issue of same id ,, it should be nonunique
