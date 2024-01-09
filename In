@@ -238,5 +238,86 @@ html...
           />
           <button type="button" class="resetPasswordBtn">Reset Password</button>
         </form>
-      </div>
+      </div><div id="passwordResetModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closePasswordResetModal()">&times;</span>
+    <h2>Password Reset Modal</h2>
+    <form id="passwordResetForm">
+      <!-- Non-editable username -->
+      <p>Username: <span id="modalUsername"></span></p>
+
+      <!-- New Password Input -->
+      <label for="newPassword">New Password:</label>
+      <input type="password" id="newPassword" placeholder="Enter new password">
+
+      <!-- Retype New Password Input -->
+      <label for="retypePassword">Retype New Password:</label>
+      <input type="password" id="retypePassword" placeholder="Retype new password">
+
+      <!-- Submit Button -->
+      <button type="button" onclick="submitPasswordReset()">Submit</button>
+    </form>
+  </div>
+</div>
+
     </div>
+
+
+condition 6...
+html...
+<div id="passwordResetModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closePasswordResetModal()">&times;</span>
+    <h2>Password Reset Modal</h2>
+    <form id="passwordResetForm">
+      <!-- Non-editable username -->
+      <p>Username: <span id="modalUsername"></span></p>
+
+      <!-- New Password Input -->
+      <label for="newPassword">New Password:</label>
+      <input type="password" id="newPassword" placeholder="Enter new password">
+
+      <!-- Retype New Password Input -->
+      <label for="retypePassword">Retype New Password:</label>
+      <input type="password" id="retypePassword" placeholder="Retype new password">
+
+      <!-- Submit Button -->
+      <button type="button" onclick="submitPasswordReset()">Submit</button>
+    </form>
+  </div>
+</div>
+
+js ...
+
+// Function to open the password reset modal with non-editable fields
+function openPasswordResetModal(username) {
+  const passwordResetModal = document.getElementById("passwordResetModal");
+  const modalUsername = document.getElementById("modalUsername");
+  const newPasswordInput = document.getElementById("newPassword");
+  const retypePasswordInput = document.getElementById("retypePassword");
+
+  // Set non-editable username
+  modalUsername.textContent = username;
+
+  // Clear input fields
+  newPasswordInput.value = "";
+  retypePasswordInput.value = "";
+
+  // Open the modal
+  passwordResetModal.style.display = "block";
+}
+
+// Function to close the password reset modal
+function closePasswordResetModal() {
+  const passwordResetModal = document.getElementById("passwordResetModal");
+  passwordResetModal.style.display = "none";
+}
+
+// Placeholder function for submitting the new password
+function submitPasswordReset() {
+  // Add your logic for submitting the new password here
+  // ...
+  console.log("New password submitted!");
+  closePasswordResetModal(); // Optionally close the modal after submission
+}
+
