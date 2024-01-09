@@ -223,3 +223,20 @@ function handleResetUsernameInputChange() {
   }
 }
 
+html...
+<div id="resetPasswordModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeResetPasswordModal()">&times;</span>
+        <h2>Password Reset</h2>
+        <form id="resetPasswordForm">
+          <label for="resetUsername">Username:</label>
+          <input
+            type="text"
+            id="resetUsername"
+            placeholder="Enter the User Name"
+            autocomplete="resetUsername"
+          />
+          <button type="button" class="resetPasswordBtn">Reset Password</button>
+        </form>
+      </div>
+    </div>
