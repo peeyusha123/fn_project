@@ -212,3 +212,40 @@ function submitPasswordReset() {
   console.log("New password submitted !");
   closeResetPasswordModal();
 }
+
+
+condition 6...
+// Function to handle the submission of the new password in the password reset modal
+function submitPasswordReset() {
+  const resetUsernameInput = document.getElementById("resetUsername");
+  const newPasswordInput = document.getElementById("resetNewPassword");
+  const retypePasswordInput = document.getElementById("retypePassword");
+
+  const enteredUsername = resetUsernameInput.value.trim();
+  const newPassword = newPasswordInput.value.trim();
+  const retypedPassword = retypePasswordInput.value.trim();
+
+  // Validate that the passwords match
+  if (newPassword !== retypedPassword) {
+    console.log("Passwords do not match. Please re-enter.");
+    return;
+  }
+
+  // Find the username in Local Storage
+  const storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
+  const usernameIndex = storedUsernames.indexOf(enteredUsername);
+
+  if (usernameIndex !== -1) {
+    // Username found, set the new password in Local Storage
+    const storedPasswords = JSON.parse(localStorage.getItem("passwords")) || [];
+    storedPasswords[usernameIndex] = newPassword;
+    localStorage.setItem("passwords", JSON.stringify(storedPasswords));
+
+    console.log("Password reset successful for", enteredUsername);
+  } else {
+    console.log("Username not found in Local Storage:", enteredUsername);
+  }
+
+  // Optionally, you can close the password reset modal here
+  closeResetPasswordModal();
+}
