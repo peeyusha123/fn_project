@@ -132,3 +132,32 @@ condition...
 11	On Click of the Submit Button in Password Reset Modal check if New Password and Reset Password Values martch and if not and show BootStrap Success alert in the Modal  Stating  "Password does not match" on the Top of  Password Reset Screen 																									
 12	BootStrap alert should have a X Mark to close also the message should disappear automatically in 5 seconds or by clicking the X Mark.																									
 13	If all Validations are good then close the Password Reset Modal and show BootStrap Success alert in the Modal  Stating  "User Password Reset Success" on the Top of  Login Screen 																									
+
+
+
+condition 4..
+// Function to handle input change in the Reset Username field
+function handleResetUsernameInputChange() {
+  const resetUsernameInput = document.getElementById("resetUsername");
+  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
+
+  // Enable the Reset Buttons only if the Reset Username field is not empty
+  const isUsernameEmpty = !resetUsernameInput.value.trim();
+  resetPasswordBtns.forEach(btn => {
+    btn.disabled = isUsernameEmpty;
+  });
+
+  // Check if the entered username is present in Local Storage
+  const enteredUsername = resetUsernameInput.value.trim();
+  const storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
+
+  const isUsernameInLocalStorage = storedUsernames.includes(enteredUsername);
+
+  if (isUsernameInLocalStorage) {
+    // Username is present in Local Storage, you can add further logic here
+    console.log("Username found in Local Storage:", enteredUsername);
+  } else {
+    // Username is not present in Local Storage, you can add further logic here
+    console.log("Username not found in Local Storage:", enteredUsername);
+  }
+}
