@@ -192,4 +192,34 @@ function handleResetUsernameInputChange() {
     console.log("Username added to Local Storage:", enteredUsername);
   }
 }
+cond 5..
+
+// Function to handle input change in the Reset Username field
+function handleResetUsernameInputChange() {
+  const resetUsernameInput = document.getElementById("resetUsername");
+  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
+
+  // Enable the Reset Buttons only if the Reset Username field is not empty
+  const isUsernameEmpty = !resetUsernameInput.value.trim();
+  resetPasswordBtns.forEach(btn => {
+    btn.disabled = isUsernameEmpty;
+  });
+
+  // Check if the entered username is present in Local Storage
+  const enteredUsername = resetUsernameInput.value.trim();
+
+  // Validation: Ensure that special characters are not present
+  const containsSpecialCharacters = /[!@#$%^&*(),.?":{}|<>]/.test(enteredUsername);
+
+  if (containsSpecialCharacters) {
+    console.log("Special characters are not allowed in the username");
+    // Optionally, you can clear the input field or display an error message
+    resetUsernameInput.value = "";
+  } else {
+    console.log("Username is valid:", enteredUsername);
+
+    // Continue with the rest of the code (e.g., checking Local Storage, enabling buttons, etc.)
+    // ...
+  }
+}
 
