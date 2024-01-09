@@ -55,3 +55,33 @@ html...
         </form>
       </div>
     </div>
+
+// Function to open the password reset modal
+function openResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "block";
+
+  // Add event listener to the input field for real-time validation
+  const resetUsernameInput = document.getElementById("resetUsername");
+  resetUsernameInput.addEventListener("input", handleResetUsernameInputChange);
+
+  // Initially disable the Reset Button
+  const resetPasswordBtn = document.getElementById("resetPasswordBtn");
+  resetPasswordBtn.disabled = true;
+}
+
+// Function to close the password reset modal
+function closeResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "none";
+}
+
+// Function to handle input change in the Reset Username field
+function handleResetUsernameInputChange() {
+  const resetUsernameInput = document.getElementById("resetUsername");
+  const resetPasswordBtn = document.getElementById("resetPasswordBtn");
+
+  // Enable the Reset Button only if the Reset Username field is not empty
+  resetPasswordBtn.disabled = !resetUsernameInput.value.trim();
+}
+.
