@@ -549,3 +549,46 @@ function openPasswordResetModal() {
 // Continue with the rest of your existing password reset modal functions
 
 
+
+
+latest...
+// Updated p4.js
+function openResetPasswordScreen() {
+  const resetPasswordScreen = document.getElementById("resetPasswordScreen");
+  resetPasswordScreen.style.display = "block";
+
+  const resetUsernameInput = document.getElementById("resetUsername");
+  resetUsernameInput.addEventListener("input", validateResetUsername);
+
+  const resetBtn = document.getElementById("resetBtn");
+  resetBtn.disabled = true;
+}
+
+function validateResetUsername() {
+  const resetUsernameInput = document.getElementById("resetUsername");
+  const resetBtn = document.getElementById("resetBtn");
+
+  const isUsernameEmpty = !resetUsernameInput.value.trim();
+  resetBtn.disabled = isUsernameEmpty;
+
+  const enteredUsername = resetUsernameInput.value.trim();
+  const containsSpecialCharacters = /[!@#$%^&*(),.?":{}|<>]/.test(
+    enteredUsername
+  );
+
+  if (containsSpecialCharacters) {
+    console.log("Special characters are not allowed in the username");
+    resetUsernameInput.value = "";
+  } else {
+    console.log("Username is valid:", enteredUsername);
+  }
+}
+
+function openPasswordResetModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  // Add logic to fill in modal content with non-editable username, new password, retype new password, and submit button
+  resetPasswordModal.style.display = "block";
+}
+
+// Continue with the rest of your existing password reset modal functions
+
