@@ -353,3 +353,102 @@ function openResetPasswordModal() {
 }
 
 // ... (unchanged)
+
+
+
+///new2...
+//p4.js
+// ...
+
+// Function to open the password reset modal
+function openResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "block";
+
+  // Add event listener to the input field for real-time validation
+  const resetUsernameInput = document.getElementById("newUsername"); // Update to use newUsername
+  resetUsernameInput.addEventListener("input", handleResetUsernameInputChange);
+
+  // Initially disable the Reset Buttons
+  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
+  resetPasswordBtns.forEach((btn) => {
+    btn.disabled = true;
+  });
+}
+
+// Function to close the password reset modal
+function closeResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "none";
+}
+
+// Function to handle input change in the Reset Username field
+function handleResetUsernameInputChange() {
+  const resetUsernameInput = document.getElementById("newUsername"); // Update to use newUsername
+  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
+
+  // Enable the Reset Buttons only if the Reset Username field is not empty
+  const isUsernameEmpty = !resetUsernameInput.value.trim();
+  resetPasswordBtns.forEach((btn) => {
+    btn.disabled = isUsernameEmpty;
+  });
+
+  // Check if the entered username is present in Local Storage
+  const enteredUsername = resetUsernameInput.value.trim();
+  storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
+
+  isUsernameInLocalStorage = storedUsernames.includes(enteredUsername);
+  // Validation: Ensure that special characters are not present
+  const containsSpecialCharacters = /[!@#$%^&*(),.?":{}|<>]/.test(
+    enteredUsername
+  );
+
+  if (containsSpecialCharacters) {
+    console.log("Special characters are not allowed in the username");
+    // Optionally, you can clear the input field or display an error message
+    resetUsernameInput.value = "";
+  } else {
+    console.log("Username is valid:", enteredUsername);
+  }
+  const storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
+
+  const isUsernameInLocalStorage = storedUsernames.includes(enteredUsername);
+
+  if (isUsernameInLocalStorage) {
+    console.log("Username found in Local Storage:", enteredUsername);
+  } else {
+    console.log("Username not found in Local Storage:", enteredUsername);
+
+    // If the username is not found, you can add it to Local Storage
+    storedUsernames.push(enteredUsername);
+    localStorage.setItem("usernames", JSON.stringify(storedUsernames));
+
+    console.log("Username added to Local Storage:", enteredUsername);
+  }
+}
+
+// Function to open the password reset modal with non-editable fields
+function openPasswordResetModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  const modalUsername = document.getElementById("modalUsername");
+  const newPasswordInput = document.getElementById("resetNewPassword");
+  const retypePasswordInput = document.getElementById("retypePassword");
+  const resetUsernameInput = document.getElementById("newUsername"); // Update to use newUsername
+
+  // Set non-editable username
+  modalUsername.textContent = resetUsernameInput.value;
+
+  // Clear input fields
+  newPasswordInput.value = "";
+  retypePasswordInput.value = "";
+
+  // Open the modal
+  resetPasswordModal.style.display = "block";
+  console.log("Password Reset Modal opened successfully");
+
+  // Add event listener
+  const submitBtn = document.getElementById("submitBtnReset");
+  submitBtn.addEventListener("click", submitPasswordReset);
+}
+
+// ...
