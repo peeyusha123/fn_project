@@ -1,88 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2021.3.1207/styles/kendo.common.min.css" />
-  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2021.3.1207/styles/kendo.rtl.min.css" />
-  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2021.3.1207/styles/kendo.default.min.css" />
-  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2021.3.1207/styles/kendo.mobile.all.min.css" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="p2.css" />
+    <title>Login Page</title>
+  </head>
+  <body>
+    <form id="loginForm">
+      <label for="username">Username:</label>
+      <input
+        type="text"
+        id="newUsername"
+        placeholder="Enter the User Name"
+        autocomplete="newUsername"
+      />
 
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-  <script src="https://kendo.cdn.telerik.com/2021.3.1207/js/kendo.all.min.js"></script>
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        id="newPassword"
+        placeholder="Enter the Password"
+        autocomplete="newPassword"
+      />
 
-  <style>
-    #grid {
-      width: 100%;
-    }
-  </style>
-</head>
-<body>
+      <button type="button" id="submitBtn" disabled>Submit</button>
+      <button type="button" id="resetBtn" style="display: none">Reset</button>
+      <button type="button" id="signupBtn" onclick="openSignUpModal()">
+        Sign Up
+      </button>
 
-  <button id="openModalBtn">Open Modal</button>
+      <button
+        type="button"
+        class="resetPasswordBtn"
+        onclick="openResetPasswordModal()"
+      >
+        Password Reset
+      </button>
+    </form>
 
-  <div id="modal" style="display: none;">
-    <label for="age">Age:</label>
-    <input type="number" id="age" />
+    <div id="signUpModalContainer"></div>
+    <div id="signUpModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeSignUpModal()">&times;</span>
+        <h2>Sign Up</h2>
+        <form id="signUpForm">
+          <label for="signupUsername">Username:</label>
+          <input
+            type="text"
+            id="signupUsername"
+            placeholder="Enter the User Name"
+            autocomplete="signupUsername"
+          />
 
-    <label for="date">Date:</label>
-    <input type="date" id="date" />
+          <label for="signupPassword">Password:</label>
+          <input
+            type="password"
+            id="signupPassword"
+            placeholder="Enter the Password"
+            autocomplete="signupPassword"
+          />
 
-    <label for="organization">Organization:</label>
-    <input type="text" id="organization" />
+          <button
+            type="button"
+            id="signupSubmitBtn"
+            onclick="submitSignUpForm()"
+          >
+            Submit
+          </button>
+          <button type="button" id="signupResetBtn" onclick="resetSignUpForm()">
+            Reset
+          </button>
+          <button type="button" id="resetStorageBtn">Reset Storage</button>
+        </form>
+      </div>
+    </div>
+    <div id="resetPasswordModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closePasswordResetModal()">&times;</span>
+        <h2>Password Reset Modal</h2>
+        <form id="passwordResetForm">
+          <!-- Non-editable username -->
+          <p>Username: <span id="modalUsername"></span></p>
 
-    <button id="saveBtn">Save</button>
-  </div>
+          <!-- New Password Input -->
+          <label for="resetNewPassword">New Password:</label>
+          <input
+            type="password"
+            id="resetNewPassword"
+            placeholder="Enter new password"
+            autocomplete="new-password"
+          />
 
-  <div id="grid"></div>
+          <!-- Retype New Password Input -->
+          <label for="retypePassword">Retype New Password:</label>
+          <input
+            type="password"
+            id="retypePassword"
+            placeholder="Retype new password"
+            autocomplete="new-password"
+          />
 
-  <script>
-    // Dummy endpoint function
-    function saveData(data) {
-      console.log("Saved data:", data);
-    }
-
-    // Open modal on button click
-    $("#openModalBtn").on("click", function () {
-      $("#modal").show();
-    });
-
-    // Save button click event
-    $("#saveBtn").on("click", function () {
-      // Get input values
-      var age = $("#age").val();
-      var date = $("#date").val();
-      var organization = $("#organization").val();
-
-      // Create payload
-      var payload = {
-        age: age,
-        date: date,
-        organization: organization
-      };
-
-      // Call dummy endpoint
-      saveData(payload);
-
-      // Close modal
-      $("#modal").hide();
-
-      // Display data in Kendo UI Grid
-      var grid = $("#grid").kendoGrid({
-        dataSource: {
-          data: [payload],
-          pageSize: 5
-        },
-        height: 300,
-        pageable: true,
-        columns: [
-          { field: "age", title: "Age" },
-          { field: "date", title: "Date" },
-          { field: "organization", title: "Organization" }
-        ]
-      }).data("kendoGrid");
-    });
-  </script>
-
-</body>
+          <!-- Submit Button -->
+          <button type="button" id="submitBtn" onclick="submitPasswordReset()">
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+    <script defer src="p3.js"></script>
+    <script defer src="p4.js"></script>
+  </body>
 </html>
+
+
+//p4.js
+// Function to open the password reset modal
+function openResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "block";
+
+  // Add event listener to the input field for real-time validation
+  const resetUsernameInput = document.getElementById("newUsername");
+  resetUsernameInput.addEventListener("input", handleResetUsernameInputChange);
+
+  // Initially disable the Reset Buttons
+  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
+  resetPasswordBtns.forEach((btn) => {
+    btn.disabled = true;
+  });
+}
+
+// Function to handle input change in the Reset Username field
+function handleResetUsernameInputChange() {
+  const resetUsernameInput = document.getElementById("newUsername");
+  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
+
+  // Enable the Reset Buttons only if the Reset Username field is not empty
+  const isUsernameEmpty = !resetUsernameInput.value.trim();
+  resetPasswordBtns.forEach((btn) => {
+    btn.disabled = isUsernameEmpty;
+  });
+}
+
+// Function to handle the submission of the new password in the password reset modal
+function submitPasswordReset() {
+  const resetUsernameInput = document.getElementById("newUsername");
+  const newPasswordInput = document.getElementById("resetNewPassword");
+  const retypePasswordInput = document.getElementById("retypePassword");
+
+  const enteredUsername = resetUsernameInput.value.trim();
+  const newPassword = newPasswordInput.value.trim();
+  const retypedPassword = retypePasswordInput.value.trim();
+
+  // Validate that the passwords match
+  if (newPassword !== retypedPassword) {
+    console.log("Passwords do not match. Please re-enter.");
+    return;
+  }
+
+  // Find the username in Local Storage
+  const storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
+  const usernameIndex = storedUsernames.indexOf(enteredUsername);
+
+  if (usernameIndex !== -1) {
+    // Username found, set the new password in Local Storage
+    const storedPasswords = JSON.parse(localStorage.getItem("passwords")) || [];
+    storedPasswords[usernameIndex] = newPassword;
+    localStorage.setItem("passwords", JSON.stringify(storedPasswords));
+
+    console.log("Password reset successful for", enteredUsername);
+  } else {
+    console.log("Username not found in Local Storage:", enteredUsername);
+  }
+
+  // Optionally, you can close the password reset modal here
+  closeResetPasswordModal();
+}
+
+// Function to close the password reset modal
+function closeResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "none";
+}
