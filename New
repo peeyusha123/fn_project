@@ -262,3 +262,11 @@ function submitPasswordReset() {
 
 above is html and js file with code please don't confuse p1.html in that code for login signup and password reset page ..
 p4.js in that code only for password reset page ... so now i give you some condition write correct code thank you
+
+conditions ..
+1	Create a Password Reset Screen with User Name and Reset  Button which will open on clicking of Password Reset Button from the Login Page																									
+2	Add a place holder in the User Name box as Enter the User Name																									
+3	Disable the Reset Button if User Name Field is empty.																									
+4	Once the User Name is entered Check if the entered username is present in the Local Storage 																									
+5	Add Validation not to enter,paste special characters in User Name																									
+6	If Present the Open a Pop Up Modal with Name as Password Reset Modal which will contain Non Editable User Name and New Password and Retype New Password Fields and a Submit Button.																									
