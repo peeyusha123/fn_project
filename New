@@ -270,3 +270,86 @@ conditions ..
 4	Once the User Name is entered Check if the entered username is present in the Local Storage 																									
 5	Add Validation not to enter,paste special characters in User Name																									
 6	If Present the Open a Pop Up Modal with Name as Password Reset Modal which will contain Non Editable User Name and New Password and Retype New Password Fields and a Submit Button.																									
+
+
+new..
+<!-- p1.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- ... (unchanged) -->
+  </head>
+  <body>
+    <form id="loginForm">
+      <!-- ... (unchanged) -->
+
+      <!-- Password Reset Button -->
+      <button
+        type="button"
+        class="resetPasswordBtn"
+        onclick="openResetPasswordModal()"
+      >
+        Password Reset
+      </button>
+    </form>
+
+    <!-- ... (unchanged) -->
+
+    <div id="resetPasswordModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeResetPasswordModal()">&times;</span>
+        <h2>Password Reset Modal</h2>
+        <form id="passwordResetForm">
+          <!-- Non-editable username -->
+          <p>Username: <span id="modalUsername"></span></p>
+
+          <!-- New Password Input -->
+          <label for="resetNewPassword">New Password:</label>
+          <input
+            type="password"
+            id="resetNewPassword"
+            placeholder="Enter new password"
+            autocomplete="new-password"
+          />
+
+          <!-- Retype New Password Input -->
+          <label for="retypePassword">Retype New Password:</label>
+          <input
+            type="password"
+            id="retypePassword"
+            placeholder="Retype new password"
+            autocomplete="new-password"
+          />
+
+          <!-- Submit Button -->
+          <button type="button" id="submitBtn" onclick="submitPasswordReset()">
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+    <script defer src="p3.js"></script>
+    <script defer src="p4.js"></script>
+  </body>
+</html>
+
+js..
+
+// p4.js
+// ... (unchanged)
+
+// Function to open the password reset modal
+function openResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "block";
+
+  // Add event listener to the input field for real-time validation
+  const resetUsernameInput = document.getElementById("resetUsername");
+  resetUsernameInput.addEventListener("input", handleResetUsernameInputChange);
+
+  // Initially disable the Reset Button
+  const resetBtn = document.getElementById("submitBtn");
+  resetBtn.disabled = true;
+}
+
+// ... (unchanged)
