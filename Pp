@@ -308,3 +308,119 @@ function submitPasswordResetForm() {
   // Once the password is successfully reset, you can close the modal
   closePasswordResetModal();
 }
+
+
+new2...
+<!-- p1.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="p2.css" />
+
+    <title>Login Page</title>
+  </head>
+  <body>
+    <!-- Your existing code -->
+
+    <div id="resetPasswordModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeResetPasswordModal()">&times;</span>
+        <h2>Password Reset Screen</h2>
+        <form id="resetPasswordForm">
+          <label for="resetUsername">Username:</label>
+          <input
+            type="text"
+            id="resetUsername"
+            placeholder="Enter the Username"
+            autocomplete="resetUsername"
+            pattern="[a-zA-Z0-9]+"
+            title="Only alphanumeric characters are allowed."
+            required
+          />
+          <button
+            type="button"
+            class="resetPasswordBtn"
+            onclick="openPasswordResetModal()"
+            disabled
+          >
+            Reset Password
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- New Modal for Password Reset -->
+    <div id="passwordResetModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closePasswordResetModal()">&times;</span>
+        <h2>Password Reset Modal</h2>
+        <form id="passwordResetForm">
+          <label for="resetUsernameDisplay">Username:</label>
+          <input
+            type="text"
+            id="resetUsernameDisplay"
+            readonly
+            disabled
+          />
+
+          <label for="newPassword">New Password:</label>
+          <input
+            type="password"
+            id="newPassword"
+            placeholder="Enter the New Password"
+            autocomplete="newPassword"
+          />
+
+          <label for="retypeNewPassword">Retype New Password:</label>
+          <input
+            type="password"
+            id="retypeNewPassword"
+            placeholder="Retype the New Password"
+            autocomplete="retypeNewPassword"
+          />
+
+          <button
+            type="button"
+            id="submitPasswordResetBtn"
+            onclick="submitPasswordResetForm()"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script defer src="p3.js"></script>
+    <script defer src="p4.js"></script>
+  </body>
+</html>
+
+// p4.js
+// Your existing code
+
+// Function to open the password reset modal
+function openPasswordResetModal() {
+  const passwordResetModal = document.getElementById("passwordResetModal");
+  passwordResetModal.style.display = "block";
+
+  // Populate the non-editable username in the new modal
+  const resetUsernameInput = document.getElementById("resetUsername");
+  const resetUsernameDisplay = document.getElementById("resetUsernameDisplay");
+  resetUsernameDisplay.value = resetUsernameInput.value.trim();
+}
+
+// Function to close the password reset modal
+function closePasswordResetModal() {
+  const passwordResetModal = document.getElementById("passwordResetModal");
+  passwordResetModal.style.display = "none";
+}
+
+// Function to submit the password reset form
+function submitPasswordResetForm() {
+  // Add your password reset logic here
+  // You may want to validate the new password and retype new password, update the password, etc.
+  // Once the password is successfully reset, you can close the modal
+  closePasswordResetModal();
+}
