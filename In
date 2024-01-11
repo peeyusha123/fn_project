@@ -189,3 +189,8 @@ function closeResetPasswordModal() {
   resetPasswordModal.style.display = "none";
 }
 
+1	Create a Password Reset Screen with User Name and Reset  Button which will open on clicking of Password Reset Button from the Login Page
+2	Add a place holder in the User Name box as Enter the User Name
+3	Disable the Reset Button if User Name Field is empty.
+4	Once the User Name is entered Check if the entered username is present in the Local Storage 
+5	Add Validation not to enter,paste special characters in User Name
