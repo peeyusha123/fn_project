@@ -184,3 +184,4 @@ function closeResetPasswordModal() {
   resetPasswordModal.style.display = "none";
 }
 
+If Present the Open a Pop Up Modal with Name as Password Reset Modal which will contain Non Editable User Name and New Password and Retype New Password Fields and a Submit Button.
