@@ -1,113 +1,3 @@
-//p1.html..
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="p2.css" />
-
-    <title>Login Page</title>
-  </head>
-  <body>
-    <form id="loginForm">
-      <label for="username">Username:</label>
-      <input
-        type="text"
-        id="newUsername"
-        placeholder="Enter the User Name"
-        autocomplete="newUsername"
-      />
-
-      <label for="password">Password:</label>
-      <input
-        type="password"
-        id="newPassword"
-        placeholder="Enter the Password"
-        autocomplete="newPassword"
-      />
-
-      <button type="button" id="submitBtn" disabled>Submit</button>
-      <button type="button" id="resetBtn" style="display: none">Reset</button>
-      <button type="button" id="signupBtn" onclick="openSignUpModal()">
-        Sign Up
-      </button>
-
-      <button
-        type="button"
-        class="resetPasswordBtn"
-        onclick="openResetPasswordModal()"
-      >
-        Password Reset
-      </button>
-    </form>
-
-    <div id="signUpModalContainer"></div>
-    <div id="signUpModal" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closeSignUpModal()">&times;</span>
-        <h2>Sign Up</h2>
-        <form id="signUpForm">
-          <label for="signupUsername">Username:</label>
-          <input
-            type="text"
-            id="signupUsername"
-            placeholder="Enter the User Name"
-            autocomplete="signupUsername"
-          />
-
-          <label for="signupPassword">Password:</label>
-          <input
-            type="password"
-            id="signupPassword"
-            placeholder="Enter the Password"
-            autocomplete="signupPassword"
-          />
-
-          <button
-            type="button"
-            id="signupSubmitBtn"
-            onclick="submitSignUpForm()"
-          >
-            Submit
-          </button>
-          <button type="button" id="signupResetBtn" onclick="resetSignUpForm()">
-            Reset
-          </button>
-          <button type="button" id="resetStorageBtn">Reset Storage</button>
-        </form>
-      </div>
-    </div>
-
-    <div id="resetPasswordModal" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closeResetPasswordModal()">&times;</span>
-        <h2>Password Reset Modal</h2>
-        <form id="resetPasswordForm">
-          <label for="resetUsername">Username:</label>
-          <input
-            type="text"
-            id="resetUsername"
-            placeholder="Enter the Username"
-            autocomplete="resetUsername"
-            pattern="[a-zA-Z0-9]+"
-            title="'only alphsnumeric characters are allowed. "
-            required
-          />
-          <button
-            type="button"
-            id="resetPasswordBtn"
-            onclick="openResetPasswordModalFromLogin()"
-          >
-            Reset Password
-          </button>
-        </form>
-      </div>
-    </div>
-    <script defer src="p3.js"></script>
-    <script defer src="p4.js"></script>
-  </body>
-</html>
-//p4.js...
 // Function to open the password reset modal
 function openResetPasswordModal() {
   const resetPasswordModal = document.getElementById("resetPasswordModal");
@@ -127,6 +17,9 @@ function openResetPasswordModal() {
 function handleResetUsernameInputChange() {
   const resetUsernameInput = document.getElementById("resetUsername");
   const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
+
+  resetPasswordBtns.disabled = !resetUsernameInput.value.trim();
+  console.log("Reset Button Disabled State:", resetPasswordBtns.disabled);
 
   // Enable the Reset Buttons only if the Reset Username field is not empty
   const isUsernameEmpty = !resetUsernameInput.value.trim();
@@ -167,9 +60,8 @@ function handleResetUsernameInputChange() {
 
 // Function to open the password reset modal
 function openResetPasswordModalFromLogin() {
-  const openResetPasswordModalFromLogin =
-    document.getElementById("resetPasswordModal");
-  openResetPasswordModalFromLogin.style.display = "block";
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "block";
 
   // Add event listener to the input field for real-time validation
   const resetUsernameInput = document.getElementById("resetUsername");
@@ -180,8 +72,7 @@ function openResetPasswordModalFromLogin() {
   resetPasswordBtns.forEach((btn) => {
     btn.disabled = true;
 
-    document.getElementById("resetUsername").value = "";
-    openResetPasswordModal();
+    resetUsernameInput.value = "";
   });
 }
 
@@ -190,4 +81,3 @@ function closeResetPasswordModal() {
   const resetPasswordModal = document.getElementById("resetPasswordModal");
   resetPasswordModal.style.display = "none";
 }
-
