@@ -96,8 +96,7 @@
           <button
             type="button"
             id="resetPasswordBtn"
-            disabled
-            onclick="openResetPasswordModal()"
+            onclick="openResetPasswordModalFromLogin()"
           >
             Reset Password
           </button>
@@ -108,8 +107,7 @@
     <script defer src="p4.js"></script>
   </body>
 </html>
-
-//p4.js..
+//p4.js...
 // Function to open the password reset modal
 function openResetPasswordModal() {
   const resetPasswordModal = document.getElementById("resetPasswordModal");
@@ -168,9 +166,10 @@ function handleResetUsernameInputChange() {
 }
 
 // Function to open the password reset modal
-function openResetPasswordModal() {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "block";
+function openResetPasswordModalFromLogin() {
+  const openResetPasswordModalFromLogin =
+    document.getElementById("resetPasswordModal");
+  openResetPasswordModalFromLogin.style.display = "block";
 
   // Add event listener to the input field for real-time validation
   const resetUsernameInput = document.getElementById("resetUsername");
@@ -180,6 +179,9 @@ function openResetPasswordModal() {
   const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
   resetPasswordBtns.forEach((btn) => {
     btn.disabled = true;
+
+    document.getElementById("resetUsername").value = "";
+    openResetPasswordModal();
   });
 }
 
@@ -189,8 +191,3 @@ function closeResetPasswordModal() {
   resetPasswordModal.style.display = "none";
 }
 
-1	Create a Password Reset Screen with User Name and Reset  Button which will open on clicking of Password Reset Button from the Login Page
-2	Add a place holder in the User Name box as Enter the User Name
-3	Disable the Reset Button if User Name Field is empty.
-4	Once the User Name is entered Check if the entered username is present in the Local Storage 
-5	Add Validation not to enter,paste special characters in User Name
