@@ -1,37 +1,3 @@
-// Function to open the password reset modal
-// In openResetPasswordModal function
-function openResetPasswordModal(triggeredFromLogin = false) {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "block";
-
-  // Add event listener to the input field for real-time validation
-  const resetUsernameInput = document.getElementById("resetUsername");
-  resetUsernameInput.addEventListener("input", handleResetUsernameInputChange);
-
-  // Initially disable the Reset Buttons
-  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
-  resetPasswordBtns.forEach((btn) => {
-    btn.disabled = true;
-  });
-
-  if (triggeredFromLogin) {
-    resetUsernameInput.value = "";
-  }
-
-  // Return a promise that resolves after opening the resetpasswordmodal
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, 0);
-  });
-}
-
-// In openResetPasswordModalFromLogin function
-async function openResetPasswordModalFromLogin() {
-  openResetPasswordModal(true);
-  openPasswordResetModal();
-}
-
 // Function to handle input change in the Reset Username field
 function handleResetUsernameInputChange() {
   const resetUsernameInput = document.getElementById("resetUsername");
@@ -56,10 +22,11 @@ function handleResetUsernameInputChange() {
     resetUsernameInput.value = "";
   } else {
     const storedUsernames = JSON.parse(localStorage.getItem("userList")) || [];
-    isUsernameInLocalStorage = storedUsernames.some(
+    const isUsernameInLocalStorage = storedUsernames.some(
       (user) => user.userName === enteredUsername
     );
     console.log("Username is valid:", enteredUsername);
+
     if (!isUsernameInLocalStorage) {
       storedUsernames.push({ userName: enteredUsername });
       localStorage.setItem("userList", JSON.stringify(storedUsernames));
@@ -67,60 +34,4 @@ function handleResetUsernameInputChange() {
 
     openPasswordResetModal(enteredUsername);
   }
-
-  const storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
-  const isUsernameInLocalStorage = storedUsernames.includes(enteredUsername);
-
-  if (isUsernameInLocalStorage) {
-    console.log("Username found in Local Storage:", enteredUsername);
-    openPasswordResetModal(enteredUsername);
-  } else {
-    console.log("Username not found in Local Storage:", enteredUsername);
-
-    // If the username is not found, you can add it to Local Storage
-    storedUsernames.push(enteredUsername);
-    localStorage.setItem("usernames", JSON.stringify(storedUsernames));
-
-    console.log("Username added to Local Storage:", enteredUsername);
-  }
-}
-
-// Function to open the password reset modal from login
-function openResetPasswordModalFromLogin() {
-  openResetPasswordModal(true);
-}
-
-// Function to close the password reset modal
-function closeResetPasswordModal() {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "none";
-}
-
-// Function to open the password reset modal
-function openPasswordResetModal(username) {
-  const passwordResetModal = document.getElementById("passwordResetModal");
-  passwordResetModal.style.display = "block";
-
-  //set the username in the modal
-  const usernameField = document.getElementById("resetUsernameInModal");
-  usernameField.value = username;
-  usernameField.setAttribute("readonly", true);
-
-  //add event listener to handle input change in second modal
-  const newPasswordInput = document.getElementById("newPasswordInModal");
-  newPasswordInput.addEventListener("input", handleNewPasswordInputChange);
-}
-
-// Function to close the password reset modal
-function closePasswordResetModal() {
-  const passwordResetModal = document.getElementById("passwordResetModal");
-  passwordResetModal.style.display = "none";
-}
-
-// Function to submit the password reset form
-function submitPasswordResetForm() {
-  // Add your password reset logic here
-  // You may want to validate the new password and retype new password, update the password, etc.
-  // Once the password is successfully reset, you can close the modal
-  closePasswordResetModal();
 }
