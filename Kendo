@@ -1,80 +1,590 @@
+//p1.html..
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kendo UI Grid with Modal</title>
-    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2022.2.1103/styles/kendo.common.min.css">
-    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2022.2.1103/styles/kendo.rtl.min.css">
-    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2022.2.1103/styles/kendo.default.min.css">
-    <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2022.2.1103/styles/kendo.mobile.all.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://kendo.cdn.telerik.com/2022.2.1103/js/kendo.all.min.js"></script>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="p2.css" />
 
-<div id="grid"></div>
+    <title>Login Page</title>
+  </head>
+  <body>
+    <form id="loginForm">
+      <label for="username">Username:</label>
+      <input
+        type="text"
+        id="newUsername"
+        placeholder="Enter the User Name"
+        autocomplete="newUsername"
+      />
 
-<script>
-    $(document).ready(function () {
-        // Sample data for the pick list
-        var organizationData = ["Organization A", "Organization B", "Organization C"];
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        id="newPassword"
+        placeholder="Enter the Password"
+        autocomplete="newPassword"
+      />
 
-        // Kendo UI Grid configuration
-        $("#grid").kendoGrid({
-            columns: [
-                { field: "name", title: "Name" },
-                { command: { text: "Edit", click: showDetails }, title: " ", width: "120px" }
-            ],
-            dataSource: {
-                data: [
-                    { name: "John Doe" },
-                    { name: "Jane Doe" }
-                ],
-                schema: {
-                    model: { id: "name" }
-                }
-            }
-        });
+      <button type="button" id="submitBtn" disabled>Submit</button>
+      <button type="button" id="resetBtn" style="display: none">Reset</button>
+      <button type="button" id="signupBtn" onclick="openSignUpModal()">
+        Sign Up
+      </button>
 
-        // Function to show details in a modal
-        function showDetails(e) {
-            e.preventDefault();
+      <button
+        type="button"
+        class="resetPasswordBtn"
+        onclick="openResetPasswordModal()"
+      >
+        Password Reset
+      </button>
+    </form>
 
-            var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
-            var modal = $("<div></div>").kendoWindow({
-                title: "Edit Details",
-                modal: true,
-                visible: false,
-                width: 300
-            }).data("kendoWindow");
+    <div id="signUpModalContainer"></div>
+    <div id="signUpModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeSignUpModal()">&times;</span>
+        <h2>Sign Up</h2>
+        <form id="signUpForm">
+          <label for="signupUsername">Username:</label>
+          <input
+            type="text"
+            id="signupUsername"
+            placeholder="Enter the User Name"
+            autocomplete="signupUsername"
+          />
 
-            modal.content("<label>Age: <input type='number' id='age'></label><br>" +
-                "<label>Date: <input type='date' id='date'></label><br>" +
-                "<label>Organization: <input id='organization' /></label><br>" +
-                "<button class='k-button' id='save'>Save</button>");
+          <label for="signupPassword">Password:</label>
+          <input
+            type="password"
+            id="signupPassword"
+            placeholder="Enter the Password"
+            autocomplete="signupPassword"
+          />
 
-            // Initialize the organization pick list
-            $("#organization").kendoDropDownList({
-                dataSource: organizationData
-            });
+          <button
+            type="button"
+            id="signupSubmitBtn"
+            onclick="submitSignUpForm()"
+          >
+            Submit
+          </button>
+          <button type="button" id="signupResetBtn" onclick="resetSignUpForm()">
+            Reset
+          </button>
+          <button type="button" id="resetStorageBtn">Reset Storage</button>
+        </form>
+      </div>
+    </div>
 
-            modal.center().open();
+    <div id="resetPasswordModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeResetPasswordModal()">&times;</span>
+        <h2>Password Reset Screen</h2>
+        <form id="resetPasswordForm">
+          <label for="resetUsername">Username:</label>
+          <input
+            type="text"
+            id="resetUsername"
+            placeholder="Enter the Username"
+            autocomplete="resetUsername"
+            pattern="[a-zA-Z0-9]+"
+            title="'only alphanumeric characters are allowed. "
+            required
+          />
+          <button
+            type="button"
+            class="resetPasswordBtn"
+            onclick="openResetPasswordModal()"
+            disabled
+          >
+            Reset Password
+          </button>
+        </form>
+      </div>
+    </div>
 
-            // Save button click event
-            $("#save").click(function () {
-                var age = $("#age").val();
-                var date = $("#date").val();
-                var organization = $("#organization").data("kendoDropDownList").value();
+    <!-- New Modal for Password Reset -->
+    <div id="passwordResetModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closePasswordResetModal()">&times;</span>
+        <h2>Password Reset Modal</h2>
+        <form id="passwordResetForm">
+          <label for="resetUsernameDisplay">Username:</label>
+          <input type="text" id="resetUsernameDisplay" readonly disabled />
 
-                // Dummy endpoint - print request payload
-                console.log("Payload: ", { age: age, date: date, organization: organization });
+          <label for="newPassword">New Password:</label>
+          <input
+            type="password"
+            id="passwordNew"
+            placeholder="Enter the New Password"
+            autocomplete="newPassword"
+          />
 
-                modal.close();
-            });
-        }
-    });
-</script>
+          <label for="retypeNewPassword">Retype New Password:</label>
+          <input
+            type="password"
+            id="retypeNewPassword"
+            placeholder="Retype the New Password"
+            autocomplete="retypeNewPassword"
+          />
 
-</body>
+          <button
+            type="button"
+            id="submitPasswordResetBtn"
+            onclick="submitPasswordResetForm()"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script defer src="p3.js"></script>
+    <script defer src="p4.js"></script>
+  </body>
 </html>
+//p2.css
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+form {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+
+button {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.error {
+  color: red;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.4);
+  padding-top: 60px;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+//p3.js..
+document.getElementById("signupPassword").addEventListener("cut", function (e) {
+  e.preventDefault();
+  showDisabledAlert();
+});
+
+document
+  .getElementById("signupPassword")
+  .addEventListener("copy", function (e) {
+    e.preventDefault();
+    showDisabledAlert();
+  });
+
+document
+  .getElementById("signupPassword")
+  .addEventListener("paste", function (e) {
+    e.preventDefault();
+    showDisabledAlert();
+  });
+
+document
+  .getElementById("signupPassword")
+  .addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+    showDisabledAlert();
+  });
+
+function showDisabledAlert() {
+  // Show Bootstrap Error alert in the Modal
+  const signUpModalContent = document.querySelector(
+    "#signUpModal .modal-content"
+  );
+  signUpModalContent.innerHTML += `
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      Copy, paste, and right-click disabled for the password field.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  `;
+}
+
+document.getElementById("newUsername").addEventListener("blur", function () {
+  validateField("newUsername");
+  updateResetButtonVisibility();
+  updateSubmitButtonState();
+});
+
+document.getElementById("newPassword").addEventListener("blur", function () {
+  validateField("newPassword");
+  updateResetButtonVisibility();
+  updateSubmitButtonState();
+});
+
+document.getElementById("submitBtn").addEventListener("click", function () {
+  submitForm();
+});
+
+document.getElementById("resetBtn").addEventListener("click", function () {
+  resetForm();
+});
+
+function validateField(field) {
+  const element = document.getElementById(field);
+  if (element.value.trim() === "") {
+    element.style.border = "2px solid red";
+  } else {
+    element.style.border = "1px solid #ccc";
+  }
+}
+
+function updateResetButtonVisibility() {
+  const usernameField = document.getElementById("newUsername");
+  const passwordField = document.getElementById("newPassword");
+  const resetButton = document.getElementById("resetBtn");
+
+  if (usernameField.value !== "" && passwordField.value !== "") {
+    resetButton.style.display = "inline-block";
+  } else {
+    resetButton.style.display = "none";
+  }
+}
+
+function updateSubmitButtonState() {
+  const usernameField = document.getElementById("newUsername");
+  const passwordField = document.getElementById("newPassword");
+  const submitButton = document.getElementById("submitBtn");
+
+  if (usernameField.value === "" && passwordField.value === "") {
+    submitButton.disabled = true;
+  } else {
+    submitButton.disabled = false;
+  }
+}
+
+function submitForm() {
+  const username = document.getElementById("newUsername").value;
+  const password = document.getElementById("newPassword").value;
+
+  if (username === "" || password === "") {
+    alert("Username and password are mandatory");
+    if (username === "") {
+      document.getElementById("newUsername").style.border = "2px solid red";
+      document.getElementById("newUsername").focus();
+    } else {
+      document.getElementById("newUsername").style.border = "1px solid #ccc";
+      document.getElementById("newPassword").style.border = "2px solid red";
+      document.getElementById("newPassword").focus();
+    }
+    return;
+  }
+
+  const userObject = {
+    userName: username,
+    pwd: password,
+  };
+
+  // Retrieve the existing user list from local storage
+  let userList = JSON.parse(localStorage.getItem("userList")) || [];
+
+  // Push the new user object to the user list
+  userList.push(userObject);
+
+  // Store the updated user list back to local storage
+  localStorage.setItem("userList", JSON.stringify(userList));
+
+  console.log("User List after submission:", userList);
+
+  // Additional logic for local storage validation can be added here
+
+  // Log the username and password JSON list data in the console
+  console.log(
+    "Username and Password JSON List Data:",
+    JSON.stringify(userList)
+  );
+}
+
+function resetForm() {
+  document.getElementById("newUsername").value = "";
+  document.getElementById("newPassword").value = "";
+  updateResetButtonVisibility();
+  updateSubmitButtonState();
+}
+document
+  .getElementById("resetStorageBtn")
+  .addEventListener("click", function () {
+    // Clear the stored local storage list
+    localStorage.removeItem("userList");
+    console.log("Local Storage List cleared");
+  });
+
+function openSignUpModal() {
+  const signUpModal = document.getElementById("signUpModal");
+  signUpModal.style.display = "block";
+}
+
+function closeSignUpModal() {
+  const signUpModal = document.getElementById("signUpModal");
+  signUpModal.style.display = "none";
+}
+
+function submitSignUpForm() {
+  const username = document.getElementById("signupUsername").value;
+  const password = document.getElementById("signupPassword").value;
+
+  if (!/^[a-zA-Z]+$/.test(username)) {
+    // Show Bootstrap Error alert in the Modal
+    const signUpModalContent = document.querySelector(
+      "#signUpModal .modal-content"
+    );
+    signUpModalContent.innerHTML += `
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        User Name cannot contain special characters or numbers. Choose another name and try again.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    `;
+    // Place the cursor in the Username Field
+    document.getElementById("signupUsername").focus();
+    return;
+  }
+  // Validate password
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^])(?=.*\d)[a-zA-Z\d!@#$%^]{8,}$/;
+  if (!passwordRegex.test(password)) {
+    // Show Bootstrap Error alert in the Modal
+    const signUpModalContent = document.querySelector(
+      "#signUpModal .modal-content"
+    );
+    signUpModalContent.innerHTML += `
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      Password must have at least 8 characters, including at least 1 lowercase letter, 1 uppercase letter, 1 digit, and 1 special character (!@#$%^).
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  `;
+    // Place the cursor in the Password Field
+    document.getElementById("signupPassword").focus();
+    return;
+  }
+  // Retrieve the existing user list from local storage
+  let userList = JSON.parse(localStorage.getItem("userList")) || [];
+
+  // Check if the username already exists
+  if (userList.some((user) => user.userName === username)) {
+    // Show Bootstrap Error alert in the Modal
+    const signUpModalContent = document.querySelector(
+      "#signUpModal .modal-content"
+    );
+    signUpModalContent.innerHTML += `
+      <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        User Name already taken. Choose another name and try again.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    `;
+    // Place the cursor in the Username Field
+    document.getElementById("signupUsername").focus();
+    return;
+  }
+
+  const userObject = {
+    userName: username,
+    pwd: password,
+  };
+
+  // Push the new user object to the user list
+  userList.push(userObject);
+
+  // Store the updated user list back to local storage
+  localStorage.setItem("userList", JSON.stringify(userList));
+
+  console.log("User List after signup:", userList);
+
+  // Close the modal after successful signup
+  closeSignUpModal();
+
+  // Show Bootstrap Success alert in the Modal on the Top of Login Screen
+  const loginForm = document.getElementById("loginForm");
+  loginForm.insertAdjacentHTML(
+    "afterbegin",
+    `
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        User is created.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    `
+  );
+
+  // Set timeout to remove the success alert after 5 seconds
+  setTimeout(() => {
+    document.querySelector(".alert-success").remove();
+  }, 5000);
+}
+//p4.js
+// Function to open the password reset modal
+function openResetPasswordModal(triggeredFromLogin = false) {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "block";
+
+  // Add event listener to the input field for real-time validation
+  const resetUsernameInput = document.getElementById("resetUsername");
+  resetUsernameInput.addEventListener("input", handleResetUsernameInputChange);
+
+  // Initially disable the Reset Buttons
+  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
+  resetPasswordBtns.forEach((btn) => {
+    btn.disabled = true;
+  });
+
+  if (triggeredFromLogin) {
+    resetUsernameInput.value = "";
+  }
+  openPasswordResetModal();
+}
+
+// Function to handle input change in the Reset Username field
+function handleResetUsernameInputChange() {
+  const resetUsernameInput = document.getElementById("resetUsername");
+  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
+
+  // Enable the Reset Buttons only if the Reset Username field is not empty
+
+  const isUsernameEmpty = !resetUsernameInput.value.trim();
+  const containsSpecialCharacters = /[!@#$%^&*(),.?":{}|<>]/.test(
+    resetUsernameInput.value.trim()
+  );
+
+  resetPasswordBtns.forEach((btn) => {
+    btn.disabled = isUsernameEmpty || containsSpecialCharacters;
+  });
+
+  // Check if the entered username is present in Local Storage
+  const enteredUsername = resetUsernameInput.value.trim();
+  if (containsSpecialCharacters) {
+    console.log("Special characters are not allowed in the username");
+    // Optionally, you can clear the input field or display an error message
+    resetUsernameInput.value = "";
+  } else {
+    console.log("Username is valid:", enteredUsername);
+  }
+
+  const storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
+  const isUsernameInLocalStorage = storedUsernames.includes(enteredUsername);
+
+  if (isUsernameInLocalStorage) {
+    console.log("Username found in Local Storage:", enteredUsername);
+  } else {
+    console.log("Username not found in Local Storage:", enteredUsername);
+
+    // If the username is not found, you can add it to Local Storage
+    storedUsernames.push(enteredUsername);
+    localStorage.setItem("usernames", JSON.stringify(storedUsernames));
+
+    console.log("Username added to Local Storage:", enteredUsername);
+  }
+}
+
+// Function to open the password reset modal from login
+function openResetPasswordModalFromLogin() {
+  openResetPasswordModal(true);
+}
+
+// Function to close the password reset modal
+function closeResetPasswordModal() {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "none";
+}
+
+// Function to open the password reset modal
+function openPasswordResetModal(username) {
+  const passwordResetModal = document.getElementById("passwordResetModal");
+  passwordResetModal.style.display = "block";
+
+  //set the username in the modal
+  const usernameField = document.getElementById("resetUsernameInModal");
+  usernameField.value = username;
+  usernameField.setAttribute("readonly", true);
+
+  //add event listener to handle input change in second modal
+  const newPasswordInput = document.getElementById("newPasswordInModal");
+  newPasswordInput.addEventListener("input,handleNewPasswordInputChange");
+}
+
+// Function to close the password reset modal
+function closePasswordResetModal() {
+  const passwordResetModal = document.getElementById("passwordResetModal");
+  passwordResetModal.style.display = "none";
+}
+
+// Function to submit the password reset form
+function submitPasswordResetForm() {
+  // Add your password reset logic here
+  // You may want to validate the new password and retype new password, update the password, etc.
+  // Once the password is successfully reset, you can close the modal
+  closePasswordResetModal();
+}
