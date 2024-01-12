@@ -35,3 +35,153 @@ function handleResetUsernameInputChange() {
     openPasswordResetModal(enteredUsername);
   }
 }
+
+
+//..html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="p2.css" />
+
+    <title>Login Page</title>
+  </head>
+  <body>
+    <form id="loginForm">
+      <label for="username">Username:</label>
+      <input
+        type="text"
+        id="newUsername"
+        placeholder="Enter the User Name"
+        autocomplete="newUsername"
+      />
+
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        id="newPassword"
+        placeholder="Enter the Password"
+        autocomplete="newPassword"
+      />
+
+      <button type="button" id="submitBtn" disabled>Submit</button>
+      <button type="button" id="resetBtn" style="display: none">Reset</button>
+      <button type="button" id="signupBtn" onclick="openSignUpModal()">
+        Sign Up
+      </button>
+
+      <button
+        type="button"
+        class="resetPasswordBtn"
+        onclick="openResetPasswordModal()"
+      >
+        Password Reset
+      </button>
+    </form>
+
+    <div id="signUpModalContainer"></div>
+    <div id="signUpModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeSignUpModal()">&times;</span>
+        <h2>Sign Up</h2>
+        <form id="signUpForm">
+          <label for="signupUsername">Username:</label>
+          <input
+            type="text"
+            id="signupUsername"
+            placeholder="Enter the User Name"
+            autocomplete="signupUsername"
+          />
+
+          <label for="signupPassword">Password:</label>
+          <input
+            type="password"
+            id="signupPassword"
+            placeholder="Enter the Password"
+            autocomplete="signupPassword"
+          />
+
+          <button
+            type="button"
+            id="signupSubmitBtn"
+            onclick="submitSignUpForm()"
+          >
+            Submit
+          </button>
+          <button type="button" id="signupResetBtn" onclick="resetSignUpForm()">
+            Reset
+          </button>
+          <button type="button" id="resetStorageBtn">Reset Storage</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="resetPasswordModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeResetPasswordModal()">&times;</span>
+        <h2>Password Reset Screen</h2>
+        <form id="resetPasswordForm">
+          <label for="resetUsername">Username:</label>
+          <input
+            type="text"
+            id="resetUsername"
+            placeholder="Enter the Username"
+            autocomplete="resetUsername"
+            pattern="[a-zA-Z0-9]+"
+            title="'only alphanumeric characters are allowed. "
+            required
+          />
+          <button
+            type="button"
+            class="resetPasswordBtn"
+            onclick="openResetPasswordModal()"
+            disabled
+          >
+            Reset Password
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- New Modal for Password Reset -->
+    <div id="passwordResetModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closePasswordResetModal()">&times;</span>
+        <h2>Password Reset Modal</h2>
+        <form id="passwordResetForm">
+          <label for="resetUsernameDisplay">Username:</label>
+          <input type="text" id="resetUsernameDisplay" readonly disabled />
+
+          <label for="newPassword">New Password:</label>
+          <input
+            type="password"
+            id="passwordNew"
+            placeholder="Enter the New Password"
+            autocomplete="newPassword"
+          />
+
+          <label for="retypeNewPassword">Retype New Password:</label>
+          <input
+            type="password"
+            id="retypeNewPassword"
+            placeholder="Retype the New Password"
+            autocomplete="retypeNewPassword"
+          />
+
+          <button
+            type="button"
+            id="submitPasswordResetBtn"
+            onclick="submitPasswordResetForm()"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script defer src="p3.js"></script>
+    <script defer src="p4.js"></script>
+  </body>
+</html>
+
