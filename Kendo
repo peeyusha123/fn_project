@@ -1,5 +1,5 @@
-//p4.js updated file
 // Function to open the password reset modal
+// In openResetPasswordModal function
 function openResetPasswordModal(triggeredFromLogin = false) {
   const resetPasswordModal = document.getElementById("resetPasswordModal");
   resetPasswordModal.style.display = "block";
@@ -17,9 +17,19 @@ function openResetPasswordModal(triggeredFromLogin = false) {
   if (triggeredFromLogin) {
     resetUsernameInput.value = "";
   }
-  setTimeout(() => {
-    openPasswordResetModal();
-  }, 0);
+
+  // Return a promise that resolves after opening the resetpasswordmodal
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, 0);
+  });
+}
+
+// In openResetPasswordModalFromLogin function
+async function openResetPasswordModalFromLogin() {
+  openResetPasswordModal(true);
+  openPasswordResetModal();
 }
 
 // Function to handle input change in the Reset Username field
@@ -50,6 +60,12 @@ function handleResetUsernameInputChange() {
       (user) => user.userName === enteredUsername
     );
     console.log("Username is valid:", enteredUsername);
+    if (!isUsernameInLocalStorage) {
+      storedUsernames.push({ userName: enteredUsername });
+      localStorage.setItem("userList", JSON.stringify(storedUsernames));
+    }
+
+    openPasswordResetModal(enteredUsername);
   }
 
   const storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
@@ -107,76 +123,4 @@ function submitPasswordResetForm() {
   // You may want to validate the new password and retype new password, update the password, etc.
   // Once the password is successfully reset, you can close the modal
   closePasswordResetModal();
-}
-
-updated..
-// In openResetPasswordModal function
-function openResetPasswordModal(triggeredFromLogin = false) {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "block";
-
-  // Add event listener to the input field for real-time validation
-  const resetUsernameInput = document.getElementById("resetUsername");
-  resetUsernameInput.addEventListener("input", handleResetUsernameInputChange);
-
-  // Initially disable the Reset Buttons
-  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
-  resetPasswordBtns.forEach((btn) => {
-    btn.disabled = true;
-  });
-
-  if (triggeredFromLogin) {
-    resetUsernameInput.value = "";
-  }
-
-  // Return a promise that resolves after opening the resetpasswordmodal
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, 0);
-  });
-}
-
-// In openResetPasswordModalFromLogin function
-async function openResetPasswordModalFromLogin() {
-  await openResetPasswordModal(true);
-  openPasswordResetModal();
-}
-
-new2..
-// In handleResetUsernameInputChange function
-function handleResetUsernameInputChange() {
-  const resetUsernameInput = document.getElementById("resetUsername");
-  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
-
-  // Enable the Reset Buttons only if the Reset Username field is not empty
-
-  const isUsernameEmpty = !resetUsernameInput.value.trim();
-  const containsSpecialCharacters = /[!@#$%^&*(),.?":{}|<>]/.test(
-    resetUsernameInput.value.trim()
-  );
-
-  resetPasswordBtns.forEach((btn) => {
-    btn.disabled = isUsernameEmpty || containsSpecialCharacters;
-  });
-
-  // Check if the entered username is present in Local Storage
-  const enteredUsername = resetUsernameInput.value.trim();
-  if (containsSpecialCharacters) {
-    console.log("Special characters are not allowed in the username");
-    // Optionally, you can clear the input field or display an error message
-    resetUsernameInput.value = "";
-  } else {
-    const storedUsernames = JSON.parse(localStorage.getItem("userList")) || [];
-    isUsernameInLocalStorage = storedUsernames.some(
-      (user) => user.userName === enteredUsername
-    );
-
-    if (!isUsernameInLocalStorage) {
-      storedUsernames.push({ userName: enteredUsername });
-      localStorage.setItem("userList", JSON.stringify(storedUsernames));
-    }
-
-    openPasswordResetModal(enteredUsername);
-  }
 }
