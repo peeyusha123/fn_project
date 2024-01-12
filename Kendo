@@ -108,3 +108,37 @@ function submitPasswordResetForm() {
   // Once the password is successfully reset, you can close the modal
   closePasswordResetModal();
 }
+
+updated..
+// In openResetPasswordModal function
+function openResetPasswordModal(triggeredFromLogin = false) {
+  const resetPasswordModal = document.getElementById("resetPasswordModal");
+  resetPasswordModal.style.display = "block";
+
+  // Add event listener to the input field for real-time validation
+  const resetUsernameInput = document.getElementById("resetUsername");
+  resetUsernameInput.addEventListener("input", handleResetUsernameInputChange);
+
+  // Initially disable the Reset Buttons
+  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
+  resetPasswordBtns.forEach((btn) => {
+    btn.disabled = true;
+  });
+
+  if (triggeredFromLogin) {
+    resetUsernameInput.value = "";
+  }
+
+  // Return a promise that resolves after opening the resetpasswordmodal
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, 0);
+  });
+}
+
+// In openResetPasswordModalFromLogin function
+async function openResetPasswordModalFromLogin() {
+  await openResetPasswordModal(true);
+  openPasswordResetModal();
+}
