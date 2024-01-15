@@ -1,118 +1,7 @@
-//p1.html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="p2.css" />
-
-    <title>Login Page</title>
-  </head>
-  <body>
-    <form id="loginForm">
-      <label for="username">Username:</label>
-      <input
-        type="text"
-        id="newUsername"
-        placeholder="Enter the User Name"
-        autocomplete="newUsername"
-      />
-
-      <label for="password">Password:</label>
-      <input
-        type="password"
-        id="newPassword"
-        placeholder="Enter the Password"
-        autocomplete="newPassword"
-      />
-
-      <button type="button" id="submitBtn" disabled>Submit</button>
-      <button type="button" id="resetBtn" style="display: none">Reset</button>
-      <button type="button" id="signupBtn" onclick="openSignUpModal()">
-        Sign Up
-      </button>
-
-      <button
-        type="button"
-        class="resetPasswordBtn"
-        onclick="openResetPasswordModal()"
-      >
-        Password Reset
-      </button>
-    </form>
-
-    <div id="signUpModalContainer"></div>
-    <div id="signUpModal" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closeSignUpModal()">&times;</span>
-        <h2>Sign Up</h2>
-        <form id="signUpForm">
-          <label for="signupUsername">Username:</label>
-          <input
-            type="text"
-            id="signupUsername"
-            placeholder="Enter the User Name"
-            autocomplete="signupUsername"
-          />
-
-          <label for="signupPassword">Password:</label>
-          <input
-            type="password"
-            id="signupPassword"
-            placeholder="Enter the Password"
-            autocomplete="signupPassword"
-          />
-
-          <button
-            type="button"
-            id="signupSubmitBtn"
-            onclick="submitSignUpForm()"
-          >
-            Submit
-          </button>
-          <button type="button" id="signupResetBtn" onclick="resetSignUpForm()">
-            Reset
-          </button>
-          <button type="button" id="resetStorageBtn">Reset Storage</button>
-        </form>
-      </div>
-    </div>
-
-    <div id="resetPasswordModal" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closeResetPasswordModal()">&times;</span>
-        <h2>Password Reset Modal</h2>
-        <form id="resetPasswordForm">
-          <label for="resetUsername">Username:</label>
-          <input
-            type="text"
-            id="resetUsername"
-            placeholder="Enter the Username"
-            autocomplete="resetUsername"
-            pattern="[a-zA-Z0-9]+"
-            title="'only alphsnumeric characters are allowed. "
-            required
-          />
-          <button
-            type="button"
-            id="resetPasswordBtn"
-            disabled
-            onclick="openResetPasswordModal()"
-          >
-            Reset Password
-          </button>
-        </form>
-      </div>
-    </div>
-    <script defer src="p3.js"></script>
-    <script defer src="p4.js"></script>
-  </body>
-</html>
-
-//p4.js
-
+p4.js..
 // Function to open the password reset modal
-function openResetPasswordModal() {
+// In openResetPasswordModal function
+function openResetPasswordModal(triggeredFromLogin = false) {
   const resetPasswordModal = document.getElementById("resetPasswordModal");
   resetPasswordModal.style.display = "block";
 
@@ -125,38 +14,73 @@ function openResetPasswordModal() {
   resetPasswordBtns.forEach((btn) => {
     btn.disabled = true;
   });
+
+  if (triggeredFromLogin) {
+    resetUsernameInput.value = "";
+  }
+
+  // Return a promise that resolves after opening the resetpasswordmodal
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, 0);
+  });
 }
+
+// In openResetPasswordModalFromLogin function
+async function openResetPasswordModalFromLogin() {
+  await openResetPasswordModal(true);
+  openPasswordResetModal();
+}
+
 // Function to handle input change in the Reset Username field
 function handleResetUsernameInputChange() {
   const resetUsernameInput = document.getElementById("resetUsername");
   const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
 
   // Enable the Reset Buttons only if the Reset Username field is not empty
+
   const isUsernameEmpty = !resetUsernameInput.value.trim();
-  containsSpecialCharacters = /[!@#$%^&*(),.?":{}|<>]/.test(
+  const containsSpecialCharacters = /[!@#$%^&*(),.?":{}|<>]/.test(
     resetUsernameInput.value.trim()
   );
+
   resetPasswordBtns.forEach((btn) => {
     btn.disabled = isUsernameEmpty || containsSpecialCharacters;
   });
 
   // Check if the entered username is present in Local Storage
   const enteredUsername = resetUsernameInput.value.trim();
-  containsSpecialCharacters = /[!@#$%^&*(),.?":{}|<>]/.test(enteredUsername);
-  if (containsSpecialCharacters) {
-    console.log("Special characters are not allowed in the username");
+  if (!containsSpecialCharacters) {
+    const storedUsernames = JSON.parse(localStorage.getItem("userList")) || [];
+
+    isUsernameInLocalStorage = storedUsernames.some(
+      (user) => user.userName === enteredUsername
+    );
+
     // Optionally, you can clear the input field or display an error message
     resetUsernameInput.value = "";
   } else {
+    const storedUsernames = JSON.parse(localStorage.getItem("userList")) || [];
+    const isUsernameInLocalStorage = storedUsernames.some(
+      (user) => user.userName === enteredUsername
+    );
     console.log("Username is valid:", enteredUsername);
+
+    if (!isUsernameInLocalStorage) {
+      storedUsernames.push({ userName: enteredUsername });
+      localStorage.setItem("userList", JSON.stringify(storedUsernames));
+    }
+
+    openPasswordResetModal(enteredUsername);
   }
 
   const storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
-
   const isUsernameInLocalStorage = storedUsernames.includes(enteredUsername);
 
   if (isUsernameInLocalStorage) {
     console.log("Username found in Local Storage:", enteredUsername);
+    openPasswordResetModal(enteredUsername);
   } else {
     console.log("Username not found in Local Storage:", enteredUsername);
 
@@ -168,24 +92,110 @@ function handleResetUsernameInputChange() {
   }
 }
 
-// Function to open the password reset modal
-function openResetPasswordModal() {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "block";
-
-  // Add event listener to the input field for real-time validation
-  const resetUsernameInput = document.getElementById("resetUsername");
-  resetUsernameInput.addEventListener("input", handleResetUsernameInputChange);
-
-  // Initially disable the Reset Buttons
-  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
-  resetPasswordBtns.forEach((btn) => {
-    btn.disabled = true;
-  });
+// Function to open the password reset modal from login
+function openResetPasswordModalFromLogin() {
+  openResetPasswordModal(true);
 }
 
 // Function to close the password reset modal
 function closeResetPasswordModal() {
   const resetPasswordModal = document.getElementById("resetPasswordModal");
   resetPasswordModal.style.display = "none";
+}
+
+// Function to open the password reset modal
+function openPasswordResetModal(username) {
+  const passwordResetModal = document.getElementById("passwordResetModal");
+  passwordResetModal.style.display = "block";
+
+  //set the username in the modal
+  const usernameField = document.getElementById("resetUsernameModal");
+  usernameField.value = username;
+  usernameField.setAttribute("readonly", true);
+
+  //add event listener to handle input change in second modal
+  const newPasswordInput = document.getElementById("newPasswordInModal");
+  newPasswordInput.addEventListener("input", handleNewPasswordInputChange);
+}
+
+// Function to close the password reset modal
+function closePasswordResetModal() {
+  const passwordResetModal = document.getElementById("passwordResetModal");
+  passwordResetModal.style.display = "none";
+}
+
+// Function to submit the password reset form
+function submitPasswordResetForm() {
+  const newPasswordInput = document.getElementById("passwordNew");
+  const retypeNewPasswordInput = document.getElementById("retypeNewPassword");
+  const resetUsernameDisplay = document.getElementById("resetUsernameDisplay");
+
+  // Validate Password
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^])(?=.*\d)[a-zA-Z\d!@#$%^]{8,}$/;
+  const newPassword = newPasswordInput.value;
+  const retypeNewPassword = retypeNewPasswordInput.value;
+
+  if (!passwordRegex.test(newPassword)) {
+    showErrorMessage("Password must meet the specified criteria.");
+    return;
+  }
+
+  // Validate Special Characters
+  const specialCharactersRegex = /[!@#$%^]/;
+  if (!specialCharactersRegex.test(newPassword)) {
+    showErrorMessage("Password must contain at least one of !@#$%^");
+    return;
+  }
+
+  // Check if New Password and Retype Password Match
+  if (newPassword !== retypeNewPassword) {
+    showErrorMessage("Passwords do not match.");
+    return;
+  }
+
+  // Update the password in local storage
+  const userList = JSON.parse(localStorage.getItem("userList")) || [];
+  const userIndex = userList.findIndex(
+    (user) => user.userName === resetUsernameDisplay.value
+  );
+
+  if (userIndex !== -1) {
+    userList[userIndex].pwd = newPassword;
+    localStorage.setItem("userList", JSON.stringify(userList));
+  }
+
+  // Close the Password Reset Modal
+  closePasswordResetModal();
+
+  // Show Bootstrap Success Alert for Password Reset Success
+  showSuccessMessage("User Password Reset Success");
+}
+
+function showErrorMessage(message) {
+  showAlert(message, "alert-danger");
+}
+
+function showSuccessMessage(message) {
+  showAlert(message, "alert-success");
+}
+
+function showAlert(message, alertType) {
+  const loginForm = document.getElementById("loginForm");
+  loginForm.insertAdjacentHTML(
+    "afterbegin",
+    `
+    <div class="alert ${alertType} alert-dismissible fade show" role="alert">
+      ${message}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  `
+  );
+
+  // Set timeout to remove the alert after 5 seconds
+  setTimeout(() => {
+    document.querySelector(`.${alertType}`).remove();
+  }, 5000);
 }
