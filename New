@@ -1,4 +1,4 @@
-p4.js..
+//p4.js  updated
 // Function to open the password reset modal
 // In openResetPasswordModal function
 function openResetPasswordModal(triggeredFromLogin = false) {
@@ -35,6 +35,7 @@ async function openResetPasswordModalFromLogin() {
 
 // Function to handle input change in the Reset Username field
 function handleResetUsernameInputChange() {
+  let isUsernameInLocalStorage;
   const resetUsernameInput = document.getElementById("resetUsername");
   const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
 
@@ -76,7 +77,7 @@ function handleResetUsernameInputChange() {
   }
 
   const storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
-  const isUsernameInLocalStorage = storedUsernames.includes(enteredUsername);
+  isUsernameInLocalStorage = storedUsernames.includes(enteredUsername);
 
   if (isUsernameInLocalStorage) {
     console.log("Username found in Local Storage:", enteredUsername);
@@ -106,22 +107,40 @@ function closeResetPasswordModal() {
 // Function to open the password reset modal
 function openPasswordResetModal(username) {
   const passwordResetModal = document.getElementById("passwordResetModal");
-  passwordResetModal.style.display = "block";
 
-  //set the username in the modal
-  const usernameField = document.getElementById("resetUsernameModal");
-  usernameField.value = username;
-  usernameField.setAttribute("readonly", true);
+  if (passwordResetModal) {
+    passwordResetModal.style.display = "block";
 
-  //add event listener to handle input change in second modal
-  const newPasswordInput = document.getElementById("newPasswordInModal");
-  newPasswordInput.addEventListener("input", handleNewPasswordInputChange);
+    //set the username in the modal
+    const usernameField = document.getElementById("resetUsernameDisplay");
+
+    if (usernameField) {
+      usernameField.value = username;
+      usernameField.setAttribute("readonly", true);
+
+      //add event listener to handle input change in second modal
+      const newPasswordInput = document.getElementById("passwordNew");
+      if (newPasswordInput) {
+        newPasswordInput.addEventListener(
+          "input",
+          handleNewPasswordInputChange
+        );
+      }
+    } else {
+      console.error("Element with id 'resetUsernameModal' not found.");
+    }
+  } else {
+    console.error("Element with id 'passwordResetModal' not found.");
+  }
 }
-
 // Function to close the password reset modal
 function closePasswordResetModal() {
   const passwordResetModal = document.getElementById("passwordResetModal");
   passwordResetModal.style.display = "none";
+}
+
+function handleNewPasswordInputChange() {
+  const newPasswordInput = document.getElementById("new");
 }
 
 // Function to submit the password reset form
@@ -199,3 +218,4 @@ function showAlert(message, alertType) {
     document.querySelector(`.${alertType}`).remove();
   }, 5000);
 }
+
