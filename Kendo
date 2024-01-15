@@ -634,3 +634,87 @@ password reset page ,, following is condition for password reset page some condi
 11	On Click of the Submit Button in Password Reset Modal check if New Password and Reset Password Values martch and if not and show BootStrap Success alert in the Modal  Stating  "Password does not match" on the Top of  Password Reset Screen 
 12	BootStrap alert should have a X Mark to close also the message should disappear automatically in 5 seconds or by clicking the X Mark.
 13	If all Validations are good then close the Password Reset Modal and show BootStrap Success alert in the Modal  Stating  "User Password Reset Success" on the Top of  Login Screen 
+
+
+new...
+
+//p4.js... js code for only password reset page
+// ... (your existing code)
+
+// Function to submit the password reset form
+function submitPasswordResetForm() {
+  const newPasswordInput = document.getElementById("passwordNew");
+  const retypeNewPasswordInput = document.getElementById("retypeNewPassword");
+  const resetUsernameDisplay = document.getElementById("resetUsernameDisplay");
+
+  // Validate Password
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^])(?=.*\d)[a-zA-Z\d!@#$%^]{8,}$/;
+  const newPassword = newPasswordInput.value;
+  const retypeNewPassword = retypeNewPasswordInput.value;
+
+  if (!passwordRegex.test(newPassword)) {
+    showErrorMessage("Password must meet the specified criteria.");
+    return;
+  }
+
+  // Validate Special Characters
+  const specialCharactersRegex = /[!@#$%^]/;
+  if (!specialCharactersRegex.test(newPassword)) {
+    showErrorMessage("Password must contain at least one of !@#$%^");
+    return;
+  }
+
+  // Check if New Password and Retype Password Match
+  if (newPassword !== retypeNewPassword) {
+    showErrorMessage("Passwords do not match.");
+    return;
+  }
+
+  // Update the password in local storage
+  const userList = JSON.parse(localStorage.getItem("userList")) || [];
+  const userIndex = userList.findIndex(
+    (user) => user.userName === resetUsernameDisplay.value
+  );
+
+  if (userIndex !== -1) {
+    userList[userIndex].pwd = newPassword;
+    localStorage.setItem("userList", JSON.stringify(userList));
+  }
+
+  // Close the Password Reset Modal
+  closePasswordResetModal();
+
+  // Show Bootstrap Success Alert for Password Reset Success
+  showSuccessMessage("User Password Reset Success");
+}
+
+function showErrorMessage(message) {
+  showAlert(message, "alert-danger");
+}
+
+function showSuccessMessage(message) {
+  showAlert(message, "alert-success");
+}
+
+function showAlert(message, alertType) {
+  const loginForm = document.getElementById("loginForm");
+  loginForm.insertAdjacentHTML(
+    "afterbegin",
+    `
+    <div class="alert ${alertType} alert-dismissible fade show" role="alert">
+      ${message}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  `
+  );
+
+  // Set timeout to remove the alert after 5 seconds
+  setTimeout(() => {
+    document.querySelector(`.${alertType}`).remove();
+  }, 5000);
+}
+
+// ... (your existing code)
