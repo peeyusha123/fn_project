@@ -1,8 +1,8 @@
-//p4.js
 // Function to open the password reset modal
 // In openResetPasswordModal function
 function openResetPasswordModal(triggeredFromLogin = false) {
   const resetPasswordModal = document.getElementById("resetPasswordModal");
+
   resetPasswordModal.style.display = "block";
 
   // Add event listener to the input field for real-time validation
@@ -22,6 +22,10 @@ function openResetPasswordModal(triggeredFromLogin = false) {
   // Return a promise that resolves after opening the resetpasswordmodal
   return new Promise((resolve) => {
     setTimeout(() => {
+      if (triggeredFromLogin) {
+        enteredUsername = resetUsernameInput.value.trim();
+        openPasswordResetModal(enteredUsername);
+      }
       resolve();
     }, 0);
   });
@@ -49,13 +53,19 @@ function handleResetUsernameInputChange() {
   resetPasswordBtns.forEach((btn) => {
     btn.disabled = isUsernameEmpty || containsSpecialCharacters;
   });
+  let enteredUsername = resetUsernameInput.value.trim();
+  isCompleteUsername = enteredUsername && enteredUsername.length > 1;
 
-  if (document.getElementById("passwordResetModal").style.display === "block") {
+  if (
+    document.getElementById("passwordResetModal").style.display === "block" &&
+    document.getElementById("passwordResetModal").offsetHeight > 0 &&
+    !isCompleteUsername
+  ) {
     resetUsernameInput.value = "";
   }
 
   // Check if the entered username is present in Local Storage
-  const enteredUsername = resetUsernameInput.value.trim();
+
   if (!containsSpecialCharacters) {
     const storedUsernames = JSON.parse(localStorage.getItem("userList")) || [];
 
