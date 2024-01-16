@@ -1,5 +1,7 @@
 // Function to open the password reset modal
 // In openResetPasswordModal function
+let openPasswordResetModalImmediately = false;
+
 function openResetPasswordModal(triggeredFromLogin = false) {
   const resetPasswordModal = document.getElementById("resetPasswordModal");
   resetPasswordModal.style.display = "block";
@@ -13,6 +15,8 @@ function openResetPasswordModal(triggeredFromLogin = false) {
   resetPasswordBtns.forEach((btn) => {
     btn.disabled = true;
   });
+
+  openPasswordResetModalImmediately = triggeredFromLogin;
 
   if (triggeredFromLogin) {
     resetUsernameInput.value = "";
@@ -49,7 +53,10 @@ function handleResetUsernameInputChange() {
     btn.disabled = isUsernameEmpty || containsSpecialCharacters;
   });
 
-  if (document.getElementById("passwordResetModal").style.display === "block") {
+  if (
+    document.getElementById("passwordResetModal").style.display === "block" &&
+    document.getElementById("passwordResetModal").offsetHeight > 0
+  ) {
     resetUsernameInput.value = "";
   }
 
@@ -76,7 +83,12 @@ function handleResetUsernameInputChange() {
       localStorage.setItem("userList", JSON.stringify(storedUsernames));
     }
 
+    // openPasswordResetModal(enteredUsername);
+  }
+
+  if (openPasswordResetModalImmediately) {
     openPasswordResetModal(enteredUsername);
+    openPasswordResetModalImmediately = false;
   }
 
   const storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
