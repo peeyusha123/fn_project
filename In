@@ -1,119 +1,32 @@
-// Function to open the password reset modal
-function openResetPasswordModal(triggeredFromLogin = false) {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "block";
+//sign up
 
-  // Add event listener to the input field for real-time validation
-  const resetUsernameInput = document.getElementById("resetUsername");
-  resetUsernameInput.addEventListener("input", handleResetUsernameInputChange);
+Create a Sign Up Modal with User Name, Password and Submit and Reset Storage Button which will open on clicking of Sign Up Button from the Login Page
+Add a place holder in the User Name box as Enter the User Name and in password box as Enter the Password.
+Create a User List Object and store the entered User Name in a key called userName and Password into pwd key inside the User Object.
+Once the User Clicks on Submit Button then Log the Username and password JSON List Data in the Console.
+Now Store the List to the Browser Local Storage
+On Click on the Reset Storage Button clear the Stored Local Storage List.
+On Submit check if the new username entered is present in the existing Local Storage List and incase if its present then throw an BootStrap Error alert in the Modal   Stating  "User Name already taken choose another Name and Try Again"  and place the Cursor in the Username Field.
+On Submit check if the new username entered is not present in the existing Local Storage List then close the SignUp modal and show BootStrap Success alert in the Modal  Stating  "User is Created" on the Top of  Login Screen 
+BootStrap alert should have a X Mark to close also the message should disappear automatically in 5 seconds or by clicking the X Mark.
+Add Validation not to get Special Characters in User Name
+Add Validation to check if Password has 8 Characters, Min 1 Lower Case, Min 1 Upper Case and Min 1 Special Character
+Allowed Special Characters in Password (!@#$%^) and anything out of this then throw an Error Message stating that the Special Character should be within this.
+Disable Copy, Paste using ShortCuts and Right Click on Password Field.
 
-  // Initially disable the Reset Buttons
-  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
-  resetPasswordBtns.forEach((btn) => {
-    btn.disabled = true;
-  });
-
-  if (triggeredFromLogin) {
-    resetUsernameInput.value = "";
-  }
-}
-
-// Function to handle input change in the Reset Username field
-function handleResetUsernameInputChange() {
-  const resetUsernameInput = document.getElementById("resetUsername");
-  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
-
-  // Enable the Reset Buttons only if the Reset Username field is not empty
-  const isUsernameEmpty = !resetUsernameInput.value.trim();
-  const containsSpecialCharacters = /[!@#$%^&*(),.?":{}|<>]/.test(
-    resetUsernameInput.value.trim()
-  );
-
-  resetPasswordBtns.forEach((btn) => {
-    btn.disabled = isUsernameEmpty || containsSpecialCharacters;
-  });
-
-  // Check if the entered username is present in Local Storage
-  const enteredUsername = resetUsernameInput.value.trim();
-  if (containsSpecialCharacters) {
-    console.log("Special characters are not allowed in the username");
-    // Optionally, you can clear the input field or display an error message
-    resetUsernameInput.value = "";
-  } else {
-    console.log("Username is valid:", enteredUsername);
-  }
-
-  const storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
-  const isUsernameInLocalStorage = storedUsernames.includes(enteredUsername);
-
-  if (isUsernameInLocalStorage) {
-    console.log("Username found in Local Storage:", enteredUsername);
-  } else {
-    console.log("Username not found in Local Storage:", enteredUsername);
-
-    // If the username is not found, you can add it to Local Storage
-    storedUsernames.push(enteredUsername);
-    localStorage.setItem("usernames", JSON.stringify(storedUsernames));
-
-    console.log("Username added to Local Storage:", enteredUsername);
-  }
-}
-
-// Function to open the password reset modal from login
-function openResetPasswordModalFromLogin() {
-  openResetPasswordModal(true);
-}
-
-// Function to close the password reset modal
-function closeResetPasswordModal() {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "none";
-}
-
-
-
-//new
-
-// Function to handle input change in the Reset Username field
-function handleResetUsernameInputChange() {
-  const resetUsernameInput = document.getElementById("resetUsername");
-  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
-
-  // Enable the Reset Buttons only if the Reset Username field is not empty
-  const isUsernameEmpty = !resetUsernameInput.value.trim();
-  const containsSpecialCharacters = /[!@#$%^&*(),.?":{}|<>]/.test(
-    resetUsernameInput.value.trim()
-  );
-
-  resetPasswordBtns.forEach((btn) => {
-    btn.disabled = isUsernameEmpty || containsSpecialCharacters;
-  });
-
-  // Check if the entered username is present in Local Storage
-  const enteredUsername = resetUsernameInput.value.trim();
-
-  // Check if the input is a complete username
-  const isCompleteUsername =
-    enteredUsername &&
-    enteredUsername.length >= MIN_USERNAME_LENGTH; // Define MIN_USERNAME_LENGTH as the minimum required length
-
-  if (isCompleteUsername && !openPasswordResetModalImmediately) {
-    const storedUsernames = JSON.parse(localStorage.getItem("userList")) || [];
-    const isUsernameInLocalStorage = storedUsernames.some(
-      (user) => user.userName === enteredUsername
-    );
-
-    if (!containsSpecialCharacters && !isUsernameInLocalStorage) {
-      storedUsernames.push({ userName: enteredUsername });
-      localStorage.setItem("userList", JSON.stringify(storedUsernames));
-    }
-
-    openPasswordResetModal(enteredUsername);
-  } else if (
-    document.getElementById("passwordResetModal").style.display === "block" &&
-    document.getElementById("passwordResetModal").offsetHeight > 0
-  ) {
-    resetUsernameInput.value = "";
-  }
-}
-
+//password reset
+1	Create a Password Reset Screen with User Name and Reset  Button which will open on clicking of Password Reset Button from the Login Page
+2	Add a place holder in the User Name box as Enter the User Name
+3	Disable the Reset Button if User Name Field is empty.
+4	Add Validation not to enter,paste special characters in User Name
+5	Once the User Name is entered Check if the entered username is present in the Local Storage 
+6	If Present the Open a Pop Up Modal with Name as Password Reset Modal which will contain Non Editable User Name and New Password and Retype New Password Fields and a Submit Button.
+7	On Click of the Submit Button in Password Reset Modal find the username and set this new password for the username in local storage.
+8	Add Validation to check if Password has 8 Characters, Min 1 Lower Case, Min 1 Upper Case and Min 1 Special Character
+9	Allowed Special Characters in Password (!@#$%^) and anything out of this then throw an Error Message stating that the Special Character should be within this.
+10	Disable Copy, Paste using ShortCuts and Right Click on Password Field.
+11	On Click of the Submit Button in Password Reset Modal check if New Password and Reset Password Values martch and if not and show BootStrap Success alert in the Modal  Stating  "Password does not match" on the Top of  Password Reset Screen 
+12	BootStrap alert should have a X Mark to close also the message should disappear automatically in 5 seconds or by clicking the X Mark.
+13	If all Validations are good then close the Password Reset Modal and show BootStrap Success alert in the Modal  Stating  "User Password Reset Success" on the Top of  Login Screen 
+	
+	
