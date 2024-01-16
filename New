@@ -14,8 +14,6 @@ function openResetPasswordModal(triggeredFromLogin = false) {
     btn.disabled = true;
   });
 
-  resetUsernameInput.addEventListener("input", handleResetUsernameInputChange);
-
   if (triggeredFromLogin) {
     resetUsernameInput.value = "";
   }
@@ -51,11 +49,14 @@ function handleResetUsernameInputChange() {
     btn.disabled = isUsernameEmpty || containsSpecialCharacters;
   });
 
+  if (document.getElementById("passwordResetModal").style.display === "block") {
+    resetUsernameInput.value = "";
+  }
+
   // Check if the entered username is present in Local Storage
   const enteredUsername = resetUsernameInput.value.trim();
   if (!containsSpecialCharacters) {
     const storedUsernames = JSON.parse(localStorage.getItem("userList")) || [];
-    
 
     isUsernameInLocalStorage = storedUsernames.some(
       (user) => user.userName === enteredUsername
