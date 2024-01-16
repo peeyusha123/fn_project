@@ -456,3 +456,27 @@ function submitPasswordResetForm() {
 }
 
 function show
+
+function showSuccessMessage(message) {
+  showAlert(message, "alert-success");
+}
+
+function showAlert(message, alertType) {
+  const loginForm = document.getElementById("loginForm");
+  loginForm.insertAdjacentHTML(
+    "afterbegin",
+    `
+    <div class="alert ${alertType} alert-dismissible fade show" role="alert">
+      ${message}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  `
+  );
+
+  // Set timeout to remove the alert after 5 seconds
+  setTimeout(() => {
+    document.querySelector(`.${alertType}`).remove();
+  }, 5000);
+}
