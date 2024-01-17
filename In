@@ -29,4 +29,23 @@ Disable Copy, Paste using ShortCuts and Right Click on Password Field.
 12	BootStrap alert should have a X Mark to close also the message should disappear automatically in 5 seconds or by clicking the X Mark.
 13	If all Validations are good then close the Password Reset Modal and show BootStrap Success alert in the Modal  Stating  "User Password Reset Success" on the Top of  Login Screen 
 	
-	
+//DB
+1.Create Table to Store USER_DETAILS																									
+2.Create Table to Store USER_LOCATION_DETAILS should have foreign key as USER_DETAILS primary key																									
+3.Create a Table to Store the history of USER_DETAILS_HISTORY Changes which should have old Value, new Value and the userid who changed it and the time it was changed																									
+																									
+4.Define a Insert Query to insert the User Details to the USER_DETAILS table																									
+5.Define a Insert Query to insert the User Location Details to the USER_LOCATION_DETAILS  table																									
+6.Define a Update query to update the User Password to the USER_DETAILS table for a given user_id																									
+7.Define a Update query to update the User Location Details like City, State to the USER_LOCATION_DETAILS  table for a given user_id																									
+8.Create a Procedure with userid as input and when you pass the user id to the procedure it should check if the user id is present and if its present then delete the USER_DETAILS and USER_LOCATION_DETAILS  for the given user id																									
+9.Create a function which with userid as input and when you pass the user id to the function it should check if the user id is present in the USER_DETAILS Table and if present return true or return false																									
+10.Create a Trigger on USER_DETAILS and USER_LOCATION_DETAILS Table columns and when you insert or update the value it should put an entry of new value and old value in the USER_DETAILS_HISTORY  Table																									
+
+//SpringBoot
+1.Create A Spring Boot Project																									
+2.Create Needed POJO, Controller, Service and DAO Methods and use Simple JDBC Connection to connect to DB																									
+3."Create Separate API for 
+Adding New User to DB
+Resetting the User Name in the DB
+Validating the Login Information against the username passed and give a session token back if the user is present and if the user is not present dont give session token and give validation message"																									
