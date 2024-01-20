@@ -1,1 +1,70 @@
 
+-- Create Table to Store USER DETAILS
+CREATE TABLE USER_DETAILS (
+    USER_ID INT PRIMARY KEY,
+    USERNAME VARCHAR(255) NOT NULL,
+    PASSWORD VARCHAR(255) NOT NULL,
+    EMAIL VARCHAR(255) NOT NULL
+);
+
+-- Create Table to Store USER LOCATION DETAILS with foreign key
+CREATE TABLE USER_LOCATION_DETAILS (
+    USER_ID INT PRIMARY KEY,
+    CITY VARCHAR(255),
+    STATE VARCHAR(255),
+    FOREIGN KEY (USER_ID) REFERENCES USER_DETAILS(USER_ID)
+);
+
+-- Create a Table to Store the history of USER DETAILS HISTORY Changes
+CREATE TABLE USER_DETAILS_HISTORY (
+    HISTORY_ID INT PRIMARY KEY,
+    USER_ID INT,
+    OLD_VALUE VARCHAR(255),
+    NEW_VALUE VARCHAR(255),
+    CHANGED_BY_USERID INT,
+    CHANGE_TIME TIMESTAMP,
+    FOREIGN KEY (USER_ID) REFERENCES USER_DETAILS(USER_ID)
+);
+
+-- Insert Query to insert User Details
+INSERT INTO USER_DETAILS (USER_ID, USERNAME, PASSWORD, EMAIL)
+VALUES (1, 'example_user', 'password123', 'user@example.com');
+
+-- Insert Query to insert User Location Details
+INSERT INTO USER_LOCATION_DETAILS (USER_ID, CITY, STATE)
+VALUES (1, 'City1', 'State1');
+
+-- Update query to update User Password
+UPDATE USER_DETAILS
+SET PASSWORD = 'newpassword'
+WHERE USER_ID = 1;
+
+-- Update query to update User Location Details
+UPDATE USER_LOCATION_DETAILS
+SET CITY = 'NewCity', STATE = 'NewState'
+WHERE USER_ID = 1;
+
+-- Create Procedure to delete USER DETAILS and USER LOCATION DETAILS
+CREATE PROCEDURE DeleteUserDetailsAndLocation(IN p_user_id INT)
+BEGIN
+    DELETE FROM USER_DETAILS WHERE USER_ID = p_user_id;
+    DELETE FROM USER_LOCATION_DETAILS WHERE USER_ID = p_user_id;
+END;
+
+-- Create Function to check if user id is present in USER DETAILS Table
+CREATE FUNCTION IsUserIdPresent(IN p_user_id INT)
+RETURNS BOOLEAN
+BEGIN
+    DECLARE user_exists BOOLEAN;
+    SELECT EXISTS(SELECT 1 FROM USER_DETAILS WHERE USER_ID = p_user_id) INTO user_exists;
+    RETURN user_exists;
+END;
+
+-- Create Trigger on USER DETAILS table for insert and update operations
+CREATE TRIGGER UserDetailsHistoryTrigger
+AFTER INSERT OR UPDATE ON USER_DETAILS
+FOR EACH ROW
+BEGIN
+    INSERT INTO USER_DETAILS_HISTORY (USER_ID, OLD_VALUE, NEW_VALUE, CHANGED_BY_USERID, CHANGE_TIME)
+    VALUES (NEW.USER_ID, OLD.PASSWORD, NEW.PASSWORD, 1, NOW());
+END;
