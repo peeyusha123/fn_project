@@ -1,4 +1,20 @@
 
+
+-- Drop foreign key constraints
+ALTER TABLE USER_LOCATION_DETAILS DROP CONSTRAINT fk_user_location_user_id;
+ALTER TABLE USER_DETAILS_HISTORY DROP CONSTRAINT fk_user_details_history_user_id;
+ALTER TABLE USER_DETAILS_HISTORY DROP CONSTRAINT fk_user_details_history_changed_by_user_id;
+
+-- Drop tables
+DROP TABLE USER_LOCATION_DETAILS;
+DROP TABLE USER_DETAILS_HISTORY;
+DROP TABLE USER_DETAILS;
+
+
+
+
+
+
 -- Create Table to Store USER DETAILS
 CREATE TABLE USER_DETAILS (
     USER_ID INT PRIMARY KEY,
