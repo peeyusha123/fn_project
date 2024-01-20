@@ -68,3 +68,81 @@ BEGIN
     INSERT INTO USER_DETAILS_HISTORY (USER_ID, OLD_VALUE, NEW_VALUE, CHANGED_BY_USERID, CHANGE_TIME)
     VALUES (NEW.USER_ID, OLD.PASSWORD, NEW.PASSWORD, 1, NOW());
 END;
+
+
+new....
+
+
+CREATE TABLE USER_DETAILS (
+   user_id INT PRIMARY KEY,
+   username VARCHAR(255) NOT NULL,
+   password VARCHAR(255) NOT NULL,
+   email VARCHAR(255) NOT NULL
+);
+
+
+CREATE TABLE USER_LOCATION_DETAILS (
+   location_id INT PRIMARY KEY,
+   user_id INT,
+   city VARCHAR(255) NOT NULL,
+   state VARCHAR(255) NOT NULL,
+   FOREIGN KEY (user_id) REFERENCES USER_DETAILS(user_id)
+);
+
+CREATE TABLE USER_DETAILS_HISTORY (
+   history_id INT PRIMARY KEY,
+   user_id INT,
+   old_value VARCHAR(255),
+   new_value VARCHAR(255),
+   changed_by_user_id INT,
+   change_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+   FOREIGN KEY (user_id) REFERENCES USER_DETAILS(user_id),
+   FOREIGN KEY (changed_by_user_id) REFERENCES USER_DETAILS(user_id)
+);
+
+
+INSERT INTO USER_DETAILS (user_id, username, password, email)
+VALUES (1, 'example_user', 'password123', 'user@example.com');
+
+
+INSERT INTO USER_LOCATION_DETAILS (location_id, user_id, city, state)
+VALUES (1, 1, 'CityName', 'StateName');
+
+
+UPDATE USER_DETAILS
+SET password = 'new_password'
+WHERE user_id = 1;
+
+
+UPDATE USER_LOCATION_DETAILS
+SET city = 'NewCity', state = 'NewState'
+WHERE user_id = 1;
+
+
+CREATE PROCEDURE DeleteUserDetailsAndLocation(IN userID INT)
+BEGIN
+   DELETE FROM USER_DETAILS WHERE user_id = userID;
+   DELETE FROM USER_LOCATION_DETAILS WHERE user_id = userID;
+END;
+
+
+
+CREATE FUNCTION CheckUserIDExistence(IN userID INT) RETURNS BOOLEAN
+BEGIN
+   DECLARE userExists BOOLEAN;
+   SELECT EXISTS(SELECT 1 FROM USER_DETAILS WHERE user_id = userID) INTO userExists;
+   RETURN userExists;
+END;
+
+
+CREATE TRIGGER UserDetailsHistoryTrigger
+AFTER INSERT OR UPDATE ON USER_DETAILS
+FOR EACH ROW
+INSERT INTO USER_DETAILS_HISTORY (user_id, old_value, new_value, changed_by_user_id)
+VALUES (NEW.user_id, NULL, NEW.username, NEW.user_id);
+
+CREATE TRIGGER UserLocationDetailsHistoryTrigger
+AFTER INSERT OR UPDATE ON USER_LOCATION_DETAILS
+FOR EACH ROW
+INSERT INTO USER_DETAILS_HISTORY (user_id, old_value, new_value, changed_by_user_id)
+VALUES (NEW.user_id, NULL, CONCAT(NEW.city, ', ', NEW.state), NEW.user_id);
