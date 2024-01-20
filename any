@@ -1,4 +1,10 @@
 
+SELECT object_name, object_type
+FROM all_objects
+WHERE object_name = 'USER_DETAILS';
+
+
+
 SELECT constraint_name
 FROM all_cons_columns
 WHERE table_name = 'USER_LOCATION_DETAILS' AND column_name = 'USER_ID';
