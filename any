@@ -1,4 +1,7 @@
 
+SELECT constraint_name
+FROM all_cons_columns
+WHERE table_name = 'USER_LOCATION_DETAILS' AND column_name = 'USER_ID';
 
 -- Drop foreign key constraints
 ALTER TABLE USER_LOCATION_DETAILS DROP CONSTRAINT fk_user_location_user_id;
