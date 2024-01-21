@@ -1,0 +1,67 @@
+Team	Tier 1 Milestone	Tier 2 Sub Milestone	Definition	Prerequisite	Predecessor	Successor	Other Information	Initial Build Predecessor (Macro, Micro, Node, In-building, Temporary, etc.)	Modification Predecessor	How to Complete	Required if Active?	Verified logic?																	
+Rosh	Project Started	Released to Build						NPP Released (NPP project) / Project Creation (SPM only project)	NPP Released (NPP project) / Project Creation (SPM only project)	POR Year, BPY, Budget Code, and Engineering Released	Yes	x																	
+Rosh	Project Started	Location Code Created						Released to Build	Released to Build	PSLC Code or MDG ID	Yes	x																	
+Rosh	Budget & funding	Budget & funding (Tier 1)						Location Code Created	Project Started	Select your PSLC from Search	Yes	x																	
+Rosh	Select Vendor	Select Vendor (Tier 1)						Project Started	Project Started	Select at least one Vendor	Yes	x																	
+Rosh	Environmental Due Diligence	Environmental Due Diligence (Tier 1)						Completion of Candidate Selection	Project Started	Environmental Territory Environmental Compliance Admin Approval	Yes	x																	
+Rosh	Environmental Due Diligence	Environmental Review						Completion of Candidate Selection	Project Started	Upload documents and/or complete necessary fields	Yes	x																	
+Rosh	Environmental Due Diligence	TSDF Review						Request from Environmental Review - Environmental Services tab - Is disposal facility required = Yes	Request from Environmental Review - Environmental Services tab - Is disposal facility required = Yes	Complete all required fields	Yes	x																	
+Rosh	Environmental Due Diligence	Global EHS Review						Request From Environmental Review	Request From Environmental Review	Environmental Global EH&S Admin Approval	Yes	x																	
+Rosh	Environmental Due Diligence	Territory Review						Request From Environmental Review	Request From Environmental Review	Environmental Admin Approval	Yes	x																	
+Rosh	Leasing (and MGD)	Leasing (and MGD) (Tier 1)						Completion of Candidate Selection	Project Started	Site Tracker Sync	Yes	x																	
+Rosh	Zoning	Zoning (Tier 1)		"Zoning Filed (A)
+Zoning Approved"				Completion of Candidate Selection	N/A	Site Tracker Sync	Yes	x																	
+Rosh	A&E 	A&E (Tier 1)		Final CD Approved (A)	Submit for NEPA Task	?? Project Started Milestone or Candidate Selection Milestone?	"The Final CDs Approved (A) date field will be systematically populated as soon as the Final CD's DRM approval is granted. Users are not able to edit this field
+Completion of the Final CDs Approved (A) date field will activate the Submit for NEPA Task as long as the Submit Structure Form Task has already been completed"	Project Started	Project Started	Upload documents and/or complete necessary fields	Yes	x																	
+Rosh	Permitting	Permitting (Tier 1)						RF Accept & Ranking Task	Project Started	Populate required fields	Yes	x																	
+Rosh	E911	E911 (Tier 1)			Submit RFDS Task (A)			Completion of Candidate Selection	Completion of Submit RFDS	Complete all active tasks	Yes	x																	
+Rosh	E911	Confirm E911 Address					n/a	Completion of Submit RFDS Task	Completion of Submit RFDS Task	Upload documents and/or complete necessary fields	Yes	x																	
+Rosh	E911	Confirm E911 Submitted					n/a	Completion of Confirm E911 Address	Completion of Submit RFDS	Upload documents and/or complete necessary fields	Yes	x																	
+Rosh	E911	Confirm TVW Received					n/a	Completion of Confirm E911 Submitted	Completion of Confirm E911 Submitted	Upload documents and/or complete necessary fields	Yes	x																	
+Rosh	Equipment	Equipment (Tier 1)		"Task Level (A) Dates
+BOM Completed Task (A)
+AWAT Material Allocation Task (A)
+Equipment Procurement Completed Task(A)"	Submit RFDS Task (A)			"RF Project Templates: Completion of Submit RFDS Task (A)
+
+Non-RF Project Templates: Completion of Candidate Selection Milestone (A)"	"RF Project Templates: Completion of Submit RFDS Task (A)
+
+Non-RF Project Templates: Completion of Project Started Milestone (A)"	Finalize Tasks	Yes	x																	
+Rosh	Equipment	BOM Completed	Engineering has provided a complete allocation of all 1ERP/S4 MMIDs associated with this 		Submit RFDS Task (A)	"AWAT Material Allocation Task
+Equipment Procurement Completed Task"	"Auto-finalizes after:
+All sections of RFDS:BOM (Tower, Ground, Power) have been submitted
+2. The user performs an EE Submit Action in RFDS:BOM
+"	"RF Project Templates: Completion of Submit RFDS
+
+Non-RF Project Templates: Completion of Candidate Selection Milestone"	"RF Project Templates: Completion of Submit RFDS
+
+Non-RF Project Templates: Completion of Project Started Milestone"	Finalize Task	Yes	x																	
+Rosh	Equipment	AWAT Material Allocation	Tracks all AWAT Material Assembly workflow for this SPM project ID. If no AWAT cabinets are included in RFDS:BOM, this task will N/A”		BOM Completed Task (A)	n/a	"Only applicable if there is an item in the RFDS:BOM with the ""AWAT Assembly Flag"" = Yes
+
+Auto-finalizes when all AWAT cabinet builds have moved to a completed state in the user’s progress bar. "	"BOM Completed (A) if there is an item in the RFDS:BOM with the AWAT Assembly Flag = ""Yes""
+
+If the above conditions are not met at BOM Completed (A), this task will N/A"	"BOM Completed (A) if there is an item in the RFDS:BOM with the AWAT Assembly Flag = ""Yes""
+
+If the above conditions are not met at BOM Completed (A), this task will N/A"	See AWAT auto-finalize logic in column 	Yes																		
+Rosh	Equipment	Equipment Procurement Completed	All 1ERP/S4 MMIDS present within RFDS:BOM have been fully procured and released for this SPM Project ID	n/a	BOM Completed Task (A)	n/a	n/a	Completion of BOM Completed Task	Completion of BOM Completed Task	Finalize Task	Yes	x																	
+Rosh	Regulatory Inservice ( ISA)	Regulatory Inservice ( ISA)		None	Upload Inservice Document Task (A)	n/a	"Callsign Approvals are granted via automated or manual approval via HQ Regulatory in the Regulatory CNSTRN/INSV module
+Callsigns are generated once the Upload Inservice Documents Task in the RFDS milestone is completed"	Completion of RFDS milestone	Completion of RFDS milestone	Call signs approved by HQ Regulatory in Regulatory Construction/In-Service Module	Yes	x																	
+Rosh	Integration	Integration (Tier 1)		"e911 Testing Complete (A)
+Integration Completed (A)"	"Construction Complete
+show date of the first callsign approved from Regulatory ISA Milestone"			Completion of Construction Complete and at least one callsign approved	Completion of Construction Complete and at least one callsign	Populate required fields	Yes	x																	
+Rosh	Regulatory Dismantlement 	Regulatory Dismantlement 		Structure Dismantled (A)			Applicable on Initial Build Projects where Site Type - Temporary and "Verizon Wireless Owned?" = Yes OR in "Dismantlement modificatiom templates where Verizon Wireless Owned?" = Yes	Project Creation if Site Type = Temporary & Structure Owner = VZW	Completion of Post TCN task if Mod template = Dismantlement & Structure Owner = VZW	Upload documents and/or complete necessary fields	Yes	x																	
+Rosh	Activation (non-RF)	Activation (non-RF) (Tier 1)		Non-RF In Service (A)	"Initial Build = RF Accept & Ranking
+Mod - Construction Completed Milestone"		The "Non-RF In Service (A)" date field can be systematically populated by Network Assurance in IOP	Selection of Non-RF Project in Project Creation & Completion of Construction Started	Selection of Non-RF Project in Project Creation	Upload documents and/or complete necessary fields		x																	
+Rosh	Closeout Documents	Closeout Documents			RTC Milestone (A)	None		Completion of Ready to Construct	Completion of Ready to Construct	"Upload Regulatory Closeout Package Type, documents and/or complete necessary fields
+Then, Finalize
+Auto updates ""Closeout Delivered (A)"" for East and ""Closeout Doc Uploaded (A)"" for West
+"	Yes	x																	
+	Closeout Documents	Document Upload			RTC Milestone (A)	None																							
+Rosh	Closeout Documents	Photo/Documents		All task (A) dates within the milestone	RTC Milestone (A)	None		"Completion of RTC
+Only applicable on the following workflows: Initial Build, RF mod, Construction Only Mod, RF Regulatory Modifications"	"Completion of RTC
+Only applicable on the following workflows: Initial Build, RF mod, Construction Only Mod, RF Regulatory Modifications"	VZW Construction Engineer or 3rd Party Inspector finalize the task	Yes	x																	
+Rosh	Closeout Documents	Environmental Construction Closeout Information			RTC Milestone (A)	None	Environmental Construction Closeout Information task is activated based upon the selection of the "EES Required" field in the Environmental Review task within the Environmental Due Diligence																						
+Rosh	Osha Rooftop Assessment						This milestone will change to a "N/A" status if the following the completion of the Initial Rooftop Assessment Completed task and will be set to active again once the Construction Completed Milestone is completed.																						
+Rosh	Osha Rooftop Assessment	Initial Safety Information Completed			Select Vendor Milestone			NA	Select Vendor Milestone	Finalize the Select Vendor Milestone	Yes																		
+Rosh	Osha Rooftop Assessment	Initial Rooftop Assessment Completed			Select Vendor Milestone		If OSHA Rooftop Mod required is "no", the project will be completed	NA	Select Vendor Milestone	Finalize the Select Vendor Milestone	Yes																		
+Rosh	Osha Rooftop Assessment	Post Safety Information Completed			Construction Completed Milestone			NA	Construction Completed Milestone	Finalize the Construction Completed Milestone	Yes																		
+Rosh	Osha Rooftop Assessment	Post Rooftop Audit Completed			Construction Completed Milestone			NA	Construction Completed Milestone	Finalize the Construction Completed Milestone	Yes																		
