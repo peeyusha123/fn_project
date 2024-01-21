@@ -1,3 +1,13 @@
+//Gsheet with tier 1 and tier 2 information
+1)Excepted Standards
+"Predecessors, Successors and Pre-Reqs should always be (A) dates (there is some exceptions in the transport milestone where these are field values and not A dates but that is an exception)
+1/8/24 Update - it appears in the current prod implementation only Pre-Reqs have the (A) date listed so please keep the current implementation as it. Predecessors and Successor will continue to show as only the task and milestone name - no (A) date"
+if the Predecessors, Successors or Pre-Reqs is a task or milestone A date - please put the word "task" or "milestone - For instance "Zoning Milestone (A)" , Submit RFDS Task (A)
+If there is any logic or conditional criteria about when a task or milestone is applicable, that must be captured in the "Other Information" section
+Users must have all the information available to them on how the task/milestone functions and all conditions around it
+As you dig into the code and find the Predecessors, Successors and Pre-Reqs - please fill out columns E, F & G in the dynamic display sheet
+2)dynamic display
+
 Team	Tier 1 Milestone	Tier 2 Sub Milestone	Definition	Prerequisite	Predecessor	Successor	Other Information	Initial Build Predecessor (Macro, Micro, Node, In-building, Temporary, etc.)	Modification Predecessor	How to Complete	Required if Active?	Verified logic?																	
 Rosh	Project Started	Released to Build						NPP Released (NPP project) / Project Creation (SPM only project)	NPP Released (NPP project) / Project Creation (SPM only project)	POR Year, BPY, Budget Code, and Engineering Released	Yes	x																	
 Rosh	Project Started	Location Code Created						Released to Build	Released to Build	PSLC Code or MDG ID	Yes	x																	
@@ -65,3 +75,54 @@ Rosh	Osha Rooftop Assessment	Initial Safety Information Completed			Select Vendo
 Rosh	Osha Rooftop Assessment	Initial Rooftop Assessment Completed			Select Vendor Milestone		If OSHA Rooftop Mod required is "no", the project will be completed	NA	Select Vendor Milestone	Finalize the Select Vendor Milestone	Yes																		
 Rosh	Osha Rooftop Assessment	Post Safety Information Completed			Construction Completed Milestone			NA	Construction Completed Milestone	Finalize the Construction Completed Milestone	Yes																		
 Rosh	Osha Rooftop Assessment	Post Rooftop Audit Completed			Construction Completed Milestone			NA	Construction Completed Milestone	Finalize the Construction Completed Milestone	Yes																		
+
+3)vcp orchestration makeup
+Mockups																									
+gnb Table 1																									
+	gNB Table	Installation (A)	Server Ready (A)																						
+	23423409238	12/11/2023	12/7/2023																						
+	23523523458	12/7/2023	12/14/2023																						
+																									
+	Dyanmic Display																								
+	FE Installation																								
+																									
+	Prerequisite			logic																					
+	Installation (A)		12/11/2023	if all gNB DU ID have date populated for Installation (A), show MAX date in Dynamic Display. Else, show blank																					
+	Server Ready (A)		12/14/2023	if all gNB DU ID have date populated for Server Ready (A), show MAX date in Dynamic Display. Else, show blank																					
+																									
+	Predecessor																								
+	VCP Far Edge CIQ Validation (A)		12/6/2023																						
+																									
+																									
+																									
+	Other Information																								
+	To complete FE Installation, all gNB DU Ids with Full Orchestration Path must be Installed with Server Ready, based upon the Create CQ Task.																								
+																									
+	Installation Pending :																								
+	Server Ready Pending :																								
+																									
+																									
+gnb Table 2																									
+	gNB Table	Installation (A)	Server Ready (A)																						
+	23423409238		12/7/2023																						
+	23523523458	12/7/2023																							
+																									
+	Dyanmic Display																								
+	FE Installation																								
+																									
+	Prerequisite			logic																					
+	Installation (A)			if all gNB DU ID have date populated for Installation (A), show MAX date in Dynamic Display. Else, show blank																					
+	Server Ready (A)			if all gNB DU ID have date populated for Server Ready (A), show MAX date in Dynamic Display. Else, show blank																					
+																									
+																									
+	Predecessor																								
+	VCP Far Edge CIQ Validation (A)		12/6/2023																						
+																									
+																									
+																									
+	Other Information																								
+	To complete FE Installation, all gNB DU Ids with Full Orchestration Path must be Installed with Server Ready, based upon the Create CQ Task.																								
+																									
+	Installation Pending : 23423409238																								
+	Server Ready Pending : 23523523458																								
+																									
