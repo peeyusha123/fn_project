@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Regulatory Construction Milestone</title>
+</head>
+<body>
+    <div class="milestone-display">
+        <!-- Display milestone information here -->
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+.milestone-display {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.milestone-display div {
+    margin-bottom: 10px;
+}
+
+strong {
+    color: #007bff;
+}
+
+hr {
+    margin: 10px 0;
+    border: 0;
+    border-top: 1px solid #ccc;
+}
+
+
+// Sample data for the milestone (replace this with your actual data)
+const milestoneData = [
+    { task: "Project Started", predecessor: "NPP Released", successor: "POR Year", prerequisites: ["BPY", "Budget Code", "Engineering Released"] },
+    // Add more tasks as needed
+];
+
+// Function to populate milestone information dynamically
+function populateMilestoneDisplay() {
+    const milestoneDisplayElement = document.querySelector('.milestone-display');
+
+    milestoneData.forEach(item => {
+        const milestoneInfo = document.createElement('div');
+        milestoneInfo.innerHTML = `
+            <strong>${item.task}</strong><br>
+            Predecessor: ${item.predecessor}<br>
+            Successor: ${item.successor}<br>
+            Prerequisites: ${item.prerequisites.join(', ')}<br>
+            <hr>
+        `;
+        milestoneDisplayElement.appendChild(milestoneInfo);
+    });
+}
+
+// Call the function to populate milestone information
+populateMilestoneDisplay();
