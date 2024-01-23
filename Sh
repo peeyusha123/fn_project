@@ -237,3 +237,29 @@ passwordFields.forEach(field => {
     <script src="reset.js"></script>
 </body>
 </html>
+
+SQL..
+
+CREATE OR REPLACE PROCEDURE DeleteUserDetailsAndLocation(
+   p_userID IN NUMBER
+)
+IS
+   v_user_count NUMBER;
+BEGIN
+   -- Check if the user ID exists
+   SELECT COUNT(*) INTO v_user_count FROM your_schema.USER_DETAILS WHERE user_id = p_userID;
+
+   IF v_user_count > 0 THEN
+      -- Delete from USER_DETAILS
+      DELETE FROM your_schema.USER_DETAILS WHERE user_id = p_userID;
+
+      -- Delete from USER_LOCATION_DETAILS
+      DELETE FROM your_schema.USER_LOCATION_DETAILS WHERE user_id = p_userID;
+
+      DBMS_OUTPUT.PUT_LINE('User details and location deleted for user ID: ' || p_userID);
+   ELSE
+      DBMS_OUTPUT.PUT_LINE('User ID ' || p_userID || ' not found.');
+   END IF;
+END DeleteUserDetailsAndLocation;
+/
+
