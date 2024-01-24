@@ -73,3 +73,23 @@ BEGIN
    DBMS_OUTPUT.PUT_LINE('User ID exists: ' || v_result);
 END;
 /
+
+
+
+CREATE OR REPLACE TRIGGER UserDetailsHistoryTrigger
+AFTER INSERT OR UPDATE ON USER_DETAILS
+FOR EACH ROW
+BEGIN
+   INSERT INTO USER_DETAILS_HISTORY (user_id, old_value, new_value, changed_by_user_id)
+   VALUES (:NEW.user_id, NULL, :NEW.username, :NEW.user_id);
+END;
+/
+
+CREATE OR REPLACE TRIGGER UserLocationDetailsHistoryTrigger
+AFTER INSERT OR UPDATE ON USER_LOCATION_DETAILS
+FOR EACH ROW
+BEGIN
+   INSERT INTO USER_DETAILS_HISTORY (user_id, old_value, new_value, changed_by_user_id)
+   VALUES (:NEW.user_id, NULL, :NEW.city || ', ' || :NEW.state, :NEW.user_id);
+END;
+/
