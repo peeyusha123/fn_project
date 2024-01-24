@@ -135,3 +135,69 @@ new2...
         <!-- Add any additional successor tasks here -->
     </ul>
 </c:if>
+
+
+
+
+
+new..
+<div class="accordion" id="ss-accordion" aria-multiselectable="true">
+				<div class="card ss-preq-container">
+				  <div id="ss-heading-one" class="card-header pred-overlay-grp" type="button" data-toggle="collapse" data-target="#ss-collapse-one" aria-expanded="true" aria-controls="ss-collapse-one">
+					<h4 class="mb-0 text-brand-red">
+					  
+						Prerequisite
+					  
+					  <i class="fa fa-angle-down pull-right"></i>
+					</h4>
+				  </div>
+			  
+				  <div id="ss-collapse-one" class="side-screen-collapse collapse in" aria-labelledby="ss-heading-one" data-grp="ss-preq-container" aria-expanded="true" style="">
+					<div class="card-body">
+						<ul class="list-group ss-prereq-list ss-list-group"><li class="list-group-item text-align-left  "><span>Task Level (A) Dates
+ </span> : <span class="pull-right"> </span></li>
+<li class="list-group-item text-align-left  "><span>1A/2C Survey Task (A) </span> : <span class="pull-right"> </span></li>
+<li class="list-group-item text-align-left  "><span>Submit Structure Form Task (A)
+ </span> : <span class="pull-right"> </span></li>
+<li class="list-group-item text-align-left  "><span>FAA Task (A) </span> : <span class="pull-right"> </span></li>
+<li class="list-group-item text-align-left  "><span>ASR Task (A) </span> : <span class="pull-right"> </span></li>
+<li class="list-group-item text-align-left  "><span>AM Further Study Task (A)
+ </span> : <span class="pull-right"> </span></li>
+<li class="list-group-item text-align-left  "><span>Submit for NEPA Task (A) </span> : <span class="pull-right"> </span></li>
+<li class="list-group-item text-align-left  "><span>NEPA/Ground Approval Task (A) </span> : <span class="pull-right"> </span></li>
+<li class="list-group-item text-align-left  "><span>Full Construction Approval Task (A) </span> : <span class="pull-right"> </span></li></ul>
+					</div>
+				  </div>
+				</div>
+				<div class="card ss-pred-container">
+				  <div id="ss-heading-two" class="card-header pred-overlay-grp" type="button" data-toggle="collapse" data-target="#ss-collapse-two" aria-expanded="true" aria-controls="ss-collapse-two">
+					<h4 class="mb-0 text-brand-red">
+						Predecessor
+					  <i class="fa fa-angle-down pull-right"></i>
+					</h4>
+				  </div>
+				  <div id="ss-collapse-two" class="side-screen-collapse collapse in" aria-labelledby="ss-heading-two" data-grp="ss-pred-container" aria-expanded="true" style="">
+					<div class="card-body">
+						<ul class="list-group ss-predecessor-list ss-list-group"><li class="list-group-item text-align-left  "><span>Submit RFDS Task (A) </span> : <span class="pull-right"> </span></li></ul>
+					</div>
+				  </div>
+				</div>
+				<div class="card ss-succ-container ">
+				  <div id="ss-heading-three" class="card-header pred-overlay-grp" type="button" data-toggle="collapse" data-target="#ss-collapse-three" aria-expanded="true" aria-controls="ss-collapse-three">
+					<h4 class="mb-0 text-brand-red">
+						Successor
+					  <i class="fa fa-angle-down pull-right"></i>
+					</h4>
+				  </div>
+				  <div id="ss-collapse-three" class="side-screen-collapse collapse in" aria-labelledby="ss-heading-three" data-grp="ss-succ-container" aria-expanded="true" style="">
+					<div class="card-body">
+						<ul class="list-group ss-successor-list ss-list-group"><li class="list-group-item text-align-left  "><span>Ready to Construct (RTC) Milestone
+</span> : <span class="pull-right"> </span></li>
+<li class="list-group-item text-align-left  "><span>Construction Awarded Task </span> : <span class="pull-right"> </span></li>
+<li class="list-group-item text-align-left  "><span>Pre TCN Task </span> : <span class="pull-right"> </span></li>
+<li class="list-group-item text-align-left  "><span>Environmental Notice to Contractor </span> : <span class="pull-right"> </span></li>
+<li class="list-group-item text-align-left  "><span>Regulatory Construction Special Requirements Task </span> : <span class="pull-right"> </span></li></ul>
+
+					</div>
+				  </div>
+				</div>
