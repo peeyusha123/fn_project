@@ -38,3 +38,16 @@ WHERE r_constraint_name IN (
     FROM all_constraints
     WHERE table_name = 'USER_DETAILS'
 );
+
+
+SELECT constraint_name, table_name, column_name
+FROM all_cons_columns
+WHERE constraint_name IN (
+    SELECT constraint_name
+    FROM all_constraints
+    WHERE r_constraint_name IN (
+        SELECT constraint_name
+        FROM all_constraints
+        WHERE table_name = 'USER_DETAILS'
+    )
+);
