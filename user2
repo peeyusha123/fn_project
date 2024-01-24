@@ -90,3 +90,48 @@ answer
         </div>
     </div>
 </div>
+
+
+new2...
+
+<i class="fa fa-info-circle hidden-xs view-side-screen" title="Prerequisite"></i>
+
+<c:if test="${not empty prerequisiteTasks}">
+    <h5>Prerequisite:</h5>
+    <ul>
+        <li>Task Level (A) Dates</li>
+        <li>1A/2C Survey Task (A)</li>
+        <li>Submit Structure Form Task (A)</li>
+        <li>FAA Task (A)</li>
+        <li>ASR Task (A)</li>
+        <li>AM Further Study Task (A)</li>
+        <li>Submit for NEPA Task (A)</li>
+        <li>NEPA/Ground Approval Task (A)</li>
+        <li>Full Construction Approval Task (A)</li>
+        <!-- Add any additional prerequisite tasks here -->
+    </ul>
+</c:if>
+
+<i class="fa fa-info-circle hidden-xs view-side-screen" title="Predecessor"></i>
+
+<c:if test="${not empty predecessorTasks}">
+    <h5>Predecessor:</h5>
+    <ul>
+        <li>Submit RFDS Task (A)</li>
+        <!-- Add any additional predecessor tasks here -->
+    </ul>
+</c:if>
+
+<i class="fa fa-info-circle hidden-xs view-side-screen" title="Successor"></i>
+
+<c:if test="${not empty successorTasks}">
+    <h5>Successor:</h5>
+    <ul>
+        <li>Ready to Construct (RTC) Milestone</li>
+        <li>Construction Awarded Task</li>
+        <li>Pre TCN Task</li>
+        <li>Environmental Notice to Contractor</li>
+        <li>Regulatory Construction Special Requirements Task</li>
+        <!-- Add any additional successor tasks here -->
+    </ul>
+</c:if>
