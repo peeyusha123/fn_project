@@ -1,0 +1,39 @@
+<div class="panel-heading" role="tab" id="regulatoryHeading">
+					<h4 class="panel-title">
+						<a class="height-20px collapsed common_task_anchor_click" id="regulatory_accordion"
+							role="button" data-toggle="collapse" data-parent="#accordion-overview"
+							href="#regulatoryAccordionPanel" aria-expanded="true" aria-controls="collapseOne">
+							<div class="col-sm-11 col-xs-11 padding-zero">
+								<div class="col-md-9 padding-zero">
+									<span class="accordion-header-with-status">
+										<c:out
+											value="${applicationScope.ContextCache.projectServiceSettings['workstepNames']['REGULATORY']}" />
+											<i class="fa fa-info-circle hidden-xs view-side-screen" title="Prerequisite"></i>
+									</span> 
+
+
+
+
+i added for daynamic display for regulatory construction milestone when i  click on display clicke it was show 
+Prerequisite Predecessor Successor these three heading , but i am confusing that how add the information inside the
+three headings ..information is listed below,,,
+
+Prerequisite:Task Level (A) Dates
+1A/2C Survey Task (A)
+Submit Structure Form Task (A)
+FAA Task (A)
+ASR Task (A)
+AM Further Study Task (A)
+Submit for NEPA Task (A)
+NEPA/Ground Approval Task (A)
+Full Construction Approval Task (A)
+
+Predecessor:Submit RFDS Task (A)
+
+Successor:Ready to Construct (RTC) Milestone
+Construction Awarded Task
+Pre TCN Task
+Environmental Notice to Contractor
+Regulatory Construction Special Requirements Task
+
+add this information in each section .. note that follow above code and add this information inside Prerequisite Predecessor Successor these three headings
