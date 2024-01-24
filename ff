@@ -51,3 +51,25 @@ WHERE constraint_name IN (
         WHERE table_name = 'USER_DETAILS'
     )
 );
+
+new...
+CREATE OR REPLACE FUNCTION IsUserIDExists(p_userID IN NUMBER) RETURN BOOLEAN
+IS
+   v_userExists BOOLEAN;
+BEGIN
+   SELECT 1 INTO v_userExists FROM USER_DETAILS WHERE user_id = p_userID;
+   RETURN TRUE;
+EXCEPTION
+   WHEN NO_DATA_FOUND THEN
+      RETURN FALSE;
+END IsUserIDExists;
+/
+
+
+DECLARE
+   v_result BOOLEAN;
+BEGIN
+   v_result := IsUserIDExists(p_userID => 1);
+   DBMS_OUTPUT.PUT_LINE('User ID exists: ' || v_result);
+END;
+/
