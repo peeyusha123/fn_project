@@ -37,3 +37,56 @@ Environmental Notice to Contractor
 Regulatory Construction Special Requirements Task
 
 add this information in each section .. note that follow above code and add this information inside Prerequisite Predecessor Successor these three headings
+
+answer
+
+<div class="panel-heading" role="tab" id="regulatoryHeading">
+    <h4 class="panel-title">
+        <a class="height-20px collapsed common_task_anchor_click" id="regulatory_accordion"
+            role="button" data-toggle="collapse" data-parent="#accordion-overview"
+            href="#regulatoryAccordionPanel" aria-expanded="true" aria-controls="collapseOne">
+            <div class="col-sm-11 col-xs-11 padding-zero">
+                <div class="col-md-9 padding-zero">
+                    <span class="accordion-header-with-status">
+                        <c:out value="${applicationScope.ContextCache.projectServiceSettings['workstepNames']['REGULATORY']}" />
+                        <i class="fa fa-info-circle hidden-xs view-side-screen" title="Prerequisite"></i>
+                    </span>
+                </div>
+            </div>
+        </a>
+    </h4>
+</div>
+
+<div id="regulatoryAccordionPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="regulatoryHeading">
+    <div class="panel-body">
+        <!-- Prerequisite Section -->
+        <div>
+            <h5>Prerequisite:</h5>
+            <ul>
+                <c:forEach var="task" items="${prerequisiteTasks}">
+                    <li>${task}</li>
+                </c:forEach>
+            </ul>
+        </div>
+
+        <!-- Predecessor Section -->
+        <div>
+            <h5>Predecessor:</h5>
+            <ul>
+                <c:forEach var="task" items="${predecessorTasks}">
+                    <li>${task}</li>
+                </c:forEach>
+            </ul>
+        </div>
+
+        <!-- Successor Section -->
+        <div>
+            <h5>Successor:</h5>
+            <ul>
+                <c:forEach var="task" items="${successorTasks}">
+                    <li>${task}</li>
+                </c:forEach>
+            </ul>
+        </div>
+    </div>
+</div>
