@@ -480,3 +480,8 @@ function showAlert(message, alertType) {
     document.querySelector(`.${alertType}`).remove();
   }, 5000);
 }
+
+
+
+new..
+create table user (id number(19,0) generated as identity, password varchar2(255 char), username varchar2(255 char), primary key (id))
