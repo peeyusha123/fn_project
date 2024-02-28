@@ -129,3 +129,14 @@ public ProjectDetails getProjectDetails(@RequestHeader("user") String user, @Req
 
     return projectDetails;
 }
+
+
+-- Query to fetch project name, alter project name, and project ID from SITE_PROJECTS
+SELECT project_name, project_id
+FROM SITE_PROJECTS
+WHERE project_id = :projectId;
+
+-- Query to fetch alter project name from proj_additional_info
+SELECT alter_project_name
+FROM proj_additional_info
+WHERE project_id = :projectId;
