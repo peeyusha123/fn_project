@@ -109,3 +109,23 @@
     </script>
   </body>
 </html>
+
+project details...
+
+@RequestMapping(value = "/getProjectDetails", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+@Operation(summary = "Returns additional details of a project", description = "Projects Service")
+@ApiResponse(responseCode = "200", description = "SUCCESS", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ProjectDetails.class))})
+@ResponseStatus(HttpStatus.OK)
+public ProjectDetails getProjectDetails(@RequestHeader("user") String user, @RequestParam("projectId") String projectId) throws Exception {
+    final User userInfo = userInfoservice.getUserInfo();
+    Logger.info("PROJECTS-SERVICE: Inside getProjectDetails(), called by " + user + " with projectId: " + projectId);
+
+    // Retrieve project details from the database
+    String projectName = ""; // Fetch from SITE_PROJECTS
+    String alterProjectName = ""; // Fetch from proj_additional_info
+
+    // Construct response object
+    ProjectDetails projectDetails = new ProjectDetails(projectName, alterProjectName, projectId);
+
+    return projectDetails;
+}
