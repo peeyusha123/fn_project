@@ -140,3 +140,27 @@ WHERE project_id = :projectId;
 SELECT alter_project_name
 FROM proj_additional_info
 WHERE project_id = :projectId;
+
+
+
+import org.springframework.jdbc.core.JdbcTemplate;
+
+public class ProjectInfoDAO {
+
+    private JdbcTemplate jdbcTemplate;
+
+    public ProjectInfoDAO(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public String fetchProjectNameAndId(int siteProjectId) {
+        String sql = "SELECT NAME, SITE_PROJECTS_ID FROM SITE_PROJECTS WHERE SITE_PROJECTS_ID = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{siteProjectId}, (resultSet, i) ->
+                resultSet.getString("NAME") + " - " + resultSet.getInt("SITE_PROJECTS_ID"));
+    }
+
+    public String fetchAlterProjectName(int siteProjectId) {
+        String sql = "SELECT ALT_PROJECT_NAME FROM proj_additional_info WHERE SITE_PROJECTS_ID = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{siteProjectId}, String.class);
+    }
+}
