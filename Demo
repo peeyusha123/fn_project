@@ -1034,3 +1034,34 @@ Message ChatGPT…
 
 ChatGPT can make mistakes. Consider checking important information.
 Function to fetch milestone data
+
+
+
+
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.*;
+import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.*;
+import java.util.List;
+import org.slf4j.*;
+
+@RestController
+public class ProjectController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
+
+    @Autowired
+    private ProjectService projectService;
+
+    @RequestMapping(value = "/getProjectDetails", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Returns additional details of a project", description = "Projects Service")
+    @ApiResponse(responseCode = "200", description = "SUCCESS", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ProjectDetails.class))})
+    @ResponseStatus(HttpStatus.OK)
+    public ProjectDetails getProjectDetails(@RequestHeader("user") String userJSON, @RequestParam("projectId") String projectId) throws Exception {
+        final User user = userInfoService.getUserInfo();
+        logger.info("PROJECTS-SERVICE: Inside {}, Called by {} with Parameter {}", Thread.currentThread().getStackTrace()[1].getMethodName(), user, projectId);
+
+        return projectService.getProjectDetails(projectId);
+    }
+}
+
