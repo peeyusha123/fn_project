@@ -164,3 +164,52 @@ public class ProjectInfoDAO {
         return jdbcTemplate.queryForObject(sql, new Object[]{siteProjectId}, String.class);
     }
 }
+
+
+new,....
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class ProjectService {
+
+    @Autowired
+    private DataSource dataSource; // Autowire the DataSource bean for database connection
+
+    public ProjectDetails getProjectDetails(User user, String projectId) throws Exception {
+        Logger.info("PROJECTS_SERVICE: Inside getProjectDetails(). Parameter: {}", projectId);
+
+        ProjectDetails projectDetails = new ProjectDetails();
+
+        final DataSourceCriteria criteria = new DataSourceCriteria();
+
+        criteria.put("USER_ID", user.getUserId());
+        criteria.put("PROJECT_ID", projectId);
+
+        try (Connection connection = dataSource.getConnection()) {
+            String sql = "SELECT project_name, alter_project_name FROM SITE_PROJECTS WHERE project_id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(sql)) {
+                statement.setString(1, projectId);
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    if (resultSet.next()) {
+                        projectDetails.setProjectName(resultSet.getString("project_name"));
+                        projectDetails.setAlterProjectName(resultSet.getString("alter_project_name"));
+                        projectDetails.setProjectId(projectId);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Logger.error("PROJECTS_SERVICE: Error in getProjectDetails()", e.getMessage());
+            throw e;
+        }
+
+        Logger.debug("RETURN PARAMS", Thread.currentThread().getStackTrace()[1].getMethodName(), projectId);
+
+        return projectDetails;
+    }
+}
