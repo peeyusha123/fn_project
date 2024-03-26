@@ -1,0 +1,225 @@
+<select class="col-xs-12 col-md-12 mandatory-field form-control-spm  in-state-gc padding-right" data-original-title=" In State GC?">
+               <option value="">Nothing Selected</option>
+               <option value="Yes">Yes</option>
+               <option value="No">No</option>
+               
+         </select>
+
+
+
+1)skill- enter existing technical skills,means currently your profient in that skill should add for e.g java spring boot
+2)Domain-your domain expertise,A domain is a functional area of knowledge or capability aligned to the business. Domain expertise can extend 
+beyond the work you are currently engaged in, and like skills, you may have many. Please indicate your experience in number of years for
+ each domain chosen. e.g full stack developer, Design in the network ,Deployment build 
+3)interest-enter interests you’d like to learn or develop,Technical skills you would like to sharpen or learn more about.. or An 
+interest is a skill that you would like to develop. It could either be a skill that is completely new to you, or it may be one
+ that you would like to sharpen. 
+4)Application-Project that you assisgned e.g FUZE
+
+
+mount pmi result:-
+<div class="select_picklist opt-field padding-left-right-zero display-flex national_fields">
+		  	<div class="col-sm-6 col-xs-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="Mount PMI Result">Mount PMI Result</label></div>
+		  	<div class="col-sm-6 col-xs-6 padding-left-right-zero border-left opt-content-section opt-content-single-select">
+		    	<select id="mountPmiResult" class="disable select_picklist_select mountPmiResult form-control border-zero input-sm padding-right-zero nf_disable">
+				    <option value="">Nothing Selected</option>
+	                <c:forEach var="mntPmiResult" items="${applicationScope.ContextCache.projectServiceSettings['mountPMIResult']}">
+	                    <option value="<c:out value='${mntPmiResult.key}'/>"><c:out value="${mntPmiResult.value}"/></option>
+	                </c:forEach>
+				</select>
+		  	</div>
+        </div>
+	</div>
+
+
+
+	  <div class="col-xs-12 col-sm-6 col-md-4 padding-right-zero group_two">
+      <div class="col-xs-12 col-sm-6 col-md-6 text-bold border-none padding-right-zero mobile-padding-left-0"> In State GC?</div>
+      <div class="col-xs-12 col-sm-6 col-md-6 padding-zero">
+	  <select class="col-xs-12 col-md-12 mandatory-field form-control-spm  in-state-gc padding-right" data-original-title=" In State GC?">
+               <option value="">Nothing Selected</option>
+               <option value="Yes">Yes</option>
+               <option value="No">No</option>
+               
+         </select>
+         </div>
+         </div>
+
+
+<div class="display-flex single_date opt-field padding-left-right-zero national_fields">
+		  <div class="col-sm-6 opt-label-section background-gray-light col-xs-6"><label class="opt-label" data-toggle="tooltip" data-placement="top" data-original-title="Tax Bond Certificate Uploaded">Tax Bond Certificate Uploaded</label></div>
+		  <div class="date-picker opt-date-picker col-sm-3 col-xs-3  padding-left-right-zero  display-flex border-left opt-forecast-section">
+            <b class=" opt-field-forecast-actual-icon opt_icon disable background-white">F</b>
+            <input id="closeoutTaxBondCerfUplodedFcDt" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Tax Bond Certificate Uploaded Forecast Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy"
+              class="disable datepicker  closeoutTaxBondCerfUplodedFcDt nf_disable form-control input-sm  border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+            <span class="input-group-btn">
+                <button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+                    <span class="vz-icon-today"></span>
+                </button>
+            </span>  <b class="fa-lg opt_field_lock border-zero opt_icon disable hide"></b>
+            <b class="fa fa-times-circle fa-lg opt_icon disable opt_field_na border-zero"></b>
+          </div>
+          <div class="date-picker opt-date-picker col-sm-3 col-xs-3  padding-left-right-zero  display-flex border-left opt-actual-section">
+            <b class="opt-field-forecast-actual-icon opt_icon disable background-white">A</b>
+            <input id="closeoutTaxBondCerfUplodedAcDt" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Tax Bond Certificate Uploaded Actual Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy"
+               class="disable datepicker closeoutTaxBondCerfUplodedAcDt nf_disable form-control input-sm  border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+             <span class="input-group-btn">
+                 <button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+                     <span class="vz-icon-today"></span>
+                 </button>
+             </span>
+             <b class="fa fa-check-circle opt_icon opt_field_check_green border-zero disable nf_disable"></b>
+          </div>
+		</div>
+</div>
+
+
+new-----
+
+<div class="col-xs-12 col-sm-12 padding-left-right-zero padding-bottom margin-top">
+	<div class="col-xs-12 col-sm-6 col-md-4 padding-left-right-zero group_one">
+		<div class="display-flex single_date opt-field padding-left-right-zero national_fields">
+		  <div class="col-sm-6 opt-label-section background-gray-light col-xs-6"><label class="opt-label" data-toggle="tooltip" data-placement="top" data-original-title="Date when Verizon approves the Closeout package">Closeout Package Approved</label></div>
+		  <div class="date-picker opt-date-picker col-sm-6  padding-left-right-zero  display-flex border-left opt-single-date-section opt-content-section col-xs-6">
+		     <input id="closeoutDocPackageAppr" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Closeout Package Approved Actual Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy"
+		       class="disable datepicker  closeoutDocPackageAppr nf_disable form-control input-sm  border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+		     <span class="input-group-btn">
+		         <button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+		             <span class="vz-icon-today"></span>
+		         </button>
+		     </span>
+		     <b class="fa fa-check-circle opt_icon opt_field_check_green border-zero disable nf_disable"></b>
+		  </div>
+		</div>
+		<div class="display-flex single_date opt-field padding-left-right-zero national_fields">
+		  <div class="col-sm-6 opt-label-section background-gray-light col-xs-6"><label class="opt-label" data-toggle="tooltip" data-placement="top" data-original-title="Date when closeout package is uploaded into FUZE">Closeout Package Uploaded</label></div>
+		  <div class="date-picker opt-date-picker col-sm-6  padding-left-right-zero  display-flex border-left opt-single-date-section opt-content-section col-xs-6">
+		     <input id="closeoutDocPackageUploaded" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Closeout Package Uploaded Actual Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy"
+		       class="disable datepicker  closeoutDocPackageUploaded nf_disable form-control input-sm  border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+		     <span class="input-group-btn">
+		         <button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+		             <span class="vz-icon-today"></span>
+		         </button>
+		     </span>
+		     <b class="fa fa-check-circle opt_icon opt_field_check_green border-zero disable nf_disable"></b>
+		  </div>
+		</div>
+		<div class="display-flex single_date opt-field padding-left-right-zero national_fields">
+		  <div class="col-sm-6 opt-label-section background-gray-light col-xs-6"><label class="opt-label" data-toggle="tooltip" data-placement="top" data-original-title="Mount PMI Submitted">Mount PMI Submitted</label></div>
+		  <div class="date-picker opt-date-picker col-sm-3 col-xs-3  padding-left-right-zero  display-flex border-left opt-forecast-section">
+            <b class=" opt-field-forecast-actual-icon opt_icon disable background-white">F</b>
+            <input id="closeoutPmiSubmittedFcDt" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Mount PMI Submitted Forecast Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy"
+              class="disable datepicker  closeoutPmiSubmittedFcDt nf_disable form-control input-sm  border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+            <span class="input-group-btn">
+                <button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+                    <span class="vz-icon-today"></span>
+                </button>
+            </span>  <b class="fa-lg opt_field_lock border-zero opt_icon disable hide"></b>
+            <b class="fa fa-times-circle fa-lg opt_icon disable opt_field_na border-zero"></b>
+          </div>
+          <div class="date-picker opt-date-picker col-sm-3 col-xs-3  padding-left-right-zero  display-flex border-left opt-actual-section">
+            <b class="opt-field-forecast-actual-icon opt_icon disable background-white">A</b>
+            <input id="closeoutPmiSubmittedAcDt" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Mount PMI Submitted Actual Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy"
+               class="disable datepicker closeoutPmiSubmittedAcDt nf_disable form-control input-sm  border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+             <span class="input-group-btn">
+                 <button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+                     <span class="vz-icon-today"></span>
+                 </button>
+             </span>
+             <b class="fa fa-check-circle opt_icon opt_field_check_green border-zero disable nf_disable"></b>
+          </div>
+		</div>
+	</div>
+<div class="col-xs-12 col-sm-6 col-md-4 padding-right-zero group_two">
+		<div class="display-flex single_date opt-field padding-left-right-zero national_fields">
+		  <div class="col-sm-6 opt-label-section background-gray-light col-xs-6"><label class="opt-label" data-toggle="tooltip" data-placement="top" data-original-title="Date when Verizon approves the Fiber closeout package">Fiber COP Approved</label></div>
+		  <div class="date-picker opt-date-picker col-sm-6  padding-left-right-zero  display-flex border-left opt-single-date-section opt-content-section col-xs-6">
+		     <input id="closeoutDocFiberCopAppr" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Fiber COP Approved Actual Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy"
+		       class="disable datepicker  closeoutDocFiberCopAppr nf_disable form-control input-sm  border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+		     <span class="input-group-btn">
+		         <button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+		             <span class="vz-icon-today"></span>
+		         </button>
+		     </span>
+		     <b class="fa fa-check-circle opt_icon opt_field_check_green border-zero disable nf_disable"></b>
+		  </div>
+		</div>
+		<div class="display-flex single_date opt-field padding-left-right-zero national_fields">
+		  <div class="col-sm-6 opt-label-section background-gray-light col-xs-6"><label class="opt-label" data-toggle="tooltip" data-placement="top" data-original-title="Date when Fiber closeout package is uploaded into FUZE">Fiber COP Uploaded</label></div>
+		  <div class="date-picker opt-date-picker col-sm-6  padding-left-right-zero  display-flex border-left opt-single-date-section opt-content-section col-xs-6">
+		     <input id="closeoutDocFiberCopUploaded" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Fiber COP Uploaded Actual Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy"
+		       class="disable datepicker  closeoutDocFiberCopUploaded nf_disable form-control input-sm  border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+		     <span class="input-group-btn">
+		         <button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+		             <span class="vz-icon-today"></span>
+		         </button>
+		     </span>
+		     <b class="fa fa-check-circle opt_icon opt_field_check_green border-zero disable nf_disable"></b>
+		  </div>
+		</div>
+		<div class="select_picklist opt-field padding-left-right-zero display-flex national_fields">
+		  	<div class="col-sm-6 col-xs-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="Mount PMI Result Received">Mount PMI Result Received</label></div>
+			  <div class="date-picker opt-date-picker col-sm-6  padding-left-right-zero  display-flex border-left opt-single-date-section opt-content-section col-xs-6">
+				<input id="closeoutPmiApproved" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Mount PMI Result Received Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy"
+				  class="disable datepicker  closeoutPmiApproved nf_disable form-control input-sm  border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+				<span class="input-group-btn">
+					<button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+						<span class="vz-icon-today"></span>
+					</button>
+				</span>
+				<b class="fa fa-check-circle opt_icon opt_field_check_green border-zero disable nf_disable"></b>
+			 </div>
+        </div>
+		
+	</div>
+	
+	<div class="col-xs-12 col-sm-6 col-md-4 padding-right-zero group_three">
+	
+      <div class="col-xs-12 col-sm-6 col-md-6 text-bold border-none padding-right-zero mobile-padding-left-0"> In State GC?</div>
+      <div class="col-xs-12 col-sm-6 col-md-6 padding-zero">
+	  <select class="col-xs-12 col-md-12 mandatory-field form-control-spm  in-state-gc padding-right" data-original-title=" In State GC?">
+               <option value="">Nothing Selected</option>
+               <option value="Yes">Yes</option>
+               <option value="No">No</option>
+               
+         </select>
+         </div>
+         
+<div class="col-sm-6 opt-label-section background-gray-light col-xs-6"><label class="opt-label" data-toggle="tooltip" data-placement="top" data-original-title="Tax Bond Certificate Uploaded">Tax Bond Certificate Uploaded</label></div>
+		  <div class="date-picker opt-date-picker col-sm-3 col-xs-3  padding-left-right-zero  display-flex border-left opt-forecast-section">
+            <b class=" opt-field-forecast-actual-icon opt_icon disable background-white">F</b>
+            <input id="closeoutTaxBondCerfUplodedFcDt" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Tax Bond Certificate Uploaded Forecast Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy"
+              class="disable datepicker  closeoutTaxBondCerfUplodedFcDt nf_disable form-control input-sm  border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+            <span class="input-group-btn">
+                <button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+                    <span class="vz-icon-today"></span>
+                </button>
+            </span>  <b class="fa-lg opt_field_lock border-zero opt_icon disable hide"></b>
+            <b class="fa fa-times-circle fa-lg opt_icon disable opt_field_na border-zero"></b>
+          </div>
+          <div class="date-picker opt-date-picker col-sm-3 col-xs-3  padding-left-right-zero  display-flex border-left opt-actual-section">
+            <b class="opt-field-forecast-actual-icon opt_icon disable background-white">A</b>
+            <input id="closeoutTaxBondCerfUplodedAcDt" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Tax Bond Certificate Uploaded Actual Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy"
+               class="disable datepicker closeoutTaxBondCerfUplodedAcDt nf_disable form-control input-sm  border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+             <span class="input-group-btn">
+                 <button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+                     <span class="vz-icon-today"></span>
+                 </button>
+             </span>
+             <b class="fa fa-check-circle opt_icon opt_field_check_green border-zero disable nf_disable"></b>
+          </div>
+		 
+		  
+		  
+		  <div class="select_picklist opt-field padding-left-right-zero display-flex national_fields">
+		  	<div class="col-sm-6 col-xs-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="Mount PMI Result">Mount PMI Result</label></div>
+		  	<div class="col-sm-6 col-xs-6 padding-left-right-zero border-left opt-content-section opt-content-single-select">
+		    	<select id="mountPmiResult" class="disable select_picklist_select mountPmiResult form-control border-zero input-sm padding-right-zero nf_disable">
+				    <option value="">Nothing Selected</option>
+	                <c:forEach var="mntPmiResult" items="${applicationScope.ContextCache.projectServiceSettings['mountPMIResult']}">
+	                    <option value="<c:out value='${mntPmiResult.key}'/>"><c:out value="${mntPmiResult.value}"/></option>
+	                </c:forEach>
+				</select>
+		  	</div>  
+	</div>
+	</div>
