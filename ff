@@ -137,3 +137,41 @@ END;
         </div>
     </div>
 </div>
+
+
+ll..
+
+<div class="col-xs-12 col-sm-6 col-md-6 text-bold border-none padding-right-zero mobile-padding-left-0"> In State GC?</div>
+<div class="col-xs-12 col-sm-6 col-md-6 padding-zero">
+    <div class="select_picklist opt-field padding-left-right-zero display-flex national_fields">
+        <select class="col-xs-12 col-md-12 mandatory-field form-control-spm in-state-gc padding-right" data-original-title="In State GC?" required>
+            <option value="">Nothing Selected</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+    </div>
+</div>
+
+<div class="col-xs-12 col-sm-6 col-md-6 text-bold border-none padding-right-zero mobile-padding-left-0"> Tax Bond Certificate Uploaded (F)/(A)</div>
+<div class="col-xs-12 col-sm-6 col-md-6 padding-zero">
+    <div class="display-flex single_date opt-field padding-left-right-zero national_fields">
+        <div class="date-picker opt-date-picker col-sm-6 padding-left-right-zero display-flex border-left opt-single-date-section opt-content-section col-xs-6">
+            <input id="taxBondCertUploadedFcDt" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Tax Bond Certificate Uploaded Forecast Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy" class="disable datepicker taxBondCertUploadedFcDt nf_disable form-control input-sm border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+            <span class="input-group-btn">
+                <button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+                    <span class="vz-icon-today"></span>
+                </button>
+            </span>
+            <b class="fa fa-check-circle opt_icon opt_field_check_green border-zero disable nf_disable"></b>
+        </div>
+        <div class="date-picker opt-date-picker col-sm-6 padding-left-right-zero display-flex border-left opt-actual-section">
+            <input id="taxBondCertUploadedAcDt" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Tax Bond Certificate Uploaded Actual Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy" class="disable datepicker taxBondCertUploadedAcDt nf_disable form-control input-sm border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value="" required/>
+            <span class="input-group-btn">
+                <button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+                    <span class="vz-icon-today"></span>
+                </button>
+            </span>
+            <b class="fa fa-check-circle opt_icon opt_field_check_green border-zero disable nf_disable"></b>
+        </div>
+    </div>
+</div>
