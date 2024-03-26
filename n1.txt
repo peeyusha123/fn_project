@@ -130,3 +130,32 @@ new-----
           </div>
 		</div>
 	</div>
+
+
+Create a new picklist field within this task:
+Field Name: In State GC?
+Field Data Type: Picklist Field
+Field Tooltip: Are all general contractors assigned to this project performing work as a resident contractor (registered with state and remitting S&U tax returns) of the state of SITE_ADDRESS_STATE? 
+SITE_ADDRESS_STATE will be the same state as the Project Level Physical Site Address State: MA, CT, or RI
+Required Field: Yes
+Selectable Values:
+Yes
+No
+Default Value: Yes
+Create a new date field called “Tax Bond Certificate Uploaded (F)/(A)”
+Field Name: Tax Bond Certificate Uploaded
+Field Data Type: (F)/(A) date
+Field Definition / Tooltip: 
+This date verifies NRC fees have been paid by the Verizon General Contractor and appropriate tax bond receipts have been received by Verizon if NRC fees apply to this project
+Field Requirements:
+The Actual Date field will be required to finalize the Documents Uploaded Task if the following conditions are met:
+Construction Completed Milestone Status != N/A (construction was performed on this project)
+Project Level Physical Site Address State is MA, CT, or RI
+In State GC Picklist is set to “No”
+Otherwise, this field will not be required 
+Editable field?: Forecast field editable, Actual date read only 
+Additional Logic:
+The actual date in this field will automatically populate once at least one document has been uploaded which meets the following criteria:
+Document Type = “CloseOut Documents”
+Document Sub Type = “Tax Bond Certificate”
+Upon subsequent document uploads that meet the above conditions, update the date in this field to the latest date a document was uploaded to this document type and subtype
