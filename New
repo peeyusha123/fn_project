@@ -12,3 +12,33 @@ AND SUB_TYPE = 'CLOSEOUT_DOCUMENTS' and SEQ !=-70  ORDER BY SEQ, VALUE ASC
 
 INSERT INTO ENUM_REFERENCE (NAME,VALUE,DESCRIPTION,GROUP_NAME,SUB_TYPE,SEQ,LAST_MODIFIED_BY)
 VALUES ('TAX_BOND_CERTIFICATE','Tax Bond Certificate','RF Documents','PROJECTS_SETTINGS','CLOSEOUT_DOCUMENTS',24,'shelape');
+
+
+new..
+
+-- Retrieve data sources containing 'getEnumMap' in their name
+SELECT * 
+FROM data_source 
+WHERE source_name LIKE '%getEnumMap%';
+
+-- Retrieve data sources with the exact name 'enum.getEnumMap'
+SELECT * 
+FROM data_source 
+WHERE source_name = 'enum.getEnumMap';
+
+-- Retrieve ENUM_REFERENCE data based on specified criteria
+SELECT NAME, VALUE, DESCRIPTION, NAME AS KEY 
+FROM ENUM_REFERENCE 
+WHERE GROUP_NAME = 'PROJECTS_SETTINGS' 
+AND SUB_TYPE = 'CLOSEOUT_DOCUMENTS' 
+AND SEQ != -70  
+ORDER BY SEQ, VALUE ASC;
+
+-- Retrieve information about a specific ENUM_REFERENCE entry
+SELECT * 
+FROM ENUM_REFERENCE 
+WHERE name = 'TAX_BOND_CERTIFICATE';
+
+-- Insert a new entry into ENUM_REFERENCE table
+INSERT INTO ENUM_REFERENCE (NAME, VALUE, DESCRIPTION, GROUP_NAME, SUB_TYPE, SEQ, LAST_MODIFIED_BY)
+VALUES ('TAX_BOND_CERTIFICATE', 'Tax Bond Certificate', 'RF Documents', 'PROJECTS_SETTINGS', 'CLOSEOUT_DOCUMENTS', 24, 'shelape');
