@@ -1,128 +1,3633 @@
-//Gsheet with tier 1 and tier 2 information
-1)Excepted Standards
-"Predecessors, Successors and Pre-Reqs should always be (A) dates (there is some exceptions in the transport milestone where these are field values and not A dates but that is an exception)
-1/8/24 Update - it appears in the current prod implementation only Pre-Reqs have the (A) date listed so please keep the current implementation as it. Predecessors and Successor will continue to show as only the task and milestone name - no (A) date"
-if the Predecessors, Successors or Pre-Reqs is a task or milestone A date - please put the word "task" or "milestone - For instance "Zoning Milestone (A)" , Submit RFDS Task (A)
-If there is any logic or conditional criteria about when a task or milestone is applicable, that must be captured in the "Other Information" section
-Users must have all the information available to them on how the task/milestone functions and all conditions around it
-As you dig into the code and find the Predecessors, Successors and Pre-Reqs - please fill out columns E, F & G in the dynamic display sheet
-2)dynamic display
+var closeoutModule ={
+	dom: {
+		// photo document task variables
+		selected : [],
+		uploadedDocuments : [],
+		selectedOrders : [],
+		idField : "documentID",
+		photoDocs  : "PHOTO_DOCUMENTS",
+		templateNodes: "",
+		dataTreeviewDataSource: null,
+		TreeviewCategories: null,
+		counter: 0,
+		finalEditNodes: [],
+		contactTypeGlobal: false,
+		contactTypeValue: "",
+		finalCheckedNodes: [],
+        pendingApproval: [],
+		submitted: [],
 
-Team	Tier 1 Milestone	Tier 2 Sub Milestone	Definition	Prerequisite	Predecessor	Successor	Other Information	Initial Build Predecessor (Macro, Micro, Node, In-building, Temporary, etc.)	Modification Predecessor	How to Complete	Required if Active?	Verified logic?																	
-Rosh	Project Started	Released to Build						NPP Released (NPP project) / Project Creation (SPM only project)	NPP Released (NPP project) / Project Creation (SPM only project)	POR Year, BPY, Budget Code, and Engineering Released	Yes	x																	
-Rosh	Project Started	Location Code Created						Released to Build	Released to Build	PSLC Code or MDG ID	Yes	x																	
-Rosh	Budget & funding	Budget & funding (Tier 1)						Location Code Created	Project Started	Select your PSLC from Search	Yes	x																	
-Rosh	Select Vendor	Select Vendor (Tier 1)						Project Started	Project Started	Select at least one Vendor	Yes	x																	
-Rosh	Environmental Due Diligence	Environmental Due Diligence (Tier 1)						Completion of Candidate Selection	Project Started	Environmental Territory Environmental Compliance Admin Approval	Yes	x																	
-Rosh	Environmental Due Diligence	Environmental Review						Completion of Candidate Selection	Project Started	Upload documents and/or complete necessary fields	Yes	x																	
-Rosh	Environmental Due Diligence	TSDF Review						Request from Environmental Review - Environmental Services tab - Is disposal facility required = Yes	Request from Environmental Review - Environmental Services tab - Is disposal facility required = Yes	Complete all required fields	Yes	x																	
-Rosh	Environmental Due Diligence	Global EHS Review						Request From Environmental Review	Request From Environmental Review	Environmental Global EH&S Admin Approval	Yes	x																	
-Rosh	Environmental Due Diligence	Territory Review						Request From Environmental Review	Request From Environmental Review	Environmental Admin Approval	Yes	x																	
-Rosh	Leasing (and MGD)	Leasing (and MGD) (Tier 1)						Completion of Candidate Selection	Project Started	Site Tracker Sync	Yes	x																	
-Rosh	Zoning	Zoning (Tier 1)		"Zoning Filed (A)
-Zoning Approved"				Completion of Candidate Selection	N/A	Site Tracker Sync	Yes	x																	
-Rosh	A&E 	A&E (Tier 1)		Final CD Approved (A)	Submit for NEPA Task	?? Project Started Milestone or Candidate Selection Milestone?	"The Final CDs Approved (A) date field will be systematically populated as soon as the Final CD's DRM approval is granted. Users are not able to edit this field
-Completion of the Final CDs Approved (A) date field will activate the Submit for NEPA Task as long as the Submit Structure Form Task has already been completed"	Project Started	Project Started	Upload documents and/or complete necessary fields	Yes	x																	
-Rosh	Permitting	Permitting (Tier 1)						RF Accept & Ranking Task	Project Started	Populate required fields	Yes	x																	
-Rosh	E911	E911 (Tier 1)			Submit RFDS Task (A)			Completion of Candidate Selection	Completion of Submit RFDS	Complete all active tasks	Yes	x																	
-Rosh	E911	Confirm E911 Address					n/a	Completion of Submit RFDS Task	Completion of Submit RFDS Task	Upload documents and/or complete necessary fields	Yes	x																	
-Rosh	E911	Confirm E911 Submitted					n/a	Completion of Confirm E911 Address	Completion of Submit RFDS	Upload documents and/or complete necessary fields	Yes	x																	
-Rosh	E911	Confirm TVW Received					n/a	Completion of Confirm E911 Submitted	Completion of Confirm E911 Submitted	Upload documents and/or complete necessary fields	Yes	x																	
-Rosh	Equipment	Equipment (Tier 1)		"Task Level (A) Dates
-BOM Completed Task (A)
-AWAT Material Allocation Task (A)
-Equipment Procurement Completed Task(A)"	Submit RFDS Task (A)			"RF Project Templates: Completion of Submit RFDS Task (A)
+		//approval.js variables
+		contacts: [],
+		vendorContactResponse: [],
 
-Non-RF Project Templates: Completion of Candidate Selection Milestone (A)"	"RF Project Templates: Completion of Submit RFDS Task (A)
+		//reg-cop task variables
+		container: "VENDOR_TAB",
+		structureSection: "STRUCTURE_INFORMATION",
+		rfdsSection: "RFDS_INFORMATION",
+		rfdsServices: "RFDS_SERVICES",
+		rfdsEquipment: "RFDS_EQUIPMENT",
+		asBuilt: "REGULATORY_BUILT_VERIFICATIONS",
+		approvalData: [],
+		contactTypes: [],
+		discrepancyFlag: false,
 
-Non-RF Project Templates: Completion of Project Started Milestone (A)"	Finalize Tasks	Yes	x																	
-Rosh	Equipment	BOM Completed	Engineering has provided a complete allocation of all 1ERP/S4 MMIDs associated with this 		Submit RFDS Task (A)	"AWAT Material Allocation Task
-Equipment Procurement Completed Task"	"Auto-finalizes after:
-All sections of RFDS:BOM (Tower, Ground, Power) have been submitted
-2. The user performs an EE Submit Action in RFDS:BOM
-"	"RF Project Templates: Completion of Submit RFDS
+		//env closeout task variables
+		modalDispContainer: null,
+	    modalTransContainer: null,
+	    globalTsdfDetails: [],
 
-Non-RF Project Templates: Completion of Candidate Selection Milestone"	"RF Project Templates: Completion of Submit RFDS
+		body : $(".closeout-Details"),
+		taskName: 'CLOSEOUT_DOCUMENTS',
+		projectId : 0
+	},
+	constructor: {
+		ajax: new commonAjax()
+	},
+	postProcess: function() {
+		console.log("inside postprocess of new closeout file ")
+		this.dom.body = $("#closeoutAccordionPanel");
+		this.dom.body.find(".common_task_anchor_click").off('click').on('click', $.proxy(projectPageModule.onCommonClick, projectPageModule));
+		this.dom.body.find(".edit-task-button").off('click').on('click', $.proxy(editTaskModule.editTaksFunction, editTaskModule));	
+		this.dom.body.find(".view-side-screen").off("click").on("click", $.proxy(sideScreenModule.onClickViewSideScreen, sideScreenModule));
+		grant7dayRule(this.dom.body);
+		this.dom.projectId = $("#site-project-id").val();
+		const data = JSON.parse($("#CLOSEOUT_DOCUMENTS").attr("data-json"));
+		var projAdditionalInfo = getProjectDetails();
+		getComments(this.dom.projectId);
+		
+		data.tasks.forEach((taskDetails) =>{
+			webComponentStatusActions(taskDetails, this.dom.body,  'CLOSEOUT_DOCUMENTS');
+		});
+		forecastProjectModule.getProjTrackerForecastDates($('#CLOSEOUT_DOCUMENTS'));
 
-Non-RF Project Templates: Completion of Project Started Milestone"	Finalize Task	Yes	x																	
-Rosh	Equipment	AWAT Material Allocation	Tracks all AWAT Material Assembly workflow for this SPM project ID. If no AWAT cabinets are included in RFDS:BOM, this task will N/A”		BOM Completed Task (A)	n/a	"Only applicable if there is an item in the RFDS:BOM with the ""AWAT Assembly Flag"" = Yes
+		getOptFields(this.dom.projectId, "CLOSEOUT_DOCUMENTS", (optFieldResponse) => {
+			if (optFieldResponse && Object.keys(optFieldResponse).length && optFieldResponse.CLOSEOUT_DOCUMENTS && optFieldResponse.CLOSEOUT_DOCUMENTS.task && optFieldResponse.CLOSEOUT_DOCUMENTS.task.length) {
+				optFieldResponse.CLOSEOUT_DOCUMENTS.task.forEach((taskDetails) =>{
+					if (taskDetails && Object.keys(taskDetails).length) {
+						$.when(createOptFields(taskDetails, this.dom.body, taskDetails.workStepName, "CLOSEOUT_DOCUMENTS")).done(basicProjectInfo(this.dom.projectId, projAdditionalInfo)); // disabling opt and national fields together
+					}else{
+						basicProjectInfo(this.dom.projectId, projAdditionalInfo);// in no opt field response atleast disable national fields for cancelled or rejected or planning non released projects
+					}
+				});
+			}
 
-Auto-finalizes when all AWAT cabinet builds have moved to a completed state in the user’s progress bar. "	"BOM Completed (A) if there is an item in the RFDS:BOM with the AWAT Assembly Flag = ""Yes""
+		});	
+		enableMilestoneComponent('CLOSEOUT_DOCUMENTS',data.milestoneStatus);
+		dismantleLogicForFields();
 
-If the above conditions are not met at BOM Completed (A), this task will N/A"	"BOM Completed (A) if there is an item in the RFDS:BOM with the AWAT Assembly Flag = ""Yes""
+		this.dom.body.find(".approve-button").off('click').on('click', $.proxy(this.acceptSectionRegCop, this));
+		this.dom.body.find(".reject-button").off('click').on('click', $.proxy(this.rejectSectionRegCop, this));
+		this.dom.body.find("#closeout-latitude").off('change').on('change', $.proxy(this.coOrdinatesChange, this));
+		this.dom.body.find("#closeout-longitude").off('change').on('change', $.proxy(this.coOrdinatesChange, this));
+		this.dom.body.find(".openWindow").off('click').on('click', $.proxy(this.editFunction, this));
+		this.dom.body.find(".resize_category_mini_max").off('click').on('click', $.proxy(this.resizeCategoryList, this));
+		this.dom.body.find(".save-category-template").off('click').on('click', $.proxy(this.openCategoryTemplateModal, this));
+		this.dom.body.find(".delete-category-template-icon").off('click').on('click', $.proxy(this.deleteCategory, this));
+		this.dom.body.find(".category_template_modal_delete_btn").off('click').on('click', $.proxy(this.deleteCategoryTemplate, this));
+		this.dom.body.find(".collapse-category-tree").off('click').on('click', $.proxy(this.collapseCategoryTree, this));
+		this.dom.body.find(".existing-category-template-dropdown").off('click').on('click', $.proxy(this.disableCategoryTemplate, this));
+		this.dom.body.find(".refresh-category-tree").off('click').on('click', $.proxy(this.refreshCategoryTree, this));
+		this.dom.body.find(".cancel-button").off('click').on('click', $.proxy(this.cancelSection, this));
 
-If the above conditions are not met at BOM Completed (A), this task will N/A"	See AWAT auto-finalize logic in column 	Yes																		
-Rosh	Equipment	Equipment Procurement Completed	All 1ERP/S4 MMIDS present within RFDS:BOM have been fully procured and released for this SPM Project ID	n/a	BOM Completed Task (A)	n/a	n/a	Completion of BOM Completed Task	Completion of BOM Completed Task	Finalize Task	Yes	x																	
-Rosh	Regulatory Inservice ( ISA)	Regulatory Inservice ( ISA)		None	Upload Inservice Document Task (A)	n/a	"Callsign Approvals are granted via automated or manual approval via HQ Regulatory in the Regulatory CNSTRN/INSV module
-Callsigns are generated once the Upload Inservice Documents Task in the RFDS milestone is completed"	Completion of RFDS milestone	Completion of RFDS milestone	Call signs approved by HQ Regulatory in Regulatory Construction/In-Service Module	Yes	x																	
-Rosh	Integration	Integration (Tier 1)		"e911 Testing Complete (A)
-Integration Completed (A)"	"Construction Complete
-show date of the first callsign approved from Regulatory ISA Milestone"			Completion of Construction Complete and at least one callsign approved	Completion of Construction Complete and at least one callsign	Populate required fields	Yes	x																	
-Rosh	Regulatory Dismantlement 	Regulatory Dismantlement 		Structure Dismantled (A)			Applicable on Initial Build Projects where Site Type - Temporary and "Verizon Wireless Owned?" = Yes OR in "Dismantlement modificatiom templates where Verizon Wireless Owned?" = Yes	Project Creation if Site Type = Temporary & Structure Owner = VZW	Completion of Post TCN task if Mod template = Dismantlement & Structure Owner = VZW	Upload documents and/or complete necessary fields	Yes	x																	
-Rosh	Activation (non-RF)	Activation (non-RF) (Tier 1)		Non-RF In Service (A)	"Initial Build = RF Accept & Ranking
-Mod - Construction Completed Milestone"		The "Non-RF In Service (A)" date field can be systematically populated by Network Assurance in IOP	Selection of Non-RF Project in Project Creation & Completion of Construction Started	Selection of Non-RF Project in Project Creation	Upload documents and/or complete necessary fields		x																	
-Rosh	Closeout Documents	Closeout Documents			RTC Milestone (A)	None		Completion of Ready to Construct	Completion of Ready to Construct	"Upload Regulatory Closeout Package Type, documents and/or complete necessary fields
-Then, Finalize
-Auto updates ""Closeout Delivered (A)"" for East and ""Closeout Doc Uploaded (A)"" for West
-"	Yes	x																	
-	Closeout Documents	Document Upload			RTC Milestone (A)	None																							
-Rosh	Closeout Documents	Photo/Documents		All task (A) dates within the milestone	RTC Milestone (A)	None		"Completion of RTC
-Only applicable on the following workflows: Initial Build, RF mod, Construction Only Mod, RF Regulatory Modifications"	"Completion of RTC
-Only applicable on the following workflows: Initial Build, RF mod, Construction Only Mod, RF Regulatory Modifications"	VZW Construction Engineer or 3rd Party Inspector finalize the task	Yes	x																	
-Rosh	Closeout Documents	Environmental Construction Closeout Information			RTC Milestone (A)	None	Environmental Construction Closeout Information task is activated based upon the selection of the "EES Required" field in the Environmental Review task within the Environmental Due Diligence																						
-Rosh	Osha Rooftop Assessment						This milestone will change to a "N/A" status if the following the completion of the Initial Rooftop Assessment Completed task and will be set to active again once the Construction Completed Milestone is completed.																						
-Rosh	Osha Rooftop Assessment	Initial Safety Information Completed			Select Vendor Milestone			NA	Select Vendor Milestone	Finalize the Select Vendor Milestone	Yes																		
-Rosh	Osha Rooftop Assessment	Initial Rooftop Assessment Completed			Select Vendor Milestone		If OSHA Rooftop Mod required is "no", the project will be completed	NA	Select Vendor Milestone	Finalize the Select Vendor Milestone	Yes																		
-Rosh	Osha Rooftop Assessment	Post Safety Information Completed			Construction Completed Milestone			NA	Construction Completed Milestone	Finalize the Construction Completed Milestone	Yes																		
-Rosh	Osha Rooftop Assessment	Post Rooftop Audit Completed			Construction Completed Milestone			NA	Construction Completed Milestone	Finalize the Construction Completed Milestone	Yes																		
+	},
 
-3)vcp orchestration makeup
-Mockups																									
-gnb Table 1																									
-	gNB Table	Installation (A)	Server Ready (A)																						
-	23423409238	12/11/2023	12/7/2023																						
-	23523523458	12/7/2023	12/14/2023																						
-																									
-	Dyanmic Display																								
-	FE Installation																								
-																									
-	Prerequisite			logic																					
-	Installation (A)		12/11/2023	if all gNB DU ID have date populated for Installation (A), show MAX date in Dynamic Display. Else, show blank																					
-	Server Ready (A)		12/14/2023	if all gNB DU ID have date populated for Server Ready (A), show MAX date in Dynamic Display. Else, show blank																					
-																									
-	Predecessor																								
-	VCP Far Edge CIQ Validation (A)		12/6/2023																						
-																									
-																									
-																									
-	Other Information																								
-	To complete FE Installation, all gNB DU Ids with Full Orchestration Path must be Installed with Server Ready, based upon the Create CQ Task.																								
-																									
-	Installation Pending :																								
-	Server Ready Pending :																								
-																									
-																									
-gnb Table 2																									
-	gNB Table	Installation (A)	Server Ready (A)																						
-	23423409238		12/7/2023																						
-	23523523458	12/7/2023																							
-																									
-	Dyanmic Display																								
-	FE Installation																								
-																									
-	Prerequisite			logic																					
-	Installation (A)			if all gNB DU ID have date populated for Installation (A), show MAX date in Dynamic Display. Else, show blank																					
-	Server Ready (A)			if all gNB DU ID have date populated for Server Ready (A), show MAX date in Dynamic Display. Else, show blank																					
-																									
-																									
-	Predecessor																								
-	VCP Far Edge CIQ Validation (A)		12/6/2023																						
-																									
-																									
-																									
-	Other Information																								
-	To complete FE Installation, all gNB DU Ids with Full Orchestration Path must be Installed with Server Ready, based upon the Create CQ Task.																								
-																									
-	Installation Pending : 23423409238																								
-	Server Ready Pending : 23523523458																								
-																									
+	// from approval.js
+	acceptSection: function(section) {
+		var contactType = $("." + section + "_APPROVAL").attr("data-set");
+		var siteProjectsId = $("#site-project-id").val();
+		var taskId = $("#" + section).attr('role');
+		var milestoneName = $("." + section).closest('.panel .panel-default').attr('id');
+		var projRegCopApprovals = this.setStatus(contactType,section);
+		projRegCopApprovals.siteProjectsId = siteProjectsId;
+		projRegCopApprovals.projRegCopApprovalsId = $("." + section + "_APPROVAL").attr("data-id");
+		projRegCopApprovals.section = section;
+		this.mergeProjRegCopApprovals(projRegCopApprovals, () => {
+			if(section === this.dom.asBuilt){
+				this.loadSections(section);
+			}
+			else{
+				this.loadApprovalSection(section);
+			}
+		});
+		var workStepsStatus = $("." + section).attr("data-status");
+		if(workStepsStatus === "REJECTED" && contactType === "VENDOR"){
+			this.updateWorkstepWorkflow(section);
+		}
+		displayStickySuccess("Approval Workflow has been updated");
+			
+	},
+	rejectSection: function(section) {
+		var contactType = $("." + section + "_APPROVAL").attr("data-set");
+		var status = this.fetchKey(contactType);
+		var thirdPartyStatus  =  $('.' + section + '_APPROVAL').find('.THIRDPARTYINSPECTOR').text();
+		var vzwConstStatus  =  $('.' + section + '_APPROVAL').find('.VZWCONSTRUCTION').text();
+		var projRegCopApprovals = {
+				"projRegCopApprovalsId": $("." + section + "_APPROVAL").attr("data-id"),
+				"section": section,
+				"siteProjectsId": $("#site-project-id").val(),
+				"vendorStatus" : "ACTIVE",
+				"thirdPartyInspectorStatus" : thirdPartyStatus ? thirdPartyStatus : 'N/A',
+				"vzwConstructionStatus" : vzwConstStatus ? vzwConstStatus : 'N/A'
+		};
+		projRegCopApprovals[status] = 'REJECTED';
+	
+		this.mergeProjRegCopApprovals(projRegCopApprovals, () => {
+			if(section === this.dom.asBuilt){
+				this.loadSections(section);
+			}
+			else{
+				this.loadApprovalSection(section);
+			}
+		});
+		//this.sendNotificationsActionItems(contactType,projRegCopApprovals,section);
+	},
+	setStatus: function(contactType,section){
+		var projRegCopApprovals = {};
+		var vendorStatus = $('.' + section + '_APPROVAL').find('.VENDOR').text();
+		switch(contactType){
+		case "VENDOR":
+			projRegCopApprovals.vendorStatus = "COMPLETED";
+	
+			if(this.dom.contacts.includes("V3PI")){
+				projRegCopApprovals.thirdPartyInspectorStatus = "ACTIVE";
+				projRegCopApprovals.vzwConstructionStatus = "N/A";
+			}
+			else{
+				projRegCopApprovals.thirdPartyInspectorStatus = "N/A";
+				projRegCopApprovals.vzwConstructionStatus = "ACTIVE";
+			}
+			break;
+		case "THIRD_PARTY_INSPECTOR":
+			projRegCopApprovals.vendorStatus = vendorStatus === 'ACTIVE' ? 'N/A' : vendorStatus; 
+			projRegCopApprovals.thirdPartyInspectorStatus = "COMPLETED";
+			projRegCopApprovals.vzwConstructionStatus = "N/A";
+			if (this.dom.discrepancyFlag){
+				projRegCopApprovals.vzwRfEngineerStatus = "ACTIVE";
+			}else{
+				projRegCopApprovals.vzwRfEngineerStatus = "N/A";
+			}
+		break;
+		case "CONSTRUCTION":
+			projRegCopApprovals.vendorStatus = vendorStatus === 'ACTIVE' ? 'N/A' : vendorStatus;
+			projRegCopApprovals.thirdPartyInspectorStatus = "N/A";
+			projRegCopApprovals.vzwConstructionStatus = "COMPLETED";
+			if(this.dom.discrepancyFlag){
+				projRegCopApprovals.vzwRfEngineerStatus = "ACTIVE";
+			}else{
+				projRegCopApprovals.vzwRfEngineerStatus = "N/A";
+			}
+			break;
+		}
+		//this.sendNotificationsActionItems(contactType,projRegCopApprovals,section);
+		return projRegCopApprovals;
+	},
+	sendNotificationsActionItems: function(contactType,projRegCopApprovals,section){
+		if(contactType){
+			let actionTypePayload = {};
+			let eventObject = {};
+			let eventAssignmentObject = {};
+			actionTypePayload.groupCode = 'CLOSEOUT_DOCUMENTS';
+			actionTypePayload.moduleName = "PROJECTS";
+			
+			this.constructor.ajax.fireApi(actionTypePayload, "events", "getEventTypesByEventGroup", (res) => {
+				var payload = {};
+				eventObject.eventStatus = "New";
+				this.constructor.ajax.fireApi(payload,"events","getEventGroups", (res1) =>{
+					$.each(res1, (i, data) => {
+						if(data.groupCode == 'CLOSEOUT_DOCUMENTS'){
+							eventObject.eventGroupId = data.eventGroupId;
+						}
+					});
+					$.each(res, (i,data) => {
+						if(section == 'PHOTO_DOCUMENTS'){
+							//3rd party or construction completed
+							if(data.eventType.trim() == "Photo Documents Completion" && (projRegCopApprovals.vendorStatus == 'COMPLETED' && (projRegCopApprovals.thirdPartyInspectorStatus == "ACTIVE" || projRegCopApprovals.vzwConstructionStatus == "ACTIVE"))){
+								eventObject.eventTypeId = data.eventTypeId;
+								eventObject.userDescription = "The Vendor/GC has completed their submission of the Photo Documents task. Please review and finalize to complete the task";
+								eventObject.eventTitle = "Photo Documents Task is Active for Completion";
+								this.dom.vendorContactResponse.forEach(vendorContacts=> {
+									if(projRegCopApprovals.thirdPartyInspectorStatus == "ACTIVE" && vendorContacts.type == 'V3PI'){
+										eventAssignmentObject.assignee = vendorContacts.userId;
+										this.createAIForRegCopApprovals(eventObject,eventAssignmentObject);
+									}else if(projRegCopApprovals.vzwConstructionStatus == "ACTIVE"){
+										var key = {};
+										key.refType = "project";
+										key.searchKey = $("#site-project-id").val();
+										searchContacts(key, (response) => {
+											response.forEach(constContact =>{
+												if(constContact.contactType == 'CONSTRUCTION' || constContact.contactType == 'CONSTRUCTION_ENGINEER_SECONDARY'){
+													eventAssignmentObject.assignee = constContact.userId;
+													this.createAIForRegCopApprovals(eventObject,eventAssignmentObject);
+												}
+											})
+										});
+									}
+								});		
+							//3rd party or construction rejection		
+							}else if(data.eventType.trim() == "Photo Documents Rejection" && (projRegCopApprovals.thirdPartyInspectorStatus == "REJECTED" || projRegCopApprovals.vzwConstructionStatus == "REJECTED")){
+								eventObject.eventTypeId = data.eventTypeId;
+								eventObject.userDescription = "The VZW Construction Engineer or 3rd Party Inspector has rejected the Photo Documents task. Please review the rejection, revise and resubmit the task";
+								eventObject.eventTitle = "Photo Documents Task is Rejected by VZW";
+								this.dom.vendorContactResponse.forEach(vendorContacts => {
+									if(vendorContacts.type == 'VCSC' || vendorContacts.type == 'VCGC' || vendorContacts.type == 'VCSM'){
+										eventAssignmentObject.assignee = vendorContacts.userId;
+										this.createAIForRegCopApprovals(eventObject,eventAssignmentObject);
+									}
+								});	
+							//vendor GC status active	
+							}else if(data.eventType.trim() == "Photo Documents Completion" && (projRegCopApprovals.vendorStatus == 'ACTIVE') && (projRegCopApprovals.thirdPartyInspectorStatus != "REJECTED" && projRegCopApprovals.vzwConstructionStatus != "REJECTED")){
+								eventObject.eventTypeId = data.eventTypeId;
+								eventObject.userDescription = "The Photo Documents Task is active for Completion";
+								eventObject.eventTitle = "Photo Documents Task is Active for Completion";
+								this.dom.vendorContactResponse.forEach(vendorContacts => {
+									if(vendorContacts.type == 'VCSC' || vendorContacts.type == 'VCGC' || vendorContacts.type == 'VCSM'){
+										eventAssignmentObject.assignee = vendorContacts.userId;
+										this.createAIForRegCopApprovals(eventObject,eventAssignmentObject);
+									}
+								});
+							}	
+						}else if(section == 'REGULATORY_BUILT_VERIFICATIONS'){
+							//3rd party or construction completed
+							if(data.eventType.trim() == "Regulatory As-Built Verification Completion" && (projRegCopApprovals.vendorStatus == 'COMPLETED' && (projRegCopApprovals.thirdPartyInspectorStatus == "ACTIVE" || projRegCopApprovals.vzwConstructionStatus == "ACTIVE"))){
+								eventObject.eventTypeId = data.eventTypeId;
+								eventObject.userDescription = "The Vendor/GC has completed their submission of the Regulatory As-Built Verifications task. Please review and finalize to complete the task.";
+								eventObject.eventTitle = "Regulatory As-Built Verification Task is Active for Completion";
+								this.dom.vendorContactResponse.forEach(vendorContacts=> {
+									if(projRegCopApprovals.thirdPartyInspectorStatus == "ACTIVE" && vendorContacts.type == 'V3PI'){
+										eventAssignmentObject.assignee = vendorContacts.userId;
+										this.createAIForRegCopApprovals(eventObject,eventAssignmentObject);
+									}else if(projRegCopApprovals.vzwConstructionStatus == "ACTIVE"){
+										var key = {};
+										key.refType = "project";
+										key.searchKey = $("#site-project-id").val();
+										searchContacts(key, (response) => {
+											response.forEach(constContact =>{
+												if(constContact.contactType == 'CONSTRUCTION' || constContact.contactType == 'CONSTRUCTION_ENGINEER_SECONDARY'){
+													eventAssignmentObject.assignee = constContact.userId;
+													this.createAIForRegCopApprovals(eventObject,eventAssignmentObject);
+												}
+											})
+										});
+									}
+								});
+							//3rd party or construction rejection
+							}else if(data.eventType.trim() == "Regulatory As-Built Verification Rejection" && (projRegCopApprovals.thirdPartyInspectorStatus == "REJECTED" || projRegCopApprovals.vzwConstructionStatus == "REJECTED")){
+								eventObject.eventTypeId = data.eventTypeId;
+								eventObject.userDescription = "The VZW Construction Engineer or 3rd Party Inspector has rejected the Regulatory As-Built Verifications task. Please review the rejection, revise and resubmit the task";
+								eventObject.eventTitle = "Regulatory As-Built Verification Task is Rejected by VZW";
+								this.dom.vendorContactResponse.forEach(vendorContacts=> {
+									if(vendorContacts.type == 'VCSC' || vendorContacts.type == 'VCGC' || vendorContacts.type == 'VCSM'){
+										eventAssignmentObject.assignee = vendorContacts.userId;
+										this.createAIForRegCopApprovals(eventObject,eventAssignmentObject);
+									}
+								});
+							//vendor GC status active	
+							}else if(data.eventType.trim() == "Regulatory As-Built Verification Completion" && (projRegCopApprovals.vendorStatus == 'ACTIVE') && (projRegCopApprovals.thirdPartyInspectorStatus != "REJECTED" && projRegCopApprovals.vzwConstructionStatus != "REJECTED")){
+								eventObject.eventTypeId = data.eventTypeId;
+								eventObject.userDescription = "Regulatory As-Built Verification Task is Active for Completion";
+								eventObject.eventTitle = "Regulatory As-Built Verification Task is Active for Completion";
+								this.dom.vendorContactResponse.forEach(vendorContacts=> {
+									if(vendorContacts.type == 'VCSC' || vendorContacts.type == 'VCGC' || vendorContacts.type == 'VCSM'){
+										eventAssignmentObject.assignee = vendorContacts.userId;
+										this.createAIForRegCopApprovals(eventObject,eventAssignmentObject);
+									}
+								});
+							}
+							else if(data.eventType.trim() == "Regulatory As-Built Verification Completion" && (projRegCopApprovals.vendorStatus == 'COMPLETED') && (projRegCopApprovals.thirdPartyInspectorStatus == "COMPLETED" || projRegCopApprovals.vzwConstructionStatus == "COMPLETED") && projRegCopApprovals.vzwRfEngineerStatus == "ACTIVE"){
+								eventObject.eventTypeId = data.eventTypeId;
+								eventObject.userDescription = "The VZW Construction Engineer, 3rd Party Inspector has completed their submission of the Regulatory As-Built Verifications COP task and an RF As-Built Discrepancy outside of acceptable tolerances was identified. Please review and finalize to complete the task";
+								eventObject.eventTitle = "Regulatory As-Built Verifications Task in COP available for review";
+								var key = {};
+								key.refType = "project";
+								key.searchKey = $("#site-project-id").val();
+								searchContacts(key, function(response) {
+									response.forEach(constContact =>{
+										if(constContact.contactType == 'RF' || constContact.contactType == 'RF_SECONDARY' || constContact.contactType == 'RF_ENGINEER_BACKUP'){
+											eventAssignmentObject.assignee = constContact.userId;
+											this.createAIForRegCopApprovals(eventObject,eventAssignmentObject);
+										}
+									})
+								});
+							}
+						}
+					});		
+				})
+			});
+		}		
+	},
+	createAIForRegCopApprovals: function(eventObject,eventAssignmentObject){
+		let mergeEventObject = {};
+		eventObject.emailRequired = "Yes";
+		eventObject.targetedDate = addDays(new Date(Date.now()), 7).toLocaleDateString();
+		eventAssignmentObject.assigneeType = "U";
+		mergeEventObject.event = eventObject;					
+		mergeEventObject.eventAssignment = eventAssignmentObject;
+		mergeEventObject.siteProjectsId = $('#site-project-id').val();				
+		this.constructor.ajax.fireApi(mergeEventObject, "events", "mergeProjEvent", (response) =>{
+			if (response) {
+				console.log('Action Item Created');
+			}		
+		});
+	},
+	fetchKey: function(filter) {
+		var statusField = "";
+		switch (filter) {
+		case "VENDOR":
+			statusField = "vendorStatus";
+			break;
+		case "THIRD_PARTY_INSPECTOR":
+			statusField = "thirdPartyInspectorStatus";
+			break;
+		case "CONSTRUCTION":
+			statusField = "vzwConstructionStatus";
+			break;
+		}
+	
+		return statusField;
+	},
+	editRegCopTask: function(section){
+		var contactType = $("." + section + "_APPROVAL").attr("data-set");
+		if(contactType === "VENDOR"){
+			var projRegCopApprovals = {
+					"projRegCopApprovalsId":  $("." + section + "_APPROVAL").attr("data-id"),
+					"section": section,
+					"siteProjectsId": $("#site-project-id").val(),
+					"vendorStatus" : "ACTIVE",
+					"thirdPartyInspectorStatus" : "",
+					"vzwConstructionStatus" : ""
+			};
+			this.mergeProjRegCopApprovals(projRegCopApprovals, () => {
+				if(section === this.dom.asBuilt){
+					this.loadSections(section);
+				}
+				else{
+					this.loadApprovalSection(section);
+				}
+				this.updateWorkstepWorkflow(section);
+				displayStickySuccess("Workflow has been updated");
+			});
+		}
+	},
+	updateWorkstepWorkflow: function(section){
+		var taskPayload = {};
+		taskPayload.siteProjectsId = $("#site-project-id").val();
+		taskPayload.workStepName = section + "_INSERT";
+		taskPayload.trackerStatus = "ACTIVE";
+		taskPayload.userReviewStatus = "";
+		this.constructor.ajax.fireApi(taskPayload, 'tracker', 'insertProjTrackerTaskDetails', (response) =>{
+			getProjectStatus(taskPayload.siteProjectsId, (response,siteProjectsId) =>{
+				populateWorkStepStatus(response, taskPayload.siteProjectsId, "ACTIVE",
+						section, "CLOSEOUT_DOCUMENTS");
+			});
+		});
+	},
+	// from closeoutPackage.js
+	loadPhotoDocumentsTask: function(){  // in leiu closeoutpackage.js
+		this.loadExistingTemplateDropdown();
+		this.loadApprovalSection();
+		this.getProjVendorContacts();
+		this.getDocTabContents();
+	},
+	checkNode: function(treeviewGrid) {
+    	var checkedNodes = $(`${treeviewGrid} .k-item input[type=checkbox]:checked`).parent().parent().find(".treenode");
+    	this.dom.finalCheckedNodes = [];
+    	for(let i = 0; i < checkedNodes.length > 0; i++){
+    		if(checkedNodes[i].id !== ""){
+    			this.dom.finalCheckedNodes.push(parseInt(checkedNodes[i].id));
+    		}
+    	}
+	},
+	
+	getProjVendorContacts: function(callback) {
+		var searchKey = {};
+		searchKey.siteProjectsId = $("#site-project-id").val();
+		this.constructor.ajax.fireApi(searchKey, "vendor", "getProjVendorDetails", (response) => {
+			this.dom.vendorContactResponse = response;
+			if(callback){
+				callback(response);
+			}
+			$.each(response,(i,contact)=>{
+				this.dom.contacts.push(contact.type);
+			});
+		});
+	},
+	// doc upload task functions
+	getProjRegCopApprovals: function(callback) {
+        var searchRequest = {};
+        searchRequest.siteProjectsId = $("#site-project-id").val();
+        this.constructor.ajax.fireApi(searchRequest, "mobile", "mobile/getProjRegCopApprovals", (response) => {
+            this.dom.approvalData = response;
+            if (callback) {
+                callback();
+            }
+        });
+    },
+	loadApprovalSection :function(section){
+    	if($('#' + this.dom.photoDocs).find('.' + this.dom.photoDocs).attr('data-status')==='ACTIVE'){
+			$("." + this.dom.photoDocs + "_APPROVAL").find(".VENDOR").text("ACTIVE");
+		}
+    	this.getProjRegCopApprovals(()=>{
+    		$("." + this.dom.photoDocs + "_APPROVAL").find(".VENDOR").text("ACTIVE");
+    		$.each(this.dom.approvalData, (i, data) =>{
+    			/** *status** */
+
+    			var keys = Object.keys(data);
+    			if(data.section === this.dom.photoDocs){
+    				$("." + this.dom.photoDocs + "_APPROVAL").attr("data-id",data.projRegCopApprovalsId);
+    				$.each(keys, function(i, keyData) {
+    					var key = keyData.replace('Status', '');
+    					key = key.toUpperCase();
+    					if (["VZWCONSTRUCTION", "THIRDPARTYINSPECTOR", "VENDOR"].indexOf(key) > -1) {
+    						$("." + data.section + "_APPROVAL").find("." + key).text(data[keyData] !== null ? data[keyData] : "");
+    					}
+    				});
+    			}
+    		});
+    	})
+	},
+	getDocTabContents: function(e) {
+        // this.displayCategoryList();
+    	this.getCloseoutDocuments(null,true);
+		this.dom.body.find(".closeoutpackage_upload_form_input").off('change').on("change", $.proxy(this.docUpload, this));
+    },
+    displayCategoryList: function(nodes) {
+    	let treeview = $(".documentTreeTab").data("kendoTreeView");
+    	if(treeview){
+    		treeview.destroy();
+    	}
+    	
+        $(".documentTreeTab").empty();
+
+        // Setup TreeviewCategories to load in Kendo TreeView
+        this.dom.TreeviewCategories = new kendo.data.HierarchicalDataSource({
+    	    data:this.dom.dataTreeviewDataSource,
+    	    schema: {
+    	        model: {
+    	            hasChildren: "hasChildren",
+    	            children: "items"
+    	        }
+    	    }
+    	});
+        
+        $(".documentTreeTab").kendoTreeView({
+        	checkboxes: {
+                checkChildren: true
+            },
+            check: function(e){
+            	// This will ensure that the treeview opens up till the last
+				// level for any node
+            	this.expandRoot = e.node;
+                this.expand($(this.expandRoot).find(".k-item").addBack());
+                
+                // This will ensure the multichecking of nodes in treeview
+                let treeviewGrid = ".documentTreeTab";
+                closeoutModule.checkNode(treeviewGrid);
+            },
+            
+            dataBound: function(e) {
+            	treeview = $(".documentTreeTab").data("kendoTreeView");
+            	if(nodes){
+            		treeview.expand(".k-item");
+                	for(let i = 0; i < closeoutModule.dom.templateNodes.length; i++){
+                		let nodeCheck = treeview.dataSource.get(closeoutModule.dom.templateNodes[i]);
+                		nodeCheck.set("checked", true);
+                		closeoutModule.dom.finalCheckedNodes.push(closeoutModule.dom.templateNodes[i]);
+                	}
+                	//treeview.collapse(".k-item");
+                }
+                if (this.expandRoot) {
+                  this.expand(e.node.find(".k-item"));
+              }
+            },
+            
+            dataSource: this.dom.TreeviewCategories,
+            template: '<span class="#= item.className #" id="#= item.id #" title="#= item.description #"> #= item.value #</span>'
+        });
+    },
+    getCloseoutDocuments: function(type,reloadTreeView) {
+    	
+        var documentWrapper = {};
+        documentWrapper.refNum = $("#site-project-id").val();
+        this.constructor.ajax.fireApi(documentWrapper, 'mobile', 'document/getCloseoutDocuments', $.proxy(function(response) {
+        	this.dom.uploadedDocuments = response;
+            if (type === "vendor") {
+                this.dom.submitted = response.filter(docs => docs.status === 'Submitted for Approval');
+                this.showVendorDocuments(this.dom.submitted);
+            } else {
+                 response.forEach(docs => {
+                	if(docs.status === 'Pending Approval'){
+                		delete docs.lastModifiedDate;
+                		delete docs.uploadedDate;
+                		this.dom.pendingApproval.push(docs);
+                	}
+                });
+                this.showDocuments(response);
+                if(reloadTreeView){
+                	this.getDocTypes();
+                	setTimeout(() =>{ 
+						this.displayCategoryList(); }, 3000);
+                }
+            }
+            if ($ && $.unblockUI) $.unblockUI();
+        }, this),  false, false,$.proxy(function(xhr,status,error){
+        	if(reloadTreeView){
+        		this.getDocTypes();
+            	this.displayCategoryList();
+            }
+        },this));
+			
+    },   
+    
+    getColumns: function() {
+
+        return [  
+        		{ 
+        			selectable: true,
+	        		width: "25px",
+					hidden: (this.dom.contactTypeGlobal==false?true:false),
+	        		media: "(min-width: 768px)",
+        			attributes: {
+        			    "class": "chbkSelectAllCloseoutDocs"
+        			},
+        			headerAttributes: {
+        				"class": "chbkSelectAllCloseoutDocsHeader"
+        			}
+        		
+        		},
+        		{
+        		template: function(response){
+        			if(response.status == "Submitted for Approval" || (response.subCategory == "RFE_MITIGATION" || response.subCategory == "ASR_SIGN_POSTED_PIC" || response.subCategory == "PIM_SWEEPS")){
+        				return `<span>
+								<b class="padding-left delete-docs text-brand-red fa fa-trash disable" title="Delete" aria-hidden="true" id="${response.documentID}"></b>
+								</span>
+								<span>
+								<b class="padding-left openWindow fa fa-pencil fa-bold text-link cursor-pointer margin-left margin-xs disable" title="Edit" aria-hidden="true" id="${response.refNumber}" docId="${response.documentID}"></b>
+								</span>
+								<span>
+								<b class="padding-left fa fa-eye fa-bold openWindow text-link cursor-pointer margin-left margin-xs disable" title="View" aria-hidden="true" id="${response.refNumber}" docId="${response.documentID}"></b>
+								</span>`
+        			}else{
+        				var disabledAttr = response.toggle!="ENABLE"?"disable":"";
+        				return `<span>
+								<b class="padding-left delete-docs text-brand-red fa fa-trash `+disabledAttr+`" title="Delete" aria-hidden="true" id="${response.documentID}"></b>
+								</span>
+								<span>
+								<b class="padding-left openWindow fa fa-pencil fa-bold text-link cursor-pointer margin-left margin-xs `+disabledAttr+`" title="Edit" aria-hidden="true" id="${response.refNumber}" docId="${response.documentID}"></b>
+								</span>
+								<span>
+								<b class="padding-left fa fa-eye fa-bold openWindow text-link cursor-pointer margin-left margin-xs `+disabledAttr+`" title="View" aria-hidden="true" id="${response.refNumber}" docId="${response.documentID}"></b>
+								</span>`
+        			}
+        		},
+        		title: "Action",
+                width: 70,
+                media: "(min-width: 768px)"
+            },
+            {
+        		field:"accessRestriction",
+        		title:"Vendor Restricted",
+        		headerAttributes: { style: "white-space: normal"},
+        		width: 30,
+        		filterable: false,
+        		template:function(response){
+        			var checkedAttr = response.accessRestriction=="YES"?"checked":"";
+        			var disabledAttr = response.toggle!="ENABLE"?"disable":"";
+        			return `<input id="docId-${response.documentID}" type='checkbox'  docId="${response.documentID}" aria-label="Restriction Switch" class="k-checkbox accessRestrictionBox `+disabledAttr+`" `+checkedAttr+`/>`;
+        		},
+        		media: "(min-width: 375px)"
+        	}, 
+            {
+                field: "title",
+                title: "Title",
+                width: 100,
+                type: "string",
+                template: function(response) {
+                    var vendorPath =
+                        `<a href="#" id="${response.documentID}" class="text-underline text-link download-documents">${response.title}</a>`;
+                    var nonVendorPath =
+                        `<a href="${response.path+ "?" + new Date().getTime()}" class="text-underline text-link" target="_blank">${response.title}</a>`;
+
+                    if ($("#isVendor").val() == "true") {
+                        return vendorPath;
+                    } else {
+                        return nonVendorPath;
+                    }
+                },
+                media: "(min-width: 768px)"
+            },
+            {
+                field: "status",
+                title: "Status",
+                width: 50,
+                media: "(min-width: 768px)"
+            },
+            {
+                field: "subCategory",
+                title: "Category",
+                width: 50,
+                media: "(min-width: 768px)"
+            },
+            {
+                field: "description",
+                title: "Sub Category",
+                width: 120,
+                type: "string",
+                media: "(min-width: 768px)"
+            },
+            {
+                field: "uploadedBy",
+                title: "Uploaded By",
+                width: 50,
+                type: "string",
+                media: "(min-width: 768px)"
+            },
+            {
+                field: "uploadedDate",
+                title: "Uploaded Date",
+                width: 50,
+                media: "(min-width: 768px)"
+            },
+            {
+                field: "lastModifiedBy",
+                title: "Last Modified By",
+                width: 50,
+                type: "string",
+                media: "(min-width: 768px)"
+            },
+            {
+                field: "lastModifiedDate",
+                title: "Last Modified Date",
+                width: 50,
+                media: "(min-width: 768px)"
+            },
+            {
+                field: "refNumber",
+                title: "refNumber",
+                hidden: true,
+                media: "(min-width: 768px)"
+            },
+            { 
+    			selectable: true,
+        		width: '25px',
+        		hidden: (this.dom.contactTypeGlobal==false?true:false),
+        		media: "(max-width: 767px)"
+    		
+    		},
+            {
+                title: "Items",
+                template: kendo.template($("#closeoutPackageTemplate").html()),
+                media: "(max-width: 767px)"
+        	},
+        	{
+        		template: function(response){
+        			if(response.status == "Submitted for Approval" || (response.subCategory == "RFE_MITIGATION" || response.subCategory == "ASR_SIGN_POSTED_PIC" || response.subCategory == "PIM_SWEEPS")){
+        				return `<div class="display-flex-column align-items-center">
+	        						<span>
+										<b class="delete-docs text-brand-red fa fa-trash fa-bold disable margin-bottom" title="Delete" aria-hidden="true" id="${response.documentID}"></b>
+									</span>
+									<span>
+										<b class="openWindow fa fa-pencil fa-bold text-link cursor-pointer disable margin-bottom" title="Edit" aria-hidden="true" id="${response.refNumber}" docId="${response.documentID}"></b>
+									</span>
+									<span>
+										<b class="fa fa-eye fa-bold openWindow text-link cursor-pointer disable" title="View" aria-hidden="true" id="${response.refNumber}" docId="${response.documentID}"></b>
+									</span>
+								</div>`
+        			}else{
+        				return `<div class="display-flex-column align-items-center">
+	        						<span>
+										<b class="delete-docs text-brand-red fa fa-trash fa-bold margin-bottom" title="Delete" aria-hidden="true" id="${response.documentID}"></b>
+									</span>
+									<span>
+										<b class="openWindow fa fa-pencil fa-bold text-link cursor-pointer margin-bottom" title="Edit" aria-hidden="true" id="${response.refNumber}" docId="${response.documentID}"></b>
+									</span>
+									<span>
+										<b class="fa fa-eye fa-bold openWindow text-link cursor-pointer" title="View" aria-hidden="true" id="${response.refNumber}" docId="${response.documentID}"></b>
+									</span>
+								</div>`
+        			}
+        		},
+        		title: "Action",
+                width: "30px",
+                media: "(max-width: 767px)"
+            }
+        ]
+    },
+    getGridOptions: function() {
+        return {
+            pageable: {
+                pageSize: 20
+			},
+			persistSelection: true,
+            selectable: false,
+            change: (e, args) => {
+                var grid = e.sender;
+                var items = grid.items();
+                items.each( (idx, row) =>{
+                    var idValue = grid.dataItem(row).get(this.dom.idField);
+                   
+                    if (row.className.indexOf("k-state-selected") >= 0) {
+                        // selectedOrders[idValue] = true;
+                    	if(this.dom.selectedOrders.indexOf(idValue)<0){
+                    		this.dom.selectedOrders.push(idValue);
+                    	}
+                    } else  {
+                    	 if(this.dom.selectedOrders.indexOf(idValue)>-1){
+                    		 this.dom.selectedOrders.splice(this.dom.selectedOrders.indexOf(idValue),1);
+                    	 }
+                    	
+                    }
+                });
+              },
+            dataBound: $.proxy(function(e) {
+            	this.dom.body.find(".chbkSelectAllCloseoutDocs").find("input").addClass("dataRestrictCheck proj-documents");
+                this.dom.body.find(".chbkSelectAllCloseoutDocsHeader").find("input").addClass("chbkSelectAllDocs");
+				this.dom.body.find("#chbkSelectAll").on("click", $.proxy(this.selectAll, this));
+				this.dom.body.find(".delete-docs").off("click").on("click", $.proxy(this.deleteNotification, this));
+                var dataItems = e.sender.dataSource.view();
+                for (var j = 0; j < dataItems.length; j++) {
+                    var item = dataItems[j].status;
+                    var row = e.sender.tbody.find("[data-uid='" + dataItems[j].uid + "']");
+                    
+                    if(dataItems[j].subCategory == "RFE_MITIGATION" || dataItems[j].subCategory == "ASR_SIGN_POSTED_PIC" || dataItems[j].subCategory == "PIM_SWEEPS"){
+                     	row.find(".proj-documents").addClass("hide");
+                    }
+                    
+                    if (item === 'Submitted for Approval') {
+                        row.addClass("on-hold-yellow");
+                    } else if (item === "Rejected") {
+                        row.addClass("cancelled-red");
+                    } else if (item === "Approved") {
+                        row.addClass("complete-green");
+                    }
+                    
+                    
+                    row.find(".dataRestrictCheck").attr("data-document-id",dataItems[j].documentID);
+                    
+                    
+                }
+                
+                var grid = e.sender;
+                var items = grid.items();
+                var itemsToSelect = [];
+                items.each( (idx, row) => {
+                  var dataItem = grid.dataItem(row);
+                  if (this.dom.selectedOrders.indexOf(dataItem[this.dom.idField])>-1) {
+                    itemsToSelect.push(row);
+                  }
+                });
+
+                e.sender.select(itemsToSelect);
+                
+               
+                
+            },this)
+            
+        }
+    },
+    getDataSourceOptions: function(response) {
+        return {
+            transport: {
+                pageSize: 20,
+                read: function(e) {
+                    e.success(response);
+                }
+            }
+        }
+    },
+    getSchema: function(){
+    	return {
+    		model:{
+    			id: "documentID",
+    			fields: {
+    				documentID:{
+    					isEditable: false
+    				},
+    				title:{
+    					isEditable: false
+    				},
+    				subCategory:{
+    					isEditable: false
+    				},
+    				status:{
+    					isEditable: false
+    				},
+    				description:{
+    					isEditable: false
+    				},
+    				lastModifiedBy:{
+    					isEditable: false
+    				},
+    				lastModifiedDate:{
+    					isEditable: false
+    				},
+    				uploadedBy:{
+    					isEditable: false
+    				},
+    				uploadedDate:{
+    					isEditable: false
+    				}
+    			}
+    		}
+    	}
+    },
+    getGridConfig: function(response) {
+        return {
+            data: response,
+            columns: this.getColumns(),
+            schema: this.getSchema(),
+            gridOptions: this.getGridOptions(),
+            dataSourceOptions: this.getDataSourceOptions(response)
+        }
+    },
+    showDocuments: function(response) {
+        let config = this.getGridConfig(response);
+        	let tableId = '#documentGrid';
+        	createKendoGrid(tableId, config.columns, config.data, config.schema, config.gridOptions, config.dataSourceOptions); 
+        	kendoSwitchComponent.createKendoSwitch(tableId);
+        	this.dom.body.find(tableId).off("change",".chbkSelectAllDocs");
+    		this.dom.body.find(tableId).on("change",".chbkSelectAllDocs", (e)=>{
+    			selectAllDocsInGrid(tableId);
+    		});
+    		
+             if(!this.dom.contactTypeGlobal){
+            	 $(".cop_doc_approve,.cop_doc_reject").addClass("hide");
+             }else{
+            	 $(".cop_doc_approve,.cop_doc_reject").addClass("show");
+            	 $(".cop_doc_approve,.cop_doc_reject").off('click').on("click", $.proxy(this.copApprovalProcess, this));
+             }
+		this.dom.body.find(".openWindow").off('click').on('click', $.proxy(this.editFunction, this));
+    },
+    docUpload: function(e) {
+        if (this.dom.finalCheckedNodes && this.dom.finalCheckedNodes.length != 0 ) {
+	          var form = $(e.currentTarget).parent('form');
+	          form.find("#refNum").val($("#site-project-id").val());
+	          form.find("#refType").val("MOBILE_CLOSEOUT_DOCUMENTS");
+	          form.find("#subCategory").val("COP");
+	          form.find("#description").val("MOBILE_CLOSEOUT_DOCUMENTS");
+	          
+	          uploadDocument($("#site-info-id").val(), form.attr('id'), $.proxy(function(response, documentIdList) {
+	        	  var DLMpayload = [];
+	        	  for(let j = 0; j < documentIdList.length; j++){	
+		        		  for (var i = 0; i < this.dom.finalCheckedNodes.length; i++){
+		        			  let documentLinkMapObj = {
+			        				  "documentId" : documentIdList[j],
+			        				  "refType" : "COP",
+			        				  "refNumber" : this.dom.finalCheckedNodes[i],
+			        		  }
+		        			  
+		        			  DLMpayload.push(documentLinkMapObj);
+		        		  }	  
+	        	  }
+	        	  if(DLMpayload.length > 0){
+	        		  this.insertDocumentMapLink(DLMpayload, $.proxy(function() {
+		                    if (blockUIExecution) blockUIExecution("Retrieving Document", 1000000);
+		                    this.getCloseoutDocuments(null,true);
+		                    this.dom.finalCheckedNodes = [];
+		                }, this), false, false);
+	        	  }
+              }, this), false, false);
+
+        } else {
+			Fuzehelper.commonModalPopUp("commonModals.jsp #closeout_package_alert_modal_container","closeout_package_alert_modal","closeout_package_alert_modal","","");
+        }
+    },
+    insertDocumentMapLink: function(DLMpayload, callback) {
+        var payload = DLMpayload;
+        this.constructor.ajax.fireApi(payload, 'document', 'addDocumentLinkMap', $.proxy(function(response) {
+            if (response) {
+                if (callback) {
+                    callback(response);
+                }
+            }
+        }, this), false, false);
+    },
+	getVendorTabContents: function(e) {
+        this.getCloseoutContactTypes($.proxy(function(response) {
+            if (response) {
+                this.getCloseoutDocuments("vendor");
+            }
+        }, this), false, false);
+        this.dom.body.find(".approval,.reject").on("click", $.proxy(this.approveRejectDocuments, this));
+    },
+    getCloseoutContactTypes: function(callback) {
+        var isVendorManager = false;
+        var projectSearchRequest = {};
+        projectSearchRequest.siteProjectsId = $("#site-project-id").val();
+        this.constructor.ajax.fireApi(projectSearchRequest, "mobile", "mobile/getCloseoutContactTypes", $.proxy(function(response) {
+            $.each(response, $.proxy(function(i, contactType) {
+
+            	$("." + this.dom.photoDocs + "_APPROVAL").attr("data-set",contactType);
+            	if(["THIRD_PARTY_INSPECTOR","CONSTRUCTION"].includes(contactType)){
+            		$("." + this.dom.photoDocs).find(".reject-task-button").removeClass("hide");
+            		this.dom.contactTypeGlobal=true;
+            		this.dom.contactTypeValue=contactType;
+            	}
+                if (contactType === "VENDOR_MANAGER") {
+                    isVendorManager = true;
+                }
+            }, this), false, false);
+            if (callback) {
+                callback(isVendorManager);
+            }
+        }, this), false, false);
+    },
+    showVendorDocuments: function(response) {
+        let config = this.getGridConfig(response);
+        config.columns.shift();
+        config.columns.unshift({
+			headerTemplate: `<input type='checkbox' class='spm_hdrCheckbox' id='chbkSelectAll'/>`,
+			template: `<input type='checkbox' class='spm_checkbox' />`,
+			width: 40,
+			config: "none"
+		});
+        /*
+		 * config.columns.unshift({ selectable: true, width: "30px", config:
+		 * "none" });
+		 */
+        createKendoGrid('#approvalDocGrid', config.columns, response, config.schema, config.gridOptions, config.dataSourceOptions);
+		this.dom.body.find(".openWindow").off('click').on('click', $.proxy(this.editFunction, this));
+    },
+	selectAll: function(e) {
+		var checked = $(e.currentTarget).is(':checked');
+		let grid = $("#approvalDocGrid").data("kendoGrid");
+
+		if (checked) {
+			isSelectAllClicked = true;
+			this.dom.body.find(".spm_checkbox:not(:checked)").each((index, item) => {
+				$(item).click();
+				let row = $(item).closest("tr");
+				let dataItem = grid.dataItem(row);
+				selected.push(dataItem.documentID); // this is line is only for developer look in console
+			});
+		} else {
+			isSelectAllClicked = false;
+			this.dom.body.find(".spm_checkbox:checked").each((index, item) => {
+				$(item).click();
+				let row = $(item).closest("tr");
+				let dataItem = grid.dataItem(row);
+				selected = selected.filter(ids => ids !== dataItem.documentID);
+			});
+		}
+		console.log('selected ids are: [' + selected.join(", ") + ']');
+	},
+    approveRejectDocuments: function(e) {
+        var status = $(e.currentTarget).attr("data-status");
+        var payload = [];
+        if (blockUIExecution) blockUIExecution("Approving/Rejecting Document(s)", 600000);
+        
+        if (this.dom.body.find('.spm_checkbox:checked').length > 0) {
+			let grid = this.dom.body.find("#approvalDocGrid").data("kendoGrid");
+			this.dom.body.find('.spm_checkbox:checked').toArray().forEach(item => {
+				let row = $(item).parents("tr");
+				let dataItem = grid.dataItem(row);
+				var doc = {
+		            "documentID": dataItem.documentID,
+		             "status": status
+		        }
+		        payload.push(doc);
+			});
+			this.constructor.ajax.fireApi(payload, 'mobile', 'document/updateRoutingDocument', $.proxy(function(response) {
+                if (response) {
+                    this.getCloseoutDocuments("vendor");
+                    displaySuccess("Documents have been successfully updated");
+                }
+                if ($ && $.unblockUI) $.unblockUI();
+            }, this), false, false);
+		} else {
+			if ($ && $.unblockUI) $.unblockUI();
+            displayError("Error", 'Please select atleast one document');
+		}
+    },
+    deleteNotification: function(e) {
+    	e.preventDefault();
+    	documentID  = e.currentTarget.id;
+        var options={
+    			title:'CONFIRM NOTIFICATION', 
+    			body:'Are you sure you want to delete this document',
+    			cancelBtn:`<button type="submit" class="btn btn-sm btn-default pull-right" data-dismiss="modal">No</button>`,
+    			confirmBtn:`<button id="${documentID}" type="submit" class="btn btn-sm btn-danger generic-confirmation-btn1 pull-right">Yes</button>`,
+    			backdrop:"static",
+	    		keyboard:"false"
+    		};
+    	Fuzehelper.commonConfirmationModalPopup("generic-confirmation-modal",options,(e) =>{
+			var genericConfirmationModal = $("#generic-confirmation-modal");
+			genericConfirmationModal.modal('show');
+			genericConfirmationModal.find(".generic-confirmation-btn1").off("click").on("click", () => {
+				var docs = {
+					'documentID' : genericConfirmationModal.find(".generic-confirmation-btn1").attr("id")
+				}
+				this.constructor.ajax.fireApi(docs, "document", "deleteDocument", (res) => {
+					if (res) {
+						displayStickySuccess("Document Deleted Successfully!");
+						$('#generic-confirmation-modal').modal('hide');
+						this.getCloseoutDocuments(null,true);
+					}
+				})
+			});
+    	});
+    },
+    checkUploadedDocuments: function(subCategory){
+    	$.each(this.dom.uploadedDocuments,(index, docs) =>{
+    		var refNumbers = docs.refNumber.split(", ");
+    		$.each(refNumbers,function(number,refNumber){
+    			if(subCategory.id == refNumber)
+    				subCategory.className += ' done';
+    		})
+    	})
+    },
+    // API call to delete the nodes for editing
+    deleteDocumentMapLink: function(delDLMpayload, callback) {
+        var payload = delDLMpayload;
+        this.constructor.ajax.fireApi(payload, 'document', 'deleteDocumentLinkMap', $.proxy(function(response) {
+            if (response) {
+                if (callback) {
+                    callback(response);
+                }
+            }
+        }, this), false, false);
+    },
+    // show checked node IDs on datasource change
+    editNode: function(treeviewGrid) {   	
+    	var checkedEditNodes = $(`${treeviewGrid} .k-item input[type=checkbox]:checked`).parent().parent().find(".treenode");
+    	this.dom.finalEditNodes = [];
+    	for(let i = 0; i < checkedEditNodes.length > 0; i++){
+    		if(checkedEditNodes[i].id !== ""){
+    			this.dom.finalEditNodes.push(parseInt(checkedEditNodes[i].id));
+    		}
+    	}
+    	this.dom.counter++;    	
+    },
+    // Edit functionality function
+    editFunction: function(e){
+    	this.dom.counter = 0;
+    	// Setup TreeviewCategories to load in Kendo TreeView
+    	var CategoriesPopUp = new kendo.data.HierarchicalDataSource({
+    	    data:this.dom.dataTreeviewDataSource,
+    	    schema: {
+    	        model: {
+    	            hasChildren: "hasChildren",
+    	            children: "items"
+    	        }
+    	    }
+    	});
+    	
+    	var treeview = null;
+    	this.dom.finalEditNodes = [];
+    	
+    	let docId = e.target.getAttribute("docId");
+    	let id =  e.target.id.trim();
+    	let title = e.target.title;
+    	let checkedId = id ? id.split(",") : [];
+    	
+    	for(var i = 0; i < checkedId.length; i++){
+    		checkedId[i] = checkedId[i].trim();
+    	}
+    	
+    	var options={
+    			title:'Document Categories', 
+    			body:'<div class="treeview" id="treeview"></div>', // this
+																	// accept
+																	// both HTML
+																	// and text
+																	// on
+																	// demand;
+    			cancelBtn:	`<button type="submit" class="btn btn-sm btn-default pull-right close_cop_doc" data-dismiss="modal">Cancel</button>`,
+    			confirmBtn:	`<button type="submit" class="btn btn-sm btn-primary pull-right edit_cop_doc">Submit</button>`,
+    			backdrop:"static",
+    			keyboard:"false"
+    			};
+    	var that = this;
+    	// Open Modal for Editing
+    	Fuzehelper.commonConfirmationModalPopup("cop_document_editing_container", options,$.proxy( function(){
+    		let copDocumentEditingModal = $("#cop_document_editing_container");
+    		copDocumentEditingModal.modal("show");
+    		if(title == "View"){
+    			copDocumentEditingModal.find(".edit_cop_doc").addClass("hide");
+    		}
+    		
+    		$("#treeview").kendoTreeView({
+    			
+    	        checkboxes: {
+    	            checkChildren: true
+    	        },
+    	        
+    	        check: function onEdit(e){ 
+    	        	// This will ensure that the treeview opens up till the last
+					// level for any node
+    	        	this.expandRoot = e.node;
+    	            this.expand($(this.expandRoot).find(".k-item").addBack());
+    	            
+    	            // This will ensure the multichecking of nodes in treeview
+                    closeoutModule.editNode("#treeview");
+    	        },
+    	        
+    	        dataBound: function(e) {
+    	        	$("#treeview").data("kendoTreeView").expand(".k-item");
+    	        	
+    	        	if(title === "View"){
+    	        		// Disable all checkboxes
+    	            	$("#treeview .k-checkbox").addClass("k-state-disabled")
+    	        	}
+    	        	
+    	        	treeview = $("#treeview").data("kendoTreeView");
+    		        for(let i = 0; i < checkedId.length; i++){
+    		        	let nodeCheck = treeview.dataSource.get(checkedId[i]);
+    		    		nodeCheck.set("checked", true)
+    		        }
+    	          },
+    			
+    	        dataSource: CategoriesPopUp,
+    	        template: '<span class="#= item.className #" id="#= item.id #" text="#= item.text #" title="#= item.description #"> #= item.value #</span>'
+    	    });
+    		
+    		copDocumentEditingModal.find(".edit_cop_doc").off("click").on("click", (e) => {
+    	    	let updateNodes = [];
+    	    	let finalUpdateNodes = [];
+    	    	let finalDeleteNodes = [];
+    	    	    	
+    	    	for(let j = 0; j < this.dom.finalEditNodes.length; j++){
+    	    		updateNodes.push(this.dom.finalEditNodes[j]);
+    	    	}  
+    	    	
+    	    	for(let k = 0; k < updateNodes.length; k++){
+    	    		if(!checkedId.includes(updateNodes[k].toString())){
+    	    			let updateDLMObj = {
+    	            			"documentId" : docId,
+    	          				"refType" : "COP",
+    	          				"refNumber" : updateNodes[k],
+    	            		}
+    	    			finalUpdateNodes.push(updateDLMObj);
+    	    		}
+    	    	}
+    	    	
+    	    	for(let l = 0; l < checkedId.length; l++){
+    		    	if(!updateNodes.includes(parseInt(checkedId[l], 10))){
+    		    		let delDLMObj = {
+    		        			"documentId" : docId,
+    		      				"refType" : "COP",
+    		      				"refNumber" : parseInt(checkedId[l], 10),
+    		        		}
+    		    		finalDeleteNodes.push(delDLMObj);
+    		    	}
+    		    }
+    	    	
+    	    	if(finalUpdateNodes.length > 0 && finalDeleteNodes.length > 0){
+    	    		// Delete the selected document first and reinsert it
+    	    		this.deleteDocumentMapLink(finalDeleteNodes, $.proxy(function() {
+    	        			if (true) blockUIExecution("Editing Document", 800000);
+    	        			this.insertDocumentMapLink(finalUpdateNodes, $.proxy(function() {
+    	    	                    this.getCloseoutDocuments(null, true);
+    	    	                    displayStickySuccess("Document Edited Successfully!");
+    	    	                }, this), false, false);
+    	                }, this), false, false);   		
+    	    	}else if(finalUpdateNodes.length > 0 && finalDeleteNodes.length == 0){
+    	    		if (true) blockUIExecution("Editing Document", 800000);
+    				this.insertDocumentMapLink(finalUpdateNodes, $.proxy(function() {
+    	                    this.getCloseoutDocuments(null, true);
+    	                    displayStickySuccess("Document Edited Successfully!");
+    	                }, this), false, false);
+    	    	}else if(finalUpdateNodes.length == 0 && finalDeleteNodes.length > 0 && updateNodes.length > 0){
+    	    		if (true) blockUIExecution("Editing Document", 800000);
+    	    		this.deleteDocumentMapLink(finalDeleteNodes, $.proxy(function() {
+    	                    this.getCloseoutDocuments(null, true);
+    	                    displayStickySuccess("Document Edited Successfully!");
+    	                }, this), false, false);
+    	    	}else if(finalUpdateNodes.length == 0 && finalDeleteNodes.length > 0 && this.dom.counter > 0){
+    	    		ValidationModal = $("#notification_modal", window.top.document );
+    	    		ValidationModal.find('.modal-header .modal-title').html(`Alert Notification`);
+    	    		ValidationModal.find('.modal-footer .ok_button_footer').removeClass("hide");
+    	    		ValidationModal.find('.modal-footer .common_notification_footer_class').addClass("hide");
+    	    		ValidationModal.find('.modal-body .modal_body_element').html('<p class=""><i class="fa fa-exclamation-circle fa-close fa-2x margin-right margin-xs valign-sub" aria-hidden="true"></i><span> ' + `Atleast one document category must be selected to complete the task.` + '</span></p>');
+    	    		ValidationModal.modal('show');
+    	    	}else if((finalUpdateNodes.length == 0 && finalDeleteNodes.length > 0 && this.dom.counter == 0) || (finalUpdateNodes.length == 0 && finalDeleteNodes.length == 0 && this.dom.counter > 0 && updateNodes.length > 0)){
+    	    		ValidationModal = $("#notification_modal", window.top.document );
+    	    		ValidationModal.find('.modal-header .modal-title').html(`Alert Notification`);
+    	    		ValidationModal.find('.modal-footer .ok_button_footer').removeClass("hide");
+    	    		ValidationModal.find('.modal-footer .common_notification_footer_class').addClass("hide");
+    	    		ValidationModal.find('.modal-body .modal_body_element').html('<p class=""><i class="fa fa-exclamation-circle fa-close fa-2x margin-right margin-xs valign-sub" aria-hidden="true"></i><span> ' + `No changes have been made to the selected categories` + '</span></p>');
+    	    		ValidationModal.modal('show');
+    	    	}
+    	    	
+    	    	copDocumentEditingModal.modal("hide");	    	
+    		});
+    		
+    	},this), false, false);
+    },
+    getDocTypes: function(){
+    	let paramReq1 = {};
+    	paramReq1.uri = "fuze-gateway/fuze-service/document/getDocTypes";
+    	paramReq1.payload = JSON.stringify({});
+
+    	var payload = {};
+    	payload.siteProjectsId = $("#site-project-id").val();                    
+    	let paramReq2 = {};
+    	paramReq2.uri = "regulatory-licenses-gateway/regulatory-licenses-service/regulatory-licenses/getProjPostTcnWrap";
+    	paramReq2.payload = JSON.stringify(payload);
+
+    	var Promise1 = Fuzehelper.multiplePostRequest(paramReq1);
+    	var Promise2 = Fuzehelper.multiplePostRequest(paramReq2);
+
+    	$.when(Promise1, Promise2).done($.proxy(function(r1, r2) {
+    		this.parseCOPDocTypes(jQuery.extend(r1[0], r2[0]));
+    	}, this), false, false).fail(function() {
+    		console.log("Looks like one api is failed to get data for env.");
+    	});
+    },
+    parseCOPDocTypes: function(response){
+    	$.each(response, (index, categories) => {	
+    		if (categories.items && categories.items.length) {
+                categories.className = 'category';
+                categories.className = 'treenode';
+                categories.hasChildren = true;
+                $.each(categories.items, (index, sectors) => {
+                	if (sectors.items && sectors.items.length) {
+                        sectors.hasChildren = true;
+                        sectors.className = 'sectors';
+                        sectors.className = 'treenode';
+                        $.each(sectors.items, (index, photo) => {
+                        	photo.hasChildren = false;
+                        	photo.className = 'phototitle';
+                        	photo.className = 'treenode';
+                        	if(photo.timeCategory === "48_HR_DOCS"){
+                        		photo.className += ' text-dark-green'
+                        	}else if(photo.timeCategory === "24_HR_DOCS"){
+                        		photo.className += ' text-brand-red';
+                        	}
+                        	this.checkUploadedDocuments(photo);
+                        });
+                    } else {
+                        sectors.hasChildren = false;
+                        sectors.className = 'phototitle';
+                        sectors.className = 'treenode';
+
+                        if(sectors.timeCategory === "48_HR_DOCS"){
+                        	sectors.className += ' text-dark-green'
+                    	}else if(sectors.timeCategory === "24_HR_DOCS"){
+                    		var vzOwned = response.projStructure.vzOwnedStructure === "Yes" ? true : false;
+                    		var regulatoryStatus = $("#REGULATORY").attr("data-status") === "COMPLETED" ? true : false;
+                    		var asrNumber = response.asr.newAsrNumber ? true : false;
+                    		var faaNumber = response.faa.previousFaaStudyNo1 + response.faa.previousFaaStudyNo2 + response.faa.previousFaaStudyNo3 + response.faa.previousFaaStudyNo4 ? true : false;
+                    		var faaProposedMrkLitingChptCodes = response.faa.faaProposedMrkLitingChptCodes ? true : false;
+                    		var className = '';
+                        	if(sectors.name === 'TOP_OF_TOWER_OVERALL_STRUCTURE_HEIGHT_REGULATORY'){
+                    			if(!vzOwned){
+                    				className = ' text-striked';
+                    			}else if(vzOwned && asrNumber && faaProposedMrkLitingChptCodes){
+                    				className = ' text-brand-red';
+                    			}
+                    		}else{
+                    			className = ' text-brand-red';
+                    			if(regulatoryStatus && !asrNumber && !faaNumber && !faaProposedMrkLitingChptCodes){
+                            		className = ' text-striked';
+                            	}
+                    		}
+                    		sectors.className += className;
+                    	 } 
+                        this.checkUploadedDocuments(sectors);
+                    }
+                });
+            } else {
+                categories.className = 'phototitle';
+                categories.className = 'treenode';
+                categories.hasChildren = false;
+                this.checkUploadedDocuments(categories);
+            }
+        });
+    	this.dom.dataTreeviewDataSource =  response;
+    },
+    copApprovalProcess: function(e) {
+      if(this.dom.selectedOrders.length == 0){
+    	     displayMessage("Please select Documents to Approve or Reject");
+    	     return false;
+      }
+  	  var status = $(e.currentTarget).attr("data-status");
+  	  var listDocumentRouting=[];
+	  $.each(this.dom.selectedOrders, ( index, value ) => {
+        	var doc={};
+        	doc.documentId = value;
+        	doc.siteProjectsId = $("#site-project-id").val();
+        	doc.status = status;
+        	doc.contactType = this.dom.contactTypeValue;
+            listDocumentRouting.push(doc);
+        if (blockUIExecution) blockUIExecution("Approving/Rejecting Document(s)", 600000);
+        
+        if (this.dom.selectedOrders.length > 0) {
+        	this.constructor.ajax.fireApi(listDocumentRouting, 'mobile', 'mobile/mergeCopApprovals', $.proxy(function(response) {
+                if (response) {
+                    displaySuccess("Documents have been successfully updated");
+                    this.dom.selectedOrders=[];
+                    this.getCloseoutDocuments(null,true);
+                }
+                if ($ && $.unblockUI) $.unblockUI();
+            }, this), false, false);
+		} else {
+			if ($ && $.unblockUI) $.unblockUI();
+            displayError("Error", 'Please select atleast one document');
+		}
+    	
+    });
+        
+  	},
+  	openCategoryTemplateModal: function(e){
+	  e.preventDefault();
+		var categoryTemplateName;
+		var categoryTemplateSaveModal;
+		if (this.dom.finalCheckedNodes.length > 0) {		
+			Fuzehelper.commonModalPopUp("commonModals.jsp #category-template-save-modal-container","category-template-save-modal","category-template-save-modal","", ()=>{
+				categoryTemplateSaveModal = $("#category-template-save-modal");
+				categoryTemplateSaveModal.find(".existing-category-template-name").attr('id', 'category-tab-template-name');
+				categoryTemplateSaveModal.find("#new-category-template-name").val("");
+				categoryTemplateName = $(".existing-category-template-dropdown");
+				categoryTemplateName.empty();
+				categoryTemplateName.append($("<option></option>").prop("value", "").text("Existing Template"));
+				this.constructor.ajax.fireApi({
+					"uiObjectName": "category-template-"
+				}, "searchtemplate", "getTemplateList", (response) =>{
+					if (response.length > 0) {
+						$.each(response, (i, data) => {
+							if (data !== null && data !== undefined) {
+								categoryTemplateName.append($("<option></option>").prop("value", data.templateId).text(data.templateName));
+							}
+						});
+					}
+					categoryTemplateSaveModal.find(".category-template-save").attr('id', 'saveCategoryTemplateBtn');
+					categoryTemplateSaveModal.modal('show');
+				});
+				categoryTemplateSaveModal.find(".category-template-save").off('click').on('click', $.proxy(this.saveCategoryTemplate, this));
+			});
+		} else {
+			displayError("Error", "You cannot save an empty template");
+		}
+  	},
+  
+  	saveCategoryTemplate : function(e){
+	  e.preventDefault();
+	  
+	  var newTemplateName = $(".new-category-template-name").val();
+	  var existingTemplateId = $(".existing-category-template-dropdown option:selected").val();
+	  var existingTemplateVal = $(".existing-category-template-dropdown option:selected").text();
+	  
+	  var payLoad = {};
+	  var request = {};
+	  request.selectedNodes = this.dom.finalCheckedNodes;
+	  var msg = $("#category-template-save-modal").find('.category-template-msg');
+	  
+	  if(newTemplateName === "" && existingTemplateId === ""){
+		  msg.removeClass('hide');
+	  }
+	  else {
+		  msg.addClass('hide');
+		  if(newTemplateName && newTemplateName != ""){
+			  payLoad.templateName = newTemplateName;
+			  payLoad.templateJSON = JSON.stringify(request);
+			  payLoad.uiObjectName = "category-template-" + newTemplateName;
+			  
+		  } else if (existingTemplateVal && existingTemplateVal != "" && existingTemplateId && existingTemplateId != ""){
+			  payLoad.templateName = existingTemplateVal;
+			  payLoad.templateJSON = JSON.stringify(request);
+			  payLoad.uiObjectName = "category-template-" + existingTemplateVal;
+		  }
+		  this.constructor.ajax.fireApi(payLoad, "searchtemplate", "mergeTemplate", (response) => {
+			  $("#category-template-save-modal").modal('hide');
+			  displayStickySuccess("Category template saved successfully.");
+			  this.loadExistingTemplateDropdown();
+			  this.displayCategoryList();
+		  });
+	  }
+
+  	},
+  	loadExistingTemplateDropdown : function(){
+	  $('.list-cop-category-template').empty();
+		this.constructor.ajax.fireApi({
+			"uiObjectName": "category-template-"
+		}, "searchtemplate", "getTemplateList", (response)=> {
+			if (response.length > 0) {
+				$.each(response, (i, data) => {
+					if (data !== null && data !== undefined) {
+						var model = $('.category-result-tab-template').html();
+						model = model.replace(/@TEMPLATE_NAME/, data.templateName).replace(/@TEMPLATE_ID/g, data.templateId);
+						$(".list-cop-category-template").append(model);
+					}
+				});
+				this.dom.body.find(".cop-category-template-li").off('click').on('click', $.proxy(this.populateSelectedCategoryTemplate, this));
+			}
+		});
+  	},
+  	deleteCategoryTemplate : function(e){
+	  e.preventDefault();
+	  var categoryTemplateId = $(e.currentTarget).attr('role');
+	  var categoryTemplate = {};
+	  categoryTemplate.templateId = categoryTemplateId;
+	  if (categoryTemplateId && categoryTemplateId !== "") {
+		  this.constructor.ajax.fireApi(categoryTemplate, "searchtemplate", "deleteTemplate", (response) => {
+			  if (response) {
+				  displayStickySuccess('Category template deleted successfully!');
+				  $(".list-cop-category-template").text("Select Template").append("<span class='vzcaret'/>");
+				  this.loadExistingTemplateDropdown();
+			  } else {
+				  console.info("No response from deleteCategoryTemplate API");
+			  }
+		  });
+	  } else {
+		  displayError("Looks like something is wrong, please try again!");
+	  }
+ 	},
+  
+  	populateSelectedCategoryTemplate : function(e){
+	  if ($(e.target).hasClass("delete-category-template-icon")) {
+		  console.log("wrong event click");
+	  } else {
+		  this.dom.finalCheckedNodes = [];
+		  var self = $(e.currentTarget);
+		  self.closest('ul').find(".selected").removeClass('selected');
+		  self.parent().addClass('selected');
+		  var id = self.attr('id');
+		  var categoryTemplate = {};
+		  categoryTemplate.templateId = id;
+		  categoryTemplate.uiObjectName = 'category-template-';
+
+		  this.constructor.ajax.fireApi(categoryTemplate, "searchtemplate", "getTemplateData", (response) =>{
+			  if (response) {
+				  var data = $.parseJSON(response.templateJSON);
+				  this.dom.templateNodes = data.selectedNodes;
+				  this.displayCategoryList(true);
+			  }
+		  });
+
+	  }
+		
+	},
+	collapseCategoryTree: function(e){
+		e.preventDefault();
+		var treeview = $(".documentTreeTab").data("kendoTreeView");
+		treeview.collapse('.k-item');
+	},
+	disableCategoryTemplate: function(e) {
+		e.preventDefault();
+		this.dom.body.find("#category-template-save-modal-container").find(".new-category-template-name").attr("disabled","disabled");
+	},
+	refreshCategoryTree: function(e){
+		e.preventDefault();
+		this.displayCategoryList();
+		this.dom.finalCheckedNodes = [];
+	},
+	
+	resizeCategoryList: function (e) {
+		self = $(e.currentTarget);
+		if (self.find('i').hasClass("glyphicon-resize-small")) {
+			self.find('i').removeClass("glyphicon-resize-small");
+			self.find('i').addClass("glyphicon-resize-full");
+			this.dom.body.find(".resize_category,.resize_photo_doc").removeClass("cop_lap_wid");
+		} else {
+			self.find('i').removeClass("glyphicon-resize-full");
+			self.find('i').addClass("glyphicon-resize-small");
+			this.dom.body.find(".resize_category,.resize_photo_doc").addClass("cop_lap_wid");
+		}
+	},
+	deleteCategory: function(e){
+		e.preventDefault();
+		e.stopPropagation();
+		var templateId = $(this).attr('id');
+		var templateName = $(this).parent("li").text();
+	
+		var options={
+				title:'CONFIRM NOTIFICATION', 
+				body:'Are you sure you want to delete the <label class="text-brand-red">'+ templateName +'</label> template? </p>', 
+				cancelBtn:`<button type="submit" class="btn btn-sm btn-default pull-right" data-dismiss="modal">Cancel</button>`,
+				confirmBtn: `<button type="submit" class="btn btn-sm btn-danger pull-right category_template_modal_delete_btn" data-dismiss="modal" role="${templateId}">Delete</button>`,
+				backdrop:"static",
+				keyboard:"false"
+		};
+		Fuzehelper.commonConfirmationModalPopup("category_template_delete_modal",options,"");
+	},
+
+	// reg-cop task functions
+	loadRegCopTask: function(e) {
+		this.dom.container = "VENDOR_TAB";
+        if (e !== undefined) {
+            this.dom.container = $(e.currentTarget).data('container');
+        }
+        this.getProjVendorContacts();
+        this.getCloseoutContactTypesRegCop();
+        this.loadSections();
+		
+	},
+	loadSections: function(section) {
+    	//this.dom.body.find("." + container).find('.check-fields,.save-fields,.approve-fields').addClass('hide');
+    	//this.dom.body.find("." + container).find(".edit-info,.verify-info").attr("checked", false);
+        //getComments($("#site-project-id").val());
+        this.getProjRegCopApprovals(() => {
+            switch (section) {
+                case this.dom.structureSection:
+                    this.getStructureData(this.dom.structureSection);
+                    break;
+                case this.dom.rfdsSection:
+                    this.getRfdsProjectInfo(this.dom.rfdsSection);
+                    break;
+                case this.dom.rfdsServices:
+                    this.getRfdsServiceInfo(this.dom.rfdsServices);
+                    break;
+                case this.dom.rfdsEquipment:
+                    this.getRfdsSettingsData(()=> {
+                        this.getEquipmentSummary(this.dom.rfdsEquipment);
+                    });
+                    break;
+                case this.dom.asBuilt:
+                	this.loadApprovalSectionRegCop(this.dom.asBuilt);
+                	break;
+                default:
+                    this.getStructureData(this.dom.structureSection);
+                    this.getRfdsProjectInfo(this.dom.rfdsSection);
+                    this.getRfdsServiceInfo(this.dom.rfdsServices);
+                    this.getRfdsSettingsData(() => {
+                        this.getEquipmentSummary(this.dom.rfdsEquipment);
+                    });
+                    this.loadApprovalSectionRegCop(this.dom.asBuilt);
+                    break;
+            }
+        });
+				
+    },
+    editSection: function(e) {
+        var checked = $(e.currentTarget).is(':checked');
+        var service = $(e.currentTarget).attr('data-service');
+        section = $(e.currentTarget).attr('data-section');
+        if (checked && section === "RFDS_INFORMATION") {
+            $("." + this.dom.container).find("." + section).find('.verify-info,.edited').attr('checked', false);
+            $("." + this.dom.container).find("." + section).find('input,select,textarea').not(".comments-history").attr('readonly', false);
+            $("." + this.dom.container).find("." + section).find('button').removeClass('hide');
+            $("." + this.dom.container).find("." + section).find('.closeout-comments').addClass('hide');
+        } else if (checked && (section === "RFDS_SERVICES" || section === "RFDS_EQUIPMENT")) {
+            $("." + this.dom.container).find("." + section).find('.' + service).find('.verify-info,.edited').attr('checked', false);
+            $("." + this.dom.container).find("." + section).find('.' + service).find('input,select').not(".equip-install-type").attr('readonly', false);
+            $("." + this.dom.container).find("." + section).find('.' + service).find('input[type="checkbox"]').removeClass('disable');
+            $("." + this.dom.container).find("." + section).find('.' + service).find('button').removeClass('hide');           
+            section === "RFDS_EQUIPMENT" ? $("." + this.dom.container).find('.' + service).find(".action").removeClass('disable') : "";
+        } else if (!checked) {
+            $("." + this.dom.container).find("." + section).find('input,select,textarea').not(".comments").attr('readonly', true);
+            $("." + this.dom.container).find("." + section).find('input[type="checkbox"]').not(".edit-info,.verify-info").addClass('disable');
+            $("." + this.dom.container).find("." + section).find('button').not(".add-row-equipment").addClass('hide');
+            $("." + this.dom.container).find("." + section).find(".add-row-equipment").addClass('disable');
+            $("." + this.dom.container).find("." + section).find('.action').addClass('disable');
+            $("." + this.dom.container).find("." + section).find('.closeout-comments').removeClass('hide');
+        }
+    },
+    verifySection: function(e) {
+        var checked = $(e.currentTarget).is(':checked');
+        section = $(e.currentTarget).attr('data-section');
+        var id = $("." + this.dom.container).find("." + section).attr('data-id');
+        if (checked) {
+            var projRegCopApprovals = {};
+            projRegCopApprovals.siteProjectsId = $("#site-project-id").val();
+            projRegCopApprovals.projRegCopApprovalsId = id;
+            projRegCopApprovals.section = section;
+            if (section === "STRUCTURE_INFORMATION" || section === "RFDS_INFORMATION") {
+                projRegCopApprovals.vendorStatus = 'APPROVED';
+            } else if (section === "RFDS_SERVICES" || section === "RFDS_EQUIPMENT") {
+                var service = $(e.currentTarget).attr('data-service');
+                projRegCopApprovals.fieldList = [];
+                if (service === "") {
+                	 projRegCopApprovals.vendorStatus = 'APPROVED';
+                     $("." + this.dom.container).find("." + section).find(".check-fields").not(".verify-all").find(".verify-info:visible").each(function(i, data) {
+                     	 var regCopId = $(this).attr('data-id');
+                          var fields = {};
+                          var service = $(this).attr('data-service');
+                          fields.field = "status";
+                          fields.value = 'APPROVED';
+                          fields.type = service;
+                          fields.projRegCopId = regCopId;
+                          projRegCopApprovals.fieldList.push(fields);
+                     });
+                } else {
+                    projRegCopApprovals.vendorStatus = 'QUEUED';
+                    var regCopId = $(e.currentTarget).attr('data-id');
+                    var fields = {};
+                    fields.field = "status";
+                    fields.value = 'APPROVED';
+                    fields.type = service;
+                    fields.projRegCopId = regCopId;
+                    projRegCopApprovals.fieldList.push(fields);
+                    $("." + this.dom.container).find("." + section).find("." + service).find("input[type='text']").each(function(i, data) {
+                        var regCopId = $(this).attr('data-id');
+                        if (regCopId !== "" && regCopId !== null && regCopId !== undefined) {
+                            var fields = {};
+                            fields.projRegCopId = regCopId;
+                            fields.status = 'Delete';
+                            projRegCopApprovals.fieldList.push(fields);
+                        }
+                    });
+                }
+            }
+            //regCopModule.mergeCloseoutComments(section);
+            this.mergeProjRegCopApprovals(projRegCopApprovals, () => {
+                $("." + this.dom.container).find("." + section).find(".cancel-button").trigger("click");
+                this.loadSections(section);
+            });
+        }
+    },
+    saveSection: function(e) {
+		e.preventDefault();
+        section = $(e.currentTarget).attr('data-section');
+        var service = $(e.currentTarget).attr('data-service');
+        var projRegCopApprovals = {
+            "constructionStatus": "",
+            "projRegCopApprovalsId": $("." + this.dom.container).find("." + section).attr('data-id'),
+            "realEstateStatus": "",
+            "regulatoryStatus": "",
+            "section": section,
+            "siteProjectsId": $("#site-project-id").val(),
+            "systemPerformanceStatus": "",
+            "vendorManagerStatus": "",
+            "vendorStatus": "COMPLETED"
+        };
+        projRegCopApprovals.fieldList = [];
+        if (section === "RFDS_INFORMATION") {
+        	$("." + this.dom.container).find("." + section).find("select,input[type='text'],textarea").not(".comments,.comments-history").each(function(i, data) {
+        		var val = $(this).val();
+        		var preVal = $(this).attr('data-prev');
+        		var regCopId = $(this).attr('data-id');
+        		if (val !== preVal) {
+        			var fields = {};
+        			fields.projRegCopId = regCopId;
+        			fields.field = $(this).closest('div').attr('id');
+        			fields.value = val;
+        			projRegCopApprovals.fieldList.push(fields);
+        		} else if (regCopId !== "" && regCopId !== null && regCopId !== undefined) {
+        			var fields = {};
+        			fields.projRegCopId = regCopId;
+        			fields.field = $(this).closest('tr').attr('class');
+        			fields.value = val;
+        			fields.status = 'Delete';
+        			projRegCopApprovals.fieldList.push(fields);
+        		}
+        	});
+        } else if (section === "RFDS_SERVICES") {
+            projRegCopApprovals.vendorStatus = "QUEUED";
+            var regCopId = $("." + this.dom.container).find("." + section).find("." + service).find(".verify-info").attr('data-id');
+            var fields = {};
+            fields.field = "status";
+            fields.value = 'COMPLETED';
+            fields.type = service;
+            fields.projRegCopId = regCopId;
+            projRegCopApprovals.fieldList.push(fields);
+            $("." + this.dom.container).find("." + section).find("." + service).find("input[type='text']").each(function(i, data) {
+                var val = $(this).val();
+                var preVal = $(this).attr('data-prev');
+                var regCopId = $(this).attr('data-id');
+                if (val !== preVal && val !== "") {
+                    var fields = {};
+                    var id = $(this).attr('id');
+                    fields.field = id.replace('asbuilt-version-', '');
+                    fields.value = val;
+                    fields.type = service;
+                    fields.projRegCopId = regCopId;
+                    projRegCopApprovals.fieldList.push(fields);
+                } else if (regCopId !== "" && regCopId !== null && regCopId !== undefined) {
+                    var fields = {};
+                    var id = $(this).attr('id');
+                    fields.field = id.replace('asbuilt-version-', '');
+                    fields.value = val;
+                    fields.type = service;
+                    fields.projRegCopId = regCopId;
+                    fields.status = 'Delete';
+                    projRegCopApprovals.fieldList.push(fields);
+                }
+            });
+        } else if (section === "RFDS_EQUIPMENT") {
+            projRegCopApprovals.vendorStatus = "QUEUED";
+            var regCopId = $("." + this.dom.container).find("." + section).find("." + service).find(".verify-info").attr('data-id');
+            var fields = {};
+            fields.field = "status";
+            fields.value = 'COMPLETED';
+            fields.type = service;
+            fields.projRegCopId = regCopId;
+            projRegCopApprovals.fieldList.push(fields);
+            $("." + this.dom.container).find("." + section).find("." + service).find(".kendogrid").find("tbody").find("tr").each(function(i, data) {
+                var equipSummaryId = $(this).find(".equip-summary").val();
+                if (equipSummaryId === "" || equipSummaryId === "@EQUIP_SUMMARY_ID") {
+                    equipSummaryId = i;
+                    var regCopId = $(this).attr('data-id');
+                    var fields = {};
+                    fields.field = 'row-status';
+                    fields.value = 'Added';
+                    fields.type = service + '-' + equipSummaryId;
+                    fields.projRegCopId = regCopId;
+                    projRegCopApprovals.fieldList.push(fields);
+                }
+                $(this).find("input,select").not('.equip-summary').each(function(i, element) {
+                    var elementType = element.type;
+                    var val = $(this).val();
+                    var preVal = $(this).attr('data-prev');
+                    var regCopId = $(this).attr('data-id');
+                    if (elementType === "checkbox") {
+                        val = $(this).is(':checked').toString();
+                    }
+                    if (val !== preVal && val !== "") {
+                        var fields = {};
+                        fields.field = $(this).attr('id');
+                        fields.value = val;
+                        fields.type = service + '-' + equipSummaryId;
+                        fields.projRegCopId = regCopId;
+                        projRegCopApprovals.fieldList.push(fields);
+                    } else if (regCopId !== "" && regCopId !== null && regCopId !== undefined) {
+                        var fields = {};
+                        fields.field = $(this).attr('id');
+                        fields.value = val;
+                        fields.type = service + '-' + equipSummaryId;
+                        fields.projRegCopId = regCopId;
+                        fields.status = 'Delete';
+                        projRegCopApprovals.fieldList.push(fields);
+                    }
+                });
+            });
+        }
+        if(projRegCopApprovals.fieldList.length > 1){
+        	this.mergeProjRegCopApprovals(projRegCopApprovals, () =>{
+        		$("." + this.dom.container).find("." + section).find(".cancel-button").trigger("click");
+        		this.loadSections(section);
+        	});
+        }else{
+        	$("." + this.dom.container).find("." + section).find(".cancel-button").trigger("click");
+        	this.loadSections(section);
+        }
+    },
+    cancelSection: function(e) {
+		e.preventDefault();
+        section = $(e.currentTarget).attr('data-section');
+        $("." + this.dom.container).find("." + section).find(".edit-info").attr('checked', false);
+        $("." + this.dom.container).find("." + section).find('input,select,textarea').not(".comments").attr('readonly', true);
+        $("." + this.dom.container).find("." + section).find('button').not(".add-row-equipment").addClass('hide');
+        $("." + this.dom.container).find("." + section).find('.action').addClass('disable');
+        $("." + this.dom.container).find("." + section).find('.closeout-comments').removeClass('hide');
+        $("." + this.dom.container).find("." + section).find('input[type="checkbox"]').not(".edit-info,.verify-info").addClass('disable');
+    },
+	mergeProjRegCopApprovals: function(projRegCopApprovals, callback) {
+        this.constructor.ajax.fireApi(projRegCopApprovals, "mobile", "mobile/mergeProjRegCopApprovals", (response) =>{
+            if (callback) {
+                callback();
+            }
+        });
+	},
+	// this is the same function as loadApprovalSection in regulatory-cop.js
+	loadApprovalSectionRegCop :function(section){
+    	if($('#' + this.dom.asBuilt).find('.'+this.dom.asBuilt).attr('data-status')==='ACTIVE'){
+			$("." + this.dom.asBuilt + "_APPROVAL").find(".VENDOR").text("ACTIVE");
+		}
+    	$.each(this.dom.approvalData, (i, data) =>{
+    		/***status***/
+    		var keys = Object.keys(data);
+    		if(data.section === this.dom.asBuilt){
+    			$("." + this.dom.asBuilt + "_APPROVAL").attr("data-id",data.projRegCopApprovalsId);
+    			$.each(keys, (i, keyData) =>{
+    				var key = keyData.replace('Status', '');
+    				key = key.toUpperCase();
+    				if (["VZWCONSTRUCTION", "THIRDPARTYINSPECTOR", "VENDOR"].indexOf(key) > -1) {
+    					$("." + this.dom.container).find("." + data.section + "_APPROVAL").find("." + key).text(data[keyData] !== null ? data[keyData] : "");
+    				}
+    			});
+    		}
+    	});
+    },
+	getStructureData: function(section) {
+        var payload = {};
+        payload.siteProjectsId = $("#site-project-id").val();
+        this.constructor.ajax.fireApi(payload, "regulatory-licenses", "getProjPostTcnWrap", (response) =>{
+        	var regulatoryContructionStatus = $("#REGULATORY").attr('data-status');
+        	var constructionCompleteStatus = $("#PHYSICAL_CONSTRUCTION_COMPLETE").attr('data-status');
+        	var postTcn = $("#PHYSICAL_CONSTRUCTION_COMPLETE").find(".POST_TCN");
+        	if(!["COMPLETED","ACTIVE"].includes(regulatoryContructionStatus)
+        			&& !["COMPLETED","ACTIVE"].includes(constructionCompleteStatus)){
+        		$("." + this.dom.container).find("." + section).addClass('hide');
+        	}
+        	if(["COMPLETED","ACTIVE"].includes(regulatoryContructionStatus)){
+        		var modType = $("#proj-type").val() === "Modification";
+        		var proposedStructureHeight = !response.projStructure.proposedStructureHeight && modType ? response.projStructure.constructedStructureHeight : response.projStructure.proposedStructureHeight ;
+            	var proposedAppurtenanceHeight = !response.projStructure.proposedAppurtenanceHeight && modType ? response.projStructure.constructedOverallStructureHeight : response.projStructure.proposedAppurtenanceHeight;
+        		$("." + this.dom.container).find("." + section).find("#reg-proposed-struct-type")
+            	.val(response.projStructure.structureType ? response.projStructure.structureType : 'NA');
+            	$("." + this.dom.container).find("." + section).find("#reg-proposed-overall-ht")
+            	.val(proposedStructureHeight ? proposedStructureHeight : 'NA');
+            	$("." + this.dom.container).find("." + section).find("#reg-proposed-overall-ht-with-app")
+            	.val(proposedAppurtenanceHeight ? proposedAppurtenanceHeight :'NA');
+        	}
+        	if(["COMPLETED","ACTIVE"].includes(constructionCompleteStatus)){
+        		var regStructHeight = response.projStructure.actualConstStrctHeight ? response.projStructure.actualConstStrctHeight : response.projStructure.proposedStructureHeight;
+        		var regStructHeightWithApp = response.projStructure.actualOverallConstStrctHeight ? response.projStructure.actualOverallConstStrctHeight : response.projStructure.proposedAppurtenanceHeight
+        		$("." + this.dom.container).find("." + section).find("#reg-built-overall-ht")
+            	.val(regStructHeight ? regStructHeight : 'NA');
+            	$("." + this.dom.container).find("." + section).find("#reg-built-overall-ht-with-app")
+            	.val(regStructHeightWithApp ? regStructHeightWithApp : 'NA');
+            	$("." + this.dom.container).find("." + section).find("#reg-built-struct-type")
+            	.val(response.projStructure.structureType ? response.projStructure.structureType :'NA');
+        	}
+        	if((postTcn.attr('data-status') === "COMPLETED" && !postTcn.find('.workstep-status').hasClass("status-na")) 
+        			|| postTcn.attr('data-status') === 'ACTIVE'){
+        		$("." + this.dom.container).find("." + section).find("#reg-proposed-marking-and-lighting")
+        		.val(response.faa.faaMrkLitingChptCodes ? response.faa.faaMrkLitingChptCodes : 'NA');
+        		$("." + this.dom.container).find("." + section).find("#reg-asr-number")
+        		.val(response.asr.newAsrNumber ? response.asr.newAsrNumber : "NA");
+        		$("." + this.dom.container).find("." + section).find("#reg-built-marking-and-lighting")
+        		.val(response.faa.faaProposedMrkLitingChptCodes ? response.faa.faaProposedMrkLitingChptCodes : 'NA');
+        		$("." + this.dom.container).find("." + section).find("#reg-built-strct-date")
+        		.val(response.projStructure.strctFullHeightDate ? response.projStructure.strctFullHeightDate : 'NA');
+        	}
+        });
+        this.showApprovalData(section);
+	},
+	getRfdsProjectInfo(section) {
+        var payload = {};
+        payload.siteProjectsId = $("#site-project-id").val();
+        payload.siteInfoId = $("#site-info-id").val();
+        this.constructor.ajax.fireApi(payload, "rfds", "listRfdsProjects", (response) =>{
+            if (response.length > 0) {
+                rfdsProjectId = response[0].rfdsProjectID;
+                $("." + this.dom.container).find("." + section).find("#closeout-latitude").val(response[0].latitude);
+                $("." + this.dom.container).find("." + section).find("#closeout-latitude").attr('data-prev', response[0].latitude);
+                $("." + this.dom.container).find("." + section).find("#closeout-longitude").val(response[0].longitude);
+                $("." + this.dom.container).find("." + section).find("#closeout-longitude").attr('data-prev', response[0].longitude);
+                $("." + this.dom.container).find("." + section).find("#closeout-scope").val(response[0].projectScope);
+                $("." + this.dom.container).find("." + section).find("#closeout-scope").attr('data-prev', response[0].projectScope);
+                $(".rfds-document").attr("href", response[0].path + "?" + new Date().getTime());
+                $(".rfds-document").attr("data-path", response[0].path + "?" + new Date().getTime());
+            }
+            this.showApprovalData(section);
+			
+        });
+    },
+    getRfdsServiceInfo(section) {
+		this.dom.discrepancyFlag = false;
+        var payload = {};
+        payload.siteProjectsId = $("#site-project-id").val();
+        payload.versionType = 'proposed';
+        this.constructor.ajax.fireApi(payload, "rfds", "getServiceDetails", (response) =>{
+            if (!jQuery.isEmptyObject(response.servicesMap)) {
+                this.showVersion(section, response.servicesMap, "proposed-version");
+                this.showVersion(section, response.servicesMap, "asbuilt-version");
+                this.showApprovalData(section);
+            }
+        });
+	},
+	showApprovalData: function(section) {
+    	$("." + this.dom.container).find("." + section).find('.check-fields,.save-fields,.approve-fields').addClass('hide');
+        $("." + this.dom.container).find("." + section).find('.background-salmon').removeClass("background-salmon");
+        $("." + this.dom.container).find("." + section).find(".closeout-comments textarea").removeClass("border-red");
+        if (this.dom.container === "VENDOR_TAB") {
+        	$("." + this.dom.container).find("." + section).find(".check-fields,.save-fields").removeClass('hide');
+        }else{
+        	$("." + this.dom.container).find("." + section).addClass('hide');
+        }
+        $.each(this.dom.approvalData, (i, data) => {
+        	        	
+            /*** hide/show based on contact type ***/
+            $.each(this.dom.contactTypes, (i, contact) => {
+            	$("." + this.dom.asBuilt + "_APPROVAL").attr("data-set",contact);
+            	if(["THIRD_PARTY_INSPECTOR","CONSTRUCTION"].includes(contact)){
+            		$("." + this.dom.asBuilt).find(".reject-task-button").removeClass("hide");
+            	}
+                var field = this.fetchRegCopKey(contact);
+                var currentContainer = "";
+                if (contact === "VENDOR_MANAGER") {
+                    currentContainer = "VENDOR_APPROVAL_TAB";
+                } else {
+                    currentContainer = "APPROVAL_TAB";
+                }
+                if (data[field] !== "" && data[field] !== null) {
+                    if (data[field] === "QUEUED") {
+                        $("." + currentContainer).find("." + data.section).find(".approve-fields").removeClass("hide");
+                        $("." + currentContainer).find("." + data.section).find(".closeout-comments").addClass("hide");
+                    } else {
+                        $("." + currentContainer).find("." + data.section).find(".approve-fields").addClass("hide");
+                        $("." + currentContainer).find("." + data.section).find(".closeout-comments").removeClass("hide");
+                    }
+                    $("." + currentContainer).find("." + data.section).removeClass('hide');
+                }
+            });
+            $("." + this.dom.container).find("." + data.section).attr("data-id", data.projRegCopApprovalsId);
+            if (["STRUCTURE_INFORMATION", "RFDS_INFORMATION"].indexOf(data.section) > -1 && section === data.section) {
+            	$("." + this.dom.container).find("." + data.section).find(".edited").prop('checked', data.vendorStatus === "COMPLETED" ? true : false);
+            	$("." + this.dom.container).find("." + data.section).find(".verify-info").prop('checked', data.vendorStatus === "APPROVED" ? true : false);
+                $.each(data.fieldList, (i, fields) =>{
+                	if(fields.field!=""){
+                		 $("." + this.dom.container).find("." + section).find("." + fields.field).find('input,select,textarea').val(fields.value);
+                         $("." + this.dom.container).find("." + section).find("." + fields.field).find('input,select,textarea').attr('data-id', fields.projRegCopId);
+                         $("." + this.dom.container).find("." + section).find("." + fields.field).find('div').addClass("background-salmon");
+                	}
+                   
+                });
+            } else if (["RFDS_SERVICES", "RFDS_EQUIPMENT"].indexOf(data.section) > -1 && section === data.section) {
+            	$("." + this.dom.container).find("." + data.section).find(".verify-info").prop('checked', data.vendorStatus === "APPROVED" ? true : false);
+            	console.log(data.fieldList);
+            	var addedgridrow="";
+            	var removedgridrow="";
+            	var retainedgridrow="";
+                $.each(data.fieldList, (i, fields) =>{
+                    if (fields.field === "status") {
+                        $("." + this.dom.container).find("." + section).find("." + fields.type).find(".verify-info").attr("data-status", fields.value);
+                        $("." + this.dom.container).find("." + section).find("." + fields.type).find(".verify-info").attr('data-id', fields.projRegCopId);
+                        $("." + this.dom.container).find("." + section).find("." + fields.type).find(".verify-info").prop('checked', fields.value === "APPROVED" ? true : false);
+                        $("." + this.dom.container).find("." + section).find("." + fields.type).find(".edited").prop('checked', fields.value === "COMPLETED" ? true : false);
+                    }
+                    if (data.section === "RFDS_SERVICES") {
+                        $("." + this.dom.container).find("." + section).find("." + fields.type).find("#asbuilt-version-" + fields.field).val(fields.value);
+                        $("." + this.dom.container).find("." + section).find("." + fields.type).find("#asbuilt-version-" + fields.field).attr('data-id', fields.projRegCopId);
+                        $("." + this.dom.container).find("." + section).find("." + fields.type).find("#asbuilt-version-" + fields.field).closest('li').addClass("background-salmon");
+						
+						if(!this.dom.discrepancyFlag){
+							closeoutModule.discrepancyCheck(fields);
+						}
+					}
+
+                    if (data.section === "RFDS_EQUIPMENT") {
+                        var fieldType = fields.type;
+                        var index = fieldType.lastIndexOf('-');
+                        var service = fieldType.substring(0, index);
+                        var equipId = fieldType.substring(index + 1, fieldType.length);
+                        
+                        
+                        
+                        
+                        if (fields.field === 'row-status' && fields.value === "Deleted") {
+                            $("." + this.dom.container).find("." + section).find("." + service).find(".kendogrid").find('tr').each(function(i, data) {
+                                var td = $(this).find('td:first').find('input');
+                                var equipSummary = td.hasClass('equip-summary');
+                                var val = td.val();
+                                if (equipSummary && val == equipId) {
+                                    $(this).addClass("background-red");
+                                    $(this).find('.action').attr('data-id',fields.projRegCopId);
+                                    $(this).find("input,select").prop("disabled",true);
+                                    $(this).find(".action").prop("disabled",true);
+                                }
+                            });
+                        } else if (fields.field === 'row-status' && (fields.value === "Added" || fields.value === "Record-Deleted")) {
+                        	var type = fields.value === "Added" ? "Added background-teal" : "Record-Deleted background-red";
+                            var bodyTemplate = $(".summary-row-template tbody").html()
+                            					.replace(/@TYPE/g,type)
+                            					.replace(/@EQUIP_SUMMARY_ID/g,equipId)
+                            					.replace(/@PROJ_REG_COP_ID/g,fields.projRegCopId);
+                            
+                            var table = $("." + this.dom.container).find("." + section).find("." + service).find(".kendogrid").find("tbody");
+                           
+                            table.append(bodyTemplate);  
+                        } else {
+                            $("." + this.dom.container).find("." + section).find("." + service).find(".kendogrid").find('tr').each(function(i, data) {
+                                var td = $(this).find('td:first').find('input');
+                                var equipSummary = td.hasClass('equip-summary');
+                                var val = td.val();
+                                var masterTr = null;
+                                if($(this).is(".Deleted, .Record-Deleted")){
+                                	$(this).find("input,select").prop("disabled",true);
+                                	$(this).find(".action").prop("disabled",true);
+                                }
+                                $(this).find('input,select,textarea').addClass('disable');
+                                if (equipSummary && val == equipId) {
+                                    masterTr = $(this);
+                                }
+                                if (masterTr != null) {
+                                    if (["equipLte700", "equipCdma850", "equipLte850", "equipCdma1900", "equipLte1900", "equipLte2100","equipLteAws3","equip5gAws3",
+                                    	"equip28GHz","equip31GHz","equip39GHz","equipLteCbrs","equip5gCbrs","equipLteLaa","equip5gLaa","equip5gN77"].indexOf(fields.field) > -1) {
+                                        masterTr.find("." + fields.field).prop("checked", fields.value === "true" ? true : false);
+                                    } else {
+                                        masterTr.find("." + fields.field).val(fields.value);
+                                    }
+                                    masterTr.find("." + fields.field).attr("data-id", fields.projRegCopId);
+                                    if (masterTr.is(".RFDS_EQUIPMENT")) {
+                                        masterTr.find("." + fields.field).closest('td').addClass("background-salmon");
+                                    }
+                                }
+                            });
+                            
+                        }   
+                    }
+                });
+                
+            }
+        });
+		this.dom.body.find(".edit-info").off('click').on('click', $.proxy(this.editSection, this));
+		this.dom.body.find(".remove-row").off('click').on('click', $.proxy(this.removeRow, this));
+		this.dom.body.find(".verify-info").off('click').on('click', $.proxy(this.verifySection, this));
+		this.dom.body.find(".data-verification-save-button").off('click').on('click', $.proxy(this.saveSection, this));
+
+	},
+	fetchRegCopKey: function(filter) {
+        var statusField = "";
+        switch (filter) {
+            case "RF":
+            case "THIRD_PARTY_INSPECTOR":
+            	statusField = "thirdPartyInspectorStatus";
+            case "SYSTEM_PERFORMANCE":
+                statusField = "systemPerformanceStatus";
+                break;
+            case "CONSTRUCTION":
+                statusField = "constructionStatus";
+                break;
+            case "REAL_ESTATE":
+                statusField = "realEstateStatus";
+                break;
+            case "REGULATORY":
+                statusField = "regulatoryStatus";
+                break;
+            case "VENDOR_MANAGER":
+                statusField = "vendorManagerStatus";
+                break;
+            case 'STRUCTURE_INFORMATION':
+            case 'RFDS_INFORMATION':
+            case 'RFDS_SERVICES':
+            case 'RFDS_EQUIPMENT':
+                $.each(this.dom.approvalData, (i, data) =>{
+                    if (data.section === filter) {
+                        var keys = Object.keys(data);
+                        $.each(keys, (i, key) => {
+                            if (data[key] === "QUEUED") {
+                                statusField = key;
+                            }
+                        });
+                    }
+                });
+                break;
+            default:
+                statusField = "";
+                break;
+        }
+        return statusField;
+	},
+	showVersion(section, servicesMap, versionType) {
+        var columnTemplateId = versionType === "asbuilt-version" ? $("#asbuilt-template") : $("#column-template");
+        var serviceInfoDetailId = $(".service-info-detail");
+        var serviceInfoTemplate = $("#service-info-template").html();
+
+        if (this.dom.container === "VENDOR_APPROVAL_TAB" || this.dom.container === "APPROVAL_TAB") {
+            columnTemplateId.find(".max-erp").removeClass('hide');
+            columnTemplateId.find(".max-erp").closest('li').removeClass('hide');
+        } else {
+            columnTemplateId.find(".max-erp").addClass('hide');
+            columnTemplateId.find(".max-erp").closest('li').addClass('hide');
+        }
+        /** Clean up everything first and will be loaded anyway */
+        serviceInfoDetailId.find("." + versionType).empty();
+
+        /** Make the tab to accomodate 2 sets now */
+        serviceInfoDetailId.find(".proposed-version").removeClass("col-md-10");
+
+        var columnTemplate = columnTemplateId.html();
+        var versionTemplate = $("#version-template").html();
+
+        $.each(servicesMap, (serviceType, versionMap) => {
+            var serviceTypeFlattened = serviceType.replace(/\s+/g, "");
+            var serviceDiv = serviceInfoDetailId.find("." + serviceTypeFlattened);
+
+            /** if Service type NOT exist, add it */
+            if (serviceDiv.length <= 0) {
+                var serviceInfoHtml = serviceInfoTemplate.replace(/@SERVICE_TYPE_FLATTENED/g, serviceTypeFlattened)
+                    .replace(/@SERVICE_TYPE/g, serviceType);
+                serviceInfoDetailId.append(serviceInfoHtml);
+            }
+            this.dom.container === "VENDOR_TAB" ? serviceInfoDetailId.find(".max-erp").addClass('hide') : serviceInfoDetailId.find(".max-erp").removeClass('hide') ;
+
+            /** Retake the service div, as html might be new from above code */
+            serviceDiv = serviceInfoDetailId.find("." + serviceTypeFlattened);
+
+            /** Clear all the versions first and then add version from DB */
+            serviceDiv.find("." + versionType).empty();
+
+
+            /** Iterate on Version Map */
+            $.each(versionMap, (version, geoplanData) => {
+
+                var versionFlattened = version.replace(/\s+/g, "");
+
+                /** Version will be inside version type like current-version, proposed-version div */
+                var versionDiv = serviceDiv.find("." + versionType).find("." + versionFlattened);
+
+                /** Add the version div to version type (current-version, proposed-version), if not present*/
+                /** Version Div will hold the sector columns */
+                if (versionDiv.length <= 0) {
+                    serviceDiv.find("." + versionType).append(versionTemplate.replace(/@CELL_VERSION_FLATTENED/g, versionFlattened));
+                }
+
+                /** Retake the version div, as html might be new from above code */
+                versionDiv = serviceDiv.find("." + versionType).find("." + versionFlattened);
+
+                serviceDiv.removeClass('hide');
+                /** Now we have all the html ready for Services and Versions, time to add sector columns */
+                $.each(geoplanData, (i, service)=> {
+
+                    var sectorName = service.sectorName;
+                    var sectorColumn = versionDiv.find("." + sectorName);
+
+                    /** If sector is present then do not add sector column html */
+                    if (sectorColumn.length <= 0) {
+                        var templateHtml = columnTemplate.replace(/@SECTOR/g, sectorName)
+                        	.replace(/@CELL_VERSION_FLATTENED/g,versionFlattened)
+                            .replace(/@SERVICE_TYPE_FLATTENED/g, serviceTypeFlattened)
+                            .replace(/@VERSION_TYPE/g, versionType)
+                        	.replace(/@colAuto/g,geoplanData.length==1?"12":(geoplanData.length==2?"6":"4"));
+                        versionDiv.append(templateHtml);
+
+                    }
+
+                    /** Retake the sector column div, as html might be new from above code */
+                    sectorColumn = versionDiv.find("." + sectorName);
+
+                    if ((service.antennaMake).length > 20) {
+                        sectorColumn.find(".antenna-make").addClass("text-small");
+                    }
+
+                    sectorColumn.find(".antenna-sector-name").text(sectorName);
+                    sectorColumn.find(".antenna-azimuth").text(service.azimuth).addClass(serviceTypeFlattened + "-proposed-version-"+ versionFlattened + "-" + sectorName+"-ANTENNA-AZIMUTH");
+                    sectorColumn.find(".enod-b-id").text(service.eNodeBId).addClass(serviceTypeFlattened + "-proposed-version-"+ versionFlattened + "-" + sectorName+"-ENOB-B-ID");
+                    sectorColumn.find(".antenna-model").text(service.antennaModel).addClass(serviceTypeFlattened + "-proposed-version-"+ versionFlattened + "-" + sectorName+"-ANTENNA-MODEL");
+                    sectorColumn.find(".antenna-make").text(service.antennaMake).addClass(serviceTypeFlattened + "-proposed-version-"+ versionFlattened + "-" + sectorName+"-ANTENNA-MAKE");
+                    sectorColumn.find(".antenna-centerline").text(service.centerline).addClass(serviceTypeFlattened + "-proposed-version-"+ versionFlattened + "-" + sectorName+"-ANTENNA-CENTERLINE");
+                    sectorColumn.find(".mechanical-downtilt").text(service.mechanicalDowntilt).addClass(serviceTypeFlattened + "-proposed-version-"+ versionFlattened + "-" + sectorName+"-MECHANICAL-DOWNTILT");
+                    sectorColumn.find(".electrical-downtilt").text(service.electricalDowntilt).addClass(serviceTypeFlattened + "-proposed-version-"+ versionFlattened + "-" + sectorName+"-ELECTRICAL-DOWNTILT");
+                    sectorColumn.find(".tip-height").text(service.tipHeight).addClass(serviceTypeFlattened + "-proposed-version-"+ versionFlattened + "-" + sectorName+"-TIP-HEIGHT");
+                    sectorColumn.find(".max-erp").text(service.maxERP).addClass(serviceTypeFlattened + "-proposed-version-"+ versionFlattened + "-" + sectorName+"-MAX-ERP");
+                    sectorColumn.find(".tta-make").text(service.ttaMake).addClass(serviceTypeFlattened + "-proposed-version-"+ versionFlattened + "-" + sectorName+"-TTA-MAKE");
+                    sectorColumn.find(".tta-model").text(service.ttaModel).addClass(serviceTypeFlattened + "-proposed-version-"+ versionFlattened + "-" + sectorName+"-TTA-MODEL");
+                    sectorColumn.find(".rru-make").text(service.rruMake).addClass(serviceTypeFlattened + "-proposed-version-"+ versionFlattened + "-" + sectorName+"-RRU-MAKE");
+                    sectorColumn.find(".rru-model").text(service.rruModel).addClass(serviceTypeFlattened + "-proposed-version-"+ versionFlattened + "-" + sectorName+"-RRU-MODEL");
+                    sectorColumn.find(".TxRx").text(service.txrx).addClass(serviceTypeFlattened + "-proposed-version-"+ versionFlattened + "-" + sectorName+"-TXRX");
+
+                    if (versionType === "asbuilt-version") {
+                        var className = versionType + "-" + serviceTypeFlattened + "-" + versionFlattened + "-" + sectorName;
+						var proposed_vz_id = serviceTypeFlattened + "-proposed-version-" + versionFlattened + "-" + sectorName;
+						this.loadAsBuiltData(sectorColumn, className, service, "data-prev",proposed_vz_id);
+                        $.each(this.dom.approvalData, (i, data) => {
+                            if (data.section === "RFDS_SERVICES") {
+                                if (data.vendorStatus === "APPROVED") {
+                                    className = versionType + "-" + serviceTypeFlattened + "-" + versionFlattened + "-" + sectorName;
+                                    this.loadAsBuiltData(sectorColumn, className, service, "value",proposed_vz_id);
+                                }
+                                $.each(data.fieldList, (i, fields) => {
+                                    if (fields.field === "status" && (fields.value === "COMPLETED" || fields.value === "APPROVED")) {
+                                        className = versionType + "-" + fields.type + "-" + versionFlattened + "-"  + sectorName;
+                                        this.loadAsBuiltData(sectorColumn, className, service, "value",proposed_vz_id);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        });
+	},
+	loadAsBuiltData: function(sectorColumn, className, service, dataAttr,proposed_vz_id) {
+        sectorColumn.find("#" + className + "-ANTENNA-AZIMUTH").attr(dataAttr, service.azimuth).attr("proposed-vz-id",proposed_vz_id + "-ANTENNA-AZIMUTH");
+        sectorColumn.find("#" + className + "-ENOD-B-ID").attr(dataAttr, service.eNodeBId).attr("proposed-vz-id",proposed_vz_id + "-ENOD-B-ID");
+        sectorColumn.find("#" + className + "-ANTENNA-MODEL").attr(dataAttr, service.antennaModel).attr("proposed-vz-id",proposed_vz_id + "-ANTENNA-MODEL");
+        sectorColumn.find("#" + className + "-ANTENNA-MAKE").attr(dataAttr, service.antennaMake).attr("proposed-vz-id",proposed_vz_id + "-ANTENNA-MAKE");
+        sectorColumn.find("#" + className + "-ANTENNA-CENTERLINE").attr(dataAttr, service.centerline).attr("proposed-vz-id",proposed_vz_id + "-ANTENNA-CENTERLINE");
+        sectorColumn.find("#" + className + "-MECHANICAL-DOWNTILT").attr(dataAttr, service.mechanicalDowntilt).attr("proposed-vz-id",proposed_vz_id + "-MECHANICAL-DOWNTILT");
+        sectorColumn.find("#" + className + "-ELECTRICAL-DOWNTILT").attr(dataAttr, service.electricalDowntilt).attr("proposed-vz-id",proposed_vz_id + "-ELECTRICAL-DOWNTILT");
+        sectorColumn.find("#" + className + "-TIP-HEIGHT").attr(dataAttr, service.tipHeight).attr("proposed-vz-id",proposed_vz_id + "-TIP-HEIGHT");
+        sectorColumn.find("#" + className + "-TTA-MAKE").attr(dataAttr, service.ttaMake).attr("proposed-vz-id",proposed_vz_id + "-TTA-MAKE");
+        sectorColumn.find("#" + className + "-TTA-MODEL").attr(dataAttr, service.ttaModel).attr("proposed-vz-id",proposed_vz_id + "-TTA-MODEL");
+        sectorColumn.find("#" + className + "-RRU-MAKE").attr(dataAttr, service.rruMake).attr("proposed-vz-id",proposed_vz_id + "-RRU-MAKE");
+        sectorColumn.find("#" + className + "-RRU-MODEL").attr(dataAttr, service.rruModel).attr("proposed-vz-id",proposed_vz_id + "-RRU-MODEL");
+        sectorColumn.find("#" + className + "-TXRX").attr(dataAttr, service.txrx).attr("proposed-vz-id",proposed_vz_id + "-TXRX");
+    },
+    getRfdsSettingsData(callback) {
+        var container = $(".summary-row-template");
+        this.constructor.ajax.fireMetaServiceAPI("rfds", "system", "getSystemSettings", (response) => {
+            $.each(response, (i, data) => {
+                if (i === "equipments") {
+                    container.find(".equip-type").empty();
+                    container.find(".equip-type").append($("<option></option>").prop("value", "").text("Select"));
+                    if (!jQuery.isEmptyObject(data) && data !== undefined && data !== null) {
+                        $.each(data, (key, value) => {
+                            container.find(".equip-type").append($("<option></option>").prop("value", key).text(value));
+                        });
+                    }
+                } else if (i === "installationTypes") {
+                    container.find(".equip-install-type").empty();
+                    container.find(".equip-install-type").append($("<option></option>").prop("value", "").text("Select"));
+                    if (!jQuery.isEmptyObject(data) && data !== undefined && data !== null) {
+                        $.each(data, (key, value) => {
+                            container.find(".equip-install-type").append($("<option></option>").prop("value", key).text(value));
+                        });
+                    }
+                } else if (i === "location") {
+                    container.find(".location").empty();
+                    container.find(".location").append($("<option></option>").prop("value", "").text("Select"));
+                    if (!jQuery.isEmptyObject(data) && data !== undefined && data !== null) {
+                        $.each(data, (key, value) => {
+                            container.find(".location").append($("<option></option>").prop("value", key).text(value));
+                            if (key === "Tower") {
+                                container.find('.location').val(key);
+                            }
+                        });
+                    }
+                }
+            });
+            if (callback) {
+                callback();
+            }
+        });
+    },
+    getEquipmentSummary: function(section) {
+        var payload = {};
+        payload.siteProjectsId = $("#site-project-id").val();
+        this.constructor.ajax.fireApi(payload, "rfds", "listProjectEquipments", (response) => {
+        	console.log(response)
+            this.showEquipmentData(section, response);
+            this.showApprovalData(section);
+        });
+    },
+    showEquipmentData: function(section, response) {
+    	
+    	//var self =  $(e.currentTarget);
+        var headTemplate = $(".summary-head-template thead").html();
+        var bodyTemplate = $(".summary-row-template tbody").html();
+        $("#equipment-added-table,#equipment-removed-table,#equipment-retained-table").find("thead,tbody").empty();
+        var that = this;
+		$("." + this.dom.container).find("." + section).find(".kendogrid").each(function(i, data)  {
+            that.createEquipementKendo("#"+ $(this).attr("id"),"");
+        });
+        if (response != null && response.length > 0) {
+        	
+            var table = null;
+            $.each(response, (index, data) =>{
+            	console.log(data)
+                if (data.installType === "Added" || data.installType === "user-report") {
+                    table = $("." + this.dom.container).find("." + section).find("#equipment-added-table tbody");
+                } else if (data.installType === "Removed") {
+                    table = $("." + this.dom.container).find("." + section).find("#equipment-removed-table tbody");
+                } else if (data.installType === 'Retained') {
+                    table = $("." + this.dom.container).find("." + section).find("#equipment-retained-table tbody");
+                }
+
+            	
+                table.append(bodyTemplate.replace(/@TYPE/g, "RFDS_EQUIPMENT")
+                		.replace(/@EQUIP_SUMMARY_ID/g,data.equipSummaryId).replace(/@PROJ_REG_COP_ID/g ,""));
+                var addedRow = table.find("tr").last();
+
+                addedRow.find(".equipSummaryId").val(data.equipSummaryId);
+                addedRow.find('.equip-type').val(data.equipType);
+                addedRow.find('.equip-type').attr("data-prev", data.equipType);
+                addedRow.find(".equipLte700").prop("checked", data.lte700);
+                addedRow.find(".equipLte700").attr("data-prev", data.lte700);
+                addedRow.find(".equipCdma850").prop("checked", data.cdma850);
+                addedRow.find(".equipCdma850").attr("data-prev", data.cdma850);
+                addedRow.find(".equipLte850").prop("checked", data.lte850);
+                addedRow.find(".equipLte850").attr("data-prev", data.lte850);
+                addedRow.find(".equipCdma1900").prop("checked", data.cdma1900);
+                addedRow.find(".equipCdma1900").attr("data-prev", data.cdma1900);
+                addedRow.find(".equipLte1900").prop("checked", data.lte1900);
+                addedRow.find(".equipLte1900").attr("data-prev", data.lte1900);
+                addedRow.find(".equipLte2100").prop("checked", data.lte2100);
+                addedRow.find(".equipLte2100").attr("data-prev", data.lte2100);
+                addedRow.find(".equipLteAws3").prop("checked", data.lteAWS3);
+                addedRow.find(".equipLteAws3").attr("data-prev", data.lteAWS3);
+                addedRow.find(".equip5gAws3").prop("checked", data._5gAWS3);
+                addedRow.find(".equip5gAws3").attr("data-prev", data._5gAWS3);
+                addedRow.find(".equip28GHz").prop("checked", data._28GHZ);
+                addedRow.find(".equip28GHz").attr("data-prev", data._28GHZ);
+                addedRow.find(".equip31GHz").prop("checked", data._31GHZ);
+                addedRow.find(".equip31GHz").attr("data-prev", data._31GHZ);
+                addedRow.find(".equip39GHz").prop("checked", data._39GHZ);
+                addedRow.find(".equip39GHz").attr("data-prev", data._39GHZ);
+                addedRow.find(".equipLteCbrs").prop("checked", data.lteCbrs);
+                addedRow.find(".equipLteCbrs").attr("data-prev", data.lteCbrs);
+                addedRow.find(".equip5gCbrs").prop("checked", data._5gCbrs);
+                addedRow.find(".equip5gCbrs").attr("data-prev", data._5gCbrs);
+                addedRow.find(".equipLteLaa").prop("checked", data.lteLaa);
+                addedRow.find(".equipLteLaa").attr("data-prev", data.lteLaa);
+                addedRow.find(".equip5gLaa").prop("checked", data._5gLaa);
+                addedRow.find(".equip5gLaa").attr("data-prev", data._5gLaa);
+                addedRow.find(".equip5gN77").prop("checked", data._5gN77);
+                addedRow.find(".equip5gN77").attr("data-prev", data._5gN77);
+                addedRow.find('.location').val(data.location);
+                addedRow.find('.location').attr("data-prev", data.location);
+                addedRow.find(".model").val(data.model);
+                addedRow.find(".model").attr("data-prev", data.model);
+                addedRow.find(".make").val(data.make);
+                addedRow.find(".make").attr("data-prev", data.make);
+                addedRow.find(".cable-length").val(data.coaxLength);
+                addedRow.find(".cable-length").attr("data-prev", data.coaxLength);
+                addedRow.find(".cable-size").val(data.coaxSize);
+                addedRow.find(".cable-size").attr("data-prev", data.coaxSize);
+                addedRow.find('.equip-install-type').val(data.equipInstallType);
+                addedRow.find('.equip-install-type').attr('data-prev', data.equipInstallType);
+                addedRow.find(".qty").val(data.qty);
+                addedRow.find(".qty").attr("data-prev", data.qty);
+                if (data.equipType === "Coaxial Cables" || data.equipType === "Fiber" || data.equipType === "Hybrid Fiber" || data.equipType === "Hybrid Cable") {
+                    addedRow.find(".cable-length,.cable-size").attr("disabled", true);
+                } else {
+                    addedRow.find(".cable-length,.cable-size").attr("disabled", false);
+                }
+            });
+        }
+    },
+    createEquipementKendo: function(tablename,response) {
+    	var select_equip_type = $('<div>').append($(".summary-row-template .equip-type").clone()).html();
+    	
+    	var select_location = $('<div>').append($(".summary-row-template .location").clone()).html();
+    	
+    	var select_equip_install_type = $('<div>').append($(".summary-row-template .equip-install-type").clone()).html();
+    	
+    	
+    	
+    	var columnsConfig = [
+    			
+    			{
+    				field: "equipSummaryId",
+    				title: "Equipment ID",
+    				template: '<input class="equipSummaryId form-control padding-zero" id="equipSummaryId">',
+    				hidden:true
+    			},
+    			{
+    				field: "equipType",
+    				title: "Equipment Type",
+    				width: 80,
+    				template: select_equip_type
+    			},
+    			{
+    				field: "lte700",
+    				title: "700 LTE",
+    				width: 80,
+    				template: '<input type="checkbox" class="equipLte700 disable" id="equipLte700">'
+    			},
+    			{
+    				field: "cdma850",
+    				title: "850 CDMA",
+    				width: 80,
+    				template: '<input type="checkbox" class="equipCdma850 disable" id="equipCdma850">'
+    			},
+    			{
+    				field: "lte850",
+    				title: "850 LTE",
+    				width: 80,
+    				template: '<input type="checkbox" class="equipLte850 disable" id="equipLte850">'
+    			},
+    			{
+    				field: "cdma1900",
+    				title: "1900 CDMA",
+    				width: 80,
+    				template: '<input type="checkbox" class="equipCdma1900 disable" id="equipCdma1900">'
+    			},
+    			{
+    				field: "lte1900",
+    				title: "1900 LTE",
+    				width: 80,
+    				template: '<input type="checkbox" class="equipLte1900 disable" id="equipLte1900">'
+    			},
+    			{
+    				field: "lte2100",
+    				title: "2100 LTE",
+    				width: 80,
+    				template: '<input type="checkbox" class="equipLte2100 disable" id="equipLte2100">'
+    			},
+    			{
+    				field: "lteAWS3",
+    				title: "AWS3 LTE",
+    				width: 80,
+    				template: '<input type="checkbox" class="equipLteAws3 disable" id="equipLteAws3">'
+    			},
+    			{
+    				field: "_5gAWS3",
+    				title: "AWS3 5G",
+    				width: 80,
+    				template: '<input type="checkbox" class="equip5gAws3 disable" id="equip5gAws3">'
+    			},
+    			{
+    				field: "_28GHZ",
+    				title: "28 GHz",
+    				width: 80,
+    				template: '<input type="checkbox" class="equip28GHz disable" id="equip28GHz">'
+    			},
+    			{
+    				field: "_31GHZ",
+    				title: "31 GHz",
+    				width: 80,
+    				template: '<input type="checkbox" class="equip31GHz disable" id="equip31GHz">'
+    			},
+    			{
+    				field: "_39GHZ",
+    				title: "39 GHz",
+    				width: 80,
+    				template: '<input type="checkbox" class="equip39GHz disable" id="equip39GHz">'
+    			},
+    			{
+    				field: "lteCbrs",
+    				title: "CBRS LTE",
+    				width: 80,
+    				template: '<input type="checkbox" class="equipLteCbrs disable" id="equipLteCbrs">'
+    			},
+    			{
+    				field: "_5gCbrs",
+    				title: "CBRS 5G",
+    				width: 80,
+    				template: '<input type="checkbox" class="equip5gCbrs disable" id="equip5gCbrs">'
+    			},
+    			{
+    				field: "lteLaa",
+    				title: "LAA LTE",
+    				width: 80,
+    				template: '<input type="checkbox" class="equipLteLaa disable" id="equipLteLaa">'
+    			},
+    			{
+    				field: "_5gLaa",
+    				title: "LAA 5G",
+    				width: 80,
+    				template: '<input type="checkbox" class="equip5gLaa disable" id="equip5gLaa">'
+    			},
+    			{
+    				field: "_5gN77",
+    				title: "L-SUB6",
+    				width: 80,
+    				template: '<input type="checkbox" class="equip5gN77 disable" id="equip5gN77">'
+    			},
+    			{
+    				field: "location",
+    				title: "Location",
+    				width: 80,
+    				template: select_location
+    			},
+    			{
+    				field: "make",
+    				title: "Make",
+    				width: 80,
+    				template: '<input class="make form-control padding-zero" type="text" readonly id="make">'
+    			},{
+    				field: "model",
+    				title: "Model",
+    				width: 80,
+    				template: '<input class="model form-control padding-zero" type="text" readonly id="model">'
+    			},
+    			{
+    				field: "coaxLength",
+    				title: "Cable Length",
+    				width: 80,
+    				template: '<input class="cable-only cable-length form-control padding-zero" type="text" readonly id="cable-length">'
+    			},
+    			{
+    				field: "coaxSize",
+    				title: "Cable Size",
+    				width: 80,
+    				template: '<input class="cable-only cable-size form-control padding-zero" type="text" readonly id="cable-size">'
+    			},
+    			{
+    				field: "equipInstallType",
+    				title: "Inst. Type",
+    				width: 80,
+    				template: select_equip_install_type
+    			},
+    			{
+    				field: "qty",
+    				title: "Quantity",
+    				width: 80,
+    				template: '<input class="qty form-control padding-zero" type="text" readonly id="qty">'
+    			},
+    			{
+    				title: "Action",
+    				width: 70,
+    				template: '<i class="remove-row vz-icon-delete" title="Delete Row" id="row-status"></i>'
+    			}
+    			];
+    	var gridLevelConfig = {
+    				pageable: {
+    					refresh: false,
+    				},
+    				 toolbar: kendo.template(
+	    					'<button type="button" class="action add-row-equipment text-dark-green disable"><span class="k-icon k-i-plus"></span>Add new record</button>   '+
+		    		 		'<div class="pull-right equipment-info check-fields hide">'+
+		    		 				'<div class="checkbox clearfix vzbs-checkbox pull-right">'+
+		    		 					'<input class="edited disable" disabled="disabled" role="checkbox" type="checkbox" data-section="RFDS_EQUIPMENT" data-service="'+$(tablename).parent().attr("class")+'" data-status=""><label>Edited</label>'+
+		    		 				'</div>'+
+		    			            '<div class="checkbox clearfix vzbs-checkbox pull-right margin-right">'+
+		    			                '<input class="verify-info" role="checkbox" type="checkbox" data-section="RFDS_EQUIPMENT" data-service="'+$(tablename).parent().attr("class")+'" data-status=""><label>Verified</label>'+
+		    			            '</div>'+
+		    			            '<div class="checkbox clearfix vzbs-checkbox pull-right margin-right">'+
+		    			                '<input class="edit-info" role="checkbox" type="checkbox" data-section="RFDS_EQUIPMENT" data-service="'+$(tablename).parent().attr("class")+'"><label>Edit</label>'+
+		    			            '</div>'+
+		    			     '</div>'      
+	    		        
+    		        ),
+    				 noRecords: false,
+    			};
+    	var response=null;
+    	let schema = this.getSchemaRegCop();
+    	createKendoGrid(tablename, columnsConfig, null, null, gridLevelConfig, null);
+		this.dom.body.find(".add-row-equipment").off('click').on('click', $.proxy(this.addRow, this));
+
+		this.dom.body.find(".edit-info").off('click').on('click', $.proxy(this.editSection, this));
+		this.dom.body.find(".remove-row").off('click').on('click', $.proxy(this.removeRow, this));
+		this.dom.body.find(".verify-info").off('click').on('click', $.proxy(this.verifySection, this));
+		this.dom.body.find(".data-verification-save-button").off('click').on('click', $.proxy(this.saveSection, this));
+		
+	},
+	getSchemaRegCop: function(){
+		return{
+            model: {
+                id : "equipSummaryId",
+                fields : {
+                	equipType : {editable: true},
+                }
+            }
+		}
+	},
+	addRow: function(e) {
+		e.preventDefault();
+        var bodyTemplate = $(".summary-row-template tbody").html();
+        var table = $(e.currentTarget).closest('.kendogrid').find("tbody");
+        table.append(bodyTemplate);
+        table.find('input,select').not(".equip-install-type").attr('readonly', false);
+        table.find('input[type="checkbox"]').removeClass('disable');
+        table.find("tr:last").find("input,select").attr('data-prev', "");
+        table.find("tr:last").find("input[type='checkbox']").attr('data-prev', "false");
+        table.find("tr:last").find(".action").removeClass('disable');
+        table.find("tr:last").find(".equip-install-type").val("PHYSICAL");
+        
+      
+    },
+    removeRow: function(e) {
+		e.preventDefault();
+        var service = $(e.currentTarget).closest('.kendogrid').parent().attr("class");
+        section = "RFDS_EQUIPMENT";
+        var projRegCopApprovals = {
+            "constructionStatus": "",
+            "projRegCopApprovalsId": $("." + this.dom.container).find("." + section).attr('data-id'),
+            "realEstateStatus": "",
+            "regulatoryStatus": "",
+            "section": section,
+            "siteProjectsId": $("#site-project-id").val(),
+            "systemPerformanceStatus": "",
+            "vendorStatus": "QUEUED"
+        };
+        projRegCopApprovals.fieldList = [];
+        var regCopId = $("." + this.dom.container).find("." + section).find("." + service).find(".verify-info").attr('data-id');
+        var fields = {};
+        fields.field = "status";
+        fields.value = 'COMPLETED';
+        fields.type = service;
+        fields.projRegCopId = regCopId;
+        projRegCopApprovals.fieldList.push(fields);
+        var equipSummaryId = $(e.currentTarget).closest("tr").find(".equip-summary").val();
+        var fields = {};
+        fields.field = $(e.currentTarget).attr('id');
+        fields.value =  $(e.currentTarget).closest("tr").hasClass("Added") ? "Record-Deleted" : "Deleted";
+        fields.type = service + '-' + equipSummaryId;
+        fields.projRegCopId = $(e.currentTarget).attr('data-id');
+        projRegCopApprovals.fieldList.push(fields);
+        if($(e.currentTarget).closest("tr").is(".RFDS_EQUIPMENT, .Added")){
+        	this.mergeProjRegCopApprovals(projRegCopApprovals);
+        	$(e.currentTarget).closest("tr").addClass("background-red");
+        }else{
+        	$(e.currentTarget).closest("tr").remove();
+        }
+	},
+	getCloseoutContactTypesRegCop: function() {
+        var projectSearchRequest = {};
+        projectSearchRequest.siteProjectsId = $("#site-project-id").val();
+        this.constructor.ajax.fireApi(projectSearchRequest, "mobile", "mobile/getCloseoutContactTypes", (response) => {
+            this.dom.contactTypes = response;
+            return response;
+        });
+	},
+	acceptSectionRegCop: function(e) {
+		e.preventDefault();
+        section = $(e.currentTarget).attr('data-section');
+        var status = this.fetchRegCopKey(section);
+        var projRegCopApprovals = {};
+        projRegCopApprovals.siteProjectsId = $("#site-project-id").val();
+        projRegCopApprovals.projRegCopApprovalsId = $("." + this.dom.container).find("." + section).attr('data-id');
+        projRegCopApprovals.section = section;
+        projRegCopApprovals[status] = 'APPROVED';
+        //regCopModule.mergeCloseoutComments(section);
+        this.mergeProjRegCopApprovals(projRegCopApprovals, () =>{
+            this.loadSections(section);
+        });
+    },
+    rejectSectionRegCop: function(e) {
+		e.preventDefault();
+        section = $(e.currentTarget).attr('data-section');
+        var status = this.fetchRegCopKey(section);
+        var projRegCopApprovals = {
+            "projRegCopApprovalsId": $("." + this.dom.container).find("." + section).attr('data-id'),
+            "section": section,
+            "siteProjectsId": $("#site-project-id").val()
+        };
+        projRegCopApprovals[status] = 'REJECTED';
+        var commentsStatus = this.mergeCloseoutComments(section);
+        if (commentsStatus) {
+            $("." + this.dom.container).find("." + section).find(".comments").removeClass("border-red");
+            this.mergeProjRegCopApprovals(projRegCopApprovals, () => {
+                this.loadSections(section);
+            });
+        } else {
+            $("." + this.dom.container).find("." + section).find(".comments").addClass("border-red");
+            displayError("Validation Error", "Please enter rejection comments");
+        }
+    },
+    mergeCloseoutComments: function(section) {
+        var flag = false;
+        var commentText = $("." + this.dom.container).find("." + section).find(".comments").val();
+        commentText = commentText ? commentText.trim() : "";
+        var taskName = $("." + this.dom.container).find("." + section).find(".comments").attr('id');
+        taskName = taskName.replace("Comments-", "");
+        var taskId = $("#CLOSEOUT_DOCUMENTS").find(".save-task-comments-button").attr('role');
+        var siteProjectsId = $("#site-project-id").val();
+        if (commentText) {
+            flag = true;
+            if (!isNaN(parseInt(taskId))) {
+                var projTaskComment = {};
+                projTaskComment.commentText = commentText;
+                projTaskComment.commentType = taskName;
+                projTaskComment.siteProjectsId = siteProjectsId;
+                projTaskComment.isSystemComment = 0;
+                
+                mergeTaskCommentsCall(projTaskComment, siteProjectsId, () => {
+                    $("." + this.dom.container).find("." + section).find(".comments").val("");
+                });
+            } else {
+                displayError("Error", `Comments cannot be saved since ${taskName} task is not active`);
+            }
+        }
+        return flag;
+    },
+	discrepancyCheck: function(fields) {
+        
+        let fieldName = fields.field.replace(fields.type,"");
+        let proposedVal =  $("."+fields.type+"-proposed-version"+fieldName).text();
+        let strOwner = $(".structure_verizon_owned");
+        let proposedHeight = $("#reg-proposed-overall-ht-with-app").val();
+        
+        if(fieldName.endsWith("ANTENNA-AZIMUTH")){
+        	this.dom.discrepancyFlag = Math.abs(proposedVal-fields.value) > 2 ? true : false;                        	
+        }
+        if(fieldName.endsWith("MECHANICAL-DOWNTILT")){
+        	this.dom.discrepancyFlag = Math.abs(proposedVal-fields.value) > 1 ? true : false;                        	
+        }
+        else if(fieldName.endsWith("ANTENNA-CENTERLINE")){
+        	this.dom.discrepancyFlag = Math.abs(proposedVal-fields.value) > 3 ? true : false;                        	
+        }
+        else if(fieldName.endsWith("TIP-HEIGHT")){
+        	if(strOwner.length && strOwner.val() == 'Yes'){
+        		this.dom.discrepancyFlag = fields.value-proposedHeight>1 ? true : false;
+        	}
+        	else {
+        		this.dom.discrepancyFlag = fields.value-proposedHeight>3 ? true : false;
+        	}                        	
+        }
+    },
+	coOrdinatesChange: function(e) {
+		let self = $(e.currentTarget);
+		let id = self.attr('id')
+		if(id == "closeout-longitude"){
+			var longitude = self.val();
+			var splittedLong = longitude.split(".");
+			var msg = "Longitude field (" + longitude + ") format is wrong." + '<br>' + "Longitude format should be -xxx.xxxxxx or -xx.xxxxxx";
+			if (longitude >= 180 || longitude <= -180) {
+				displayError("Validation Report", msg);
+				$(this).val("");
+			}
+			if (splittedLong.length !== 2 || (splittedLong[0].length !== 4 && splittedLong[0].length !== 3 && splittedLong[0].length !== 2) || splittedLong[0].split("-").length !== 2 ) {
+				displayError("Validation Report", msg);
+				$(this).val("");
+			}
+		}
+		if(id =="closeout-latitude"){
+			var latitude = self.val();
+			var splittedLat = latitude.split(".");
+			var msg = "Latitude field (" + latitude + ") format is wrong." + '<br>' + "Latitude format should be -xx.xxxxxx or xx.xxxxxx and the valid range is between -90 and 90";
+			if (latitude >= 90 || latitude <= -90) {
+				displayError("Validation Report", msg);
+				$(this).val("");
+			}
+			else if (splittedLat.length !== 2 || (splittedLat[0].length !== 3 && splittedLat[0].length !== 2 && splittedLat[0].length !== 1)) {
+
+				displayError("Validation Report", msg);
+				$(this).val("");
+			}
+		}
+	},
+
+	//Environmental Construction Closeout task
+
+	loadEnvCloseoutInfoTask: function(){
+		this.dom.modalDispContainer = $(".closeout_wastestream_tsdf_template");
+	    this.dom.modalTransContainer = $(".closeout_transport_tsdf_template");
+		this.resetContainer();
+		this.getTsdfInfo();
+		this.dom.body.find("#search-disposal-button").off("click").on("click", $.proxy(this.searchLocations, this));
+		this.dom.body.find(".btn_wastestream_tsdf").off("click").on("click", $.proxy(this.addNew, this));	
+
+	},
+
+	disposalComments: function(e) {
+	   e.preventDefault();
+	   e.stopPropagation();
+	   let self = $(e.currentTarget);
+
+	   $("." + self.attr("name")).addClass('hide');
+	   if (self.attr('id') === "signing-manifest" && self.val() === "Yes") {
+	   this.dom.modalDispContainer.find('#signing-manifest-comments').addClass('empty mandatory-field');
+	   } else {
+		   this.dom.modalDispContainer.find('#signing-manifest-comments').removeClass('empty mandatory-field');
+	   }
+	},
+	resetContainer: function() {
+		this.dom.body.find(".select-search-criteria").val("");
+		this.dom.body.find("#waste-input").val("");
+		this.dom.body.find(".search-disposal-result").removeClass('hide');
+	},
+	searchLocations: function(e, callback) {
+		e.preventDefault();
+		var search = {};
+		search.refType = this.dom.body.find(".select-search-criteria").val();
+		search.searchKey = this.dom.body.find("#waste-input").val();
+
+		if (search.refType === "") {
+			displayError("Warning", "Please select search criteria!!");
+		} else {
+			this.searchLocationsCall(search, (response) => {
+				this.showSearchResults(response);
+			});
+		}
+	},
+	searchLocationsCall: function(search, callback) {
+		this.constructor.ajax.fireApi(search, "env", "searchEnvTransportDisposalFacilities", (response) => {
+			if (callback) {
+				callback(response);
+			}
+		});
+	},
+	getTsdfInfo: function() {
+		var projectSearchRequest = {};
+		projectSearchRequest.siteProjectsId = $("#site-project-id").val();
+		this.constructor.ajax.fireApi(projectSearchRequest, "env", "getProjEnvCloseoutTsdfReviewDetails", (response) => {
+			this.dom.globalTsdfDetails = response;
+			this.disposalGrid(response.projEnvDisposalFacility);
+			this.transportGrid(response.projEnvTransport);
+		});
+	},
+	showSearchResults: function(facilities) {
+		let columns = this.getSearchColumns();
+		let schema = this.getSearchSchema();
+		let gridOptions = this.getSearchGridOptions();
+		let dataSourceOptions = this.getSearchDataSourceOptions(facilities);
+		let container = this.dom.body.find("#search-disposal");
+
+		createKendoGrid(container, columns, facilities, schema, gridOptions, dataSourceOptions);
+		this.dom.body.find(".search-disposal-result").removeClass('hide');
+	},
+	getSearchColumns: function() {
+		return [{
+				template: function(response) {
+					if (response.envTransportersId <= 0) {
+						return `<div class='col-sm-12 padding-zero margin-zero'>
+									<a role='button' data-id=${response.envDisposalFacilitiesId} data-role="WASTE_STREAM" class='col-sm-4 k-grid-custom-add btn btn-sm padding-zero margin-zero'><span><i class='padding-right text-dark-green fa fa-plus add_fac'></i></span></a>
+								</div>`
+					} else {
+						return `<div class='col-sm-12 padding-zero margin-zero'>
+									<a role='button' data-id=${response.envTransportersId} data-role="TRANSPORTER" class='col-sm-4 k-grid-custom-add btn btn-sm padding-zero margin-zero'><span><i class='padding-right text-dark-green fa fa-plus add_fac'></i></span></a>
+								</div>`
+					}
+				},
+				title: "Action",
+				width: "50px",
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "envTransportersId",
+				title: "envTransportersId",
+				hidden: true,
+				type: "string",
+				attributes: {
+					"id": "envTransportersId",
+				},
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "envDisposalFacilitiesId",
+				title: "envDisposalFacilitiesId",
+				hidden: true,
+				type: "string",
+				attributes: {
+					"id": "envDisposalFacilitiesId",
+				},
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "propTsdf",
+				title: "Disposal Facility/Transporter",
+				width: "100px",
+				media: "(min-width: 768px)"
+			}, {
+				field: "address",
+				title: "Address",
+				width: "100px",
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "city",
+				title: "City",
+				width: "100px",
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "state",
+				title: "State",
+				width: "100px",
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "zip",
+				title: "Zip",
+				width: "100px",
+				media: "(min-width: 768px)"
+			}, {
+				field: "epaId",
+				title: "Epa Id",
+				width: "100px",
+				media: "(min-width: 768px)"
+			},
+			{
+				title: "Items",
+				template: kendo.template($("#search-disposal-transporters-responsive").html()),
+				media: "(max-width: 767px)"
+			}
+		];
+	},
+	getSearchSchema: function() {
+		return {
+			model: {
+				fields: {
+					envTransportersId: {
+						editable: false
+					},
+					envDisposalFacilitiesId: {
+						editable: false
+					},
+					propTsdf: {
+						editable: false
+					},
+					address: {
+						editable: false
+					},
+					city: {
+						editable: false
+					},
+					state: {
+						editable: false
+					},
+					zip: {
+						editable: false
+					},
+					epaId: {
+						editable: false
+					}
+				}
+			}
+		}
+	},
+	getSearchGridOptions() {
+		return {
+			pageable: {
+				pageSize: 10
+			},
+			dataBound: (e) => {
+				this.dom.body.find(".add_fac").off("click").on("click", $.proxy(this.addFacility, this));
+			}
+		}
+	},
+	getSearchDataSourceOptions(facilities) {
+		return {
+			pageSize: 10,
+			transport: {
+				read: function(e) {
+					e.success(facilities);
+				},
+			}
+		}
+	},
+	addNew: function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		var refType = this.dom.body.find(".select-search-criteria").val();
+
+		if (refType === "") {
+			displayError("Warning", "Please select search criteria!!");
+		} else {
+			this.showAdditionalData("new", refType, {});
+		}
+	},
+	addFacility: function(e) {
+		e.preventDefault();
+		let self = $(e.currentTarget);
+		let id = self.closest('a').attr('data-id');
+		let role = self.closest('a').attr('data-role');
+
+		var search = {};
+		search.refType = role;
+		if (role === 'WASTE_STREAM') {
+			search.envDisposalFacilitiesId = id;
+		} else {
+			search.envTransportersId = id;
+		}
+
+		this.searchLocationsCall(search, (response) => {
+			this.showAdditionalData("edit", role, response[0]);
+		});
+	},
+	showAdditionalData: function(action, type, data) {
+		let container = type === "WASTE_STREAM" ? this.dom.modalDispContainer : this.dom.modalTransContainer;
+		let envId = "";
+		let projEnvId = "";
+		
+		if(type === "TRANSPORTER"){
+			var proposedDisposalFacilityDetails = this.dom.globalTsdfDetails.projEnvDisposalFacility;
+			container.find("#closeout-transporter-link-disposal-facility").empty();
+			container.find("#closeout-transporter-link-disposal-facility").append($("<option></option>").prop("value", "").text("Nothing Selected"));
+			$.each(proposedDisposalFacilityDetails, (i, data) => {
+				container.find("#closeout-transporter-link-disposal-facility").append($("<option></option>").prop("value", data.projEnvDisposalFacilitiesId).text(data.propTsdf + "-" + data.wasteDesc));
+			});
+			
+			container.find('#closeout-transporter-link-disposal-facility').val(data.projEnvDisposalFacilitiesId);
+			envId = data.envTransportersId;
+			projEnvId = data.projEnvTransportId;
+
+		}else{
+			container.find('.pcc_tsdf').remove();
+			container.find('.env_closeout_tsdf').removeClass('hide');
+			container.find('#signing-manifest').val(data.lessorOwner);
+			container.find('#hazardous-waste').val(data.hazardousWaste);
+			container.find('#disposal-facility-estimated-quantity').val(data.estimatedQty);
+			container.find('#disposal-facility-waste-description').val(data.wasteDesc);
+			container.find('#disposal-facility-units').val(data.units);
+			container.find('#signing-manifest-comments').val(data.lessorOwnerComments);
+			container.find('#waste-description-comments').val(data.wasteDescComments);
+			container.find('#tsdf-accept-reject-comments').val(data.comments);
+			container.find('#units-comments').val(data.unitsComments);
+			envId = data.envDisposalFacilitiesId;
+			projEnvId = data.projEnvDisposalFacilitiesId;
+
+			container.find("select.form-control#signing-manifest").off("change").on("change", $.proxy(this.disposalComments, this));
+		}	
+		
+		container.find('#prop-TSDF').val(data.propTsdf);
+		container.find('#address1').val(data.address);
+		container.find('#city').val(data.city);
+		container.find('#state').val(data.state);
+		container.find('#zipcode').val(data.zip);
+		container.find('#epa-id').val(data.epaId);
+		container.find('#accept-reject-comments').val(data.comments);
+		container.find(".facility-save-button").attr("data-env-id", envId);
+		container.find(".facility-save-button").attr("data-proj-env-id", projEnvId);
+		container.find(".facility-save-button").attr("data-role", type);
+		
+		if (action === "new") {
+			container.find('.new-waste-data').removeAttr('readonly');
+			container.find('input,select,textarea').not('.new-waste-data').attr('readonly', false);
+			container.find('.facility-save-button').removeClass('hide');
+		} else if (action === "edit") {
+			container.find('.new-waste-data').attr('readonly', true);
+			container.find('input,select,textarea').not('.new-waste-data').attr('readonly', false);
+			container.find('.facility-save-button').removeClass('hide');
+		} else if (action === "view") {
+			container.find('input,select,textarea').attr('readonly', true);
+			container.find('.facility-save-button').addClass('hide');
+		}
+		
+		container.find(".facility-save-button").off("click").on("click", $.proxy(this.saveDisposal, this));
+		container.modal('show');
+	},
+	commentsCheck: function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		let self = $(e.currentTarget);
+		let id = self.attr('id');
+		let answer = self.val();
+		let name = self.attr("name");
+
+		$("." + name).addClass('hide');
+
+		if (id === "signing-manifest" && answer === "Yes") {
+			this.dom.modalDispContainer.find('#signing-manifest-comments').addClass('empty mandatory-field');
+		} else {
+			this.dom.modalDispContainer.find('#signing-manifest-comments').removeClass('empty mandatory-field');
+		}
+
+		if (answer === "Other") {
+			this.dom.modalDispContainer.find("." + name).removeClass('hide');
+		}
+	},
+	saveDisposal: function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		let self = $(e.currentTarget);
+		let type = self.attr('data-role');
+		
+		let container = type === "WASTE_STREAM" ? this.dom.modalDispContainer : this.dom.modalTransContainer;
+		let valid = true;       
+		var disposalFacilities = this.dom.globalTsdfDetails.projEnvDisposalFacility;
+		var transportDetails = this.dom.globalTsdfDetails.projEnvTransport;
+		container.find('.empty').each(function(i, data) {
+			if (data !== null && data !== undefined) {
+				if (!$(this).hasClass('disable') && !$(this).hasClass('hide') && !$(this).closest('tr').hasClass('hide')) { // no checks on disable/hide
+					$(this).removeClass('border-red');
+					var value = $(this).val();
+					var id = $(this).attr('id');
+					var title = $(this).attr('data-original-title');
+
+					if (!value) {
+						$(this).focus();
+						$(this).addClass('border-red');
+						var msg = "Please enter value in " + '<span class="text-brand-red">' + title + '</span>' + " field";
+						displayError("Validation Report", msg);
+						return valid = false;
+					}
+				}
+			}
+		});
+		if (valid) {
+			var payload = {};
+			payload.siteProjectsId = $('#site-project-id').val();
+			//payload.version = closeoutInfoVersion;
+			payload.propTsdf = container.find('#prop-TSDF').val();
+			payload.address = container.find('#address1').val();
+			payload.city = container.find('#city').val();
+			payload.state = container.find('#state').val();
+			payload.zip = container.find('#zipcode').val();
+			payload.epaId = container.find('#epa-id').val();
+			payload.comments = container.find('#accept-reject-comments').val();
+
+			if(type === "WASTE_STREAM"){
+				let projEnvDisFacId = self.attr('data-proj-env-id');
+				payload.envDisposalFacilitiesId = self.attr('data-env-id');
+				payload.projEnvDisposalFacilitiesId = self.attr('data-proj-env-id');
+				$.each(disposalFacilities, (i, data) => {
+					if (data.projEnvDisposalFacilitiesId == projEnvDisFacId){
+						payload.version = data.version;
+					}
+				}); 
+				payload.hazardousWaste = container.find('#hazardous-waste').val();
+				payload.lessorOwner = container.find('#signing-manifest').val();
+				payload.lessorOwnerComments = container.find('#signing-manifest-comments').val();
+				payload.estimatedQty = container.find('#disposal-facility-estimated-quantity').val();
+				payload.units = container.find('#disposal-facility-units').val();
+				payload.wasteDesc = container.find('#disposal-facility-waste-description').val();
+				payload.wasteDescComments = container.find('#waste-description-comments').val();
+				payload.unitsComments = container.find('#units-comments').val();
+				payload.status = container.find('#signing-manifest').val() === 'Yes' ? "Approval Exempt" : "Added";
+			}else{
+				let projEnvTransportId = self.attr('data-proj-env-id');
+				payload.envTransportersId = self.attr("data-env-id");
+				payload.projEnvTransportId = self.attr('data-proj-env-id');
+				$.each(transportDetails, (i, data)=> {
+					if (data.projEnvTransportId == projEnvTransportId){
+						payload.version = data.version;
+					}
+				});
+				payload.projEnvDisposalFacilitiesId = container.find('#closeout-transporter-link-disposal-facility').val();
+				$.each(this.dom.globalTsdfDetails.projEnvDisposalFacility, (i, data) =>{
+					if (data.projEnvDisposalFacilitiesId == payload.projEnvDisposalFacilitiesId) {
+						payload.status = data.lessorOwner === 'Yes' ? "Approval Exempt" : "Added";
+					}
+				 });
+			}
+
+            self.attr("data-proj-env-id", "");
+			self.attr('data-env-id', "");
+			this.mergeDisposalFacility(payload, type,() => {
+				this.getTsdfInfo();
+				container.modal('hide');
+			});
+		}
+	},
+	disposalGrid: function(facilities) {
+		let columns = this.getDispColumns();
+		let schema = this.getDispSchema();
+		let gridOptions = this.getDispGridOptions();
+		let dataSourceOptions = this.getDispDataSourceOptions(facilities);
+		let container = this.dom.body.find("#facility-selected-list");
+
+		createKendoGrid(container, columns, facilities, schema, gridOptions, dataSourceOptions);
+	},
+	getDispColumns: function() {
+		return [{
+				template: function(response) {
+					return `<div class='col-sm-12 padding-zero margin-zero'>
+								<a role='button' data-id=${response.envDisposalFacilitiesId} data-role=${response.projEnvDisposalFacilitiesId} class='col-sm-3 k-grid-custom-edit btn btn-sm padding-zero margin-zero'><span><i class='padding-right text-link fa fa-pencil edit_disp'></i></span></a>
+								<a role='button' data-id=${response.envDisposalFacilitiesId} data-role=${response.projEnvDisposalFacilitiesId} class='col-sm-3 k-grid-custom-delete btn btn-sm padding-zero margin-zero'><span><i class='text-brand-red fa fa-trash delete_disp'></i></span></a>
+								<a role='button' data-id=${response.envDisposalFacilitiesId} data-role=${response.projEnvDisposalFacilitiesId} class='col-sm-3 k-grid-custom-clone btn btn-sm padding-zero margin-zero'><span><i class='text-link fa fa-copy clone_disp'></i></span></a>
+								<a role='button' data-id=${response.envDisposalFacilitiesId} data-role=${response.projEnvDisposalFacilitiesId} class='col-sm-3 k-grid-custom-view btn btn-sm padding-zero margin-zero'><span><i class='text-link fa fa-eye view_disp'></i></span></a>
+							</div>`;
+				},
+				title: "Action",
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "projEnvDisposalFacilitiesId",
+				title: "projEnvDisposalFacilitiesId",
+				hidden: true,
+				type: "string",
+				attributes: {
+					"id": "projEnvDisposalFacilitiesId",
+				},
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "envDisposalFacilitiesId",
+				title: "envDisposalFacilitiesId",
+				hidden: true,
+				type: "string",
+				attributes: {
+					"id": "envDisposalFacilitiesId",
+				},
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "propTsdf",
+				title: "Disposal Facility",
+				media: "(min-width: 768px)"
+			}, {
+				field: "address",
+				title: "Address",
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "city",
+				title: "City",
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "state",
+				title: "State",
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "zip",
+				title: "Zip",
+				media: "(min-width: 768px)"
+			}, {
+				field: "epaId",
+				title: "Epa Id",
+				media: "(min-width: 768px)"
+			},
+			// {
+			// 	field: "status",
+			// 	title: "Status",
+			// 	media: "(min-width: 768px)"
+			// },
+			{
+				field: "reviewedBy",
+				title: "Reviewed By",
+				media: "(min-width: 768px)"
+			},
+			{
+				title: "Items",
+				template: kendo.template($("#search-disposal-responsive").html()),
+				media: "(max-width: 767px)"
+			}
+		];
+	},
+	getDispSchema: function() {
+		return {
+			model: {
+				id: "projEnvDisposalFacilitiesId",
+				fields: {
+					projEnvDisposalFacilitiesId: {
+						editable: false
+					},
+					envDisposalFacilitiesId: {
+						editable: false
+					},
+					propTsdf: {
+						editable: false
+					},
+					address: {
+						editable: false
+					},
+					city: {
+						editable: false
+					},
+					state: {
+						editable: false
+					},
+					zip: {
+						editable: false
+					},
+					epaId: {
+						editable: false
+					},
+					// status: {
+					// 	editable: false
+					// },
+					reviewedBy: {
+						editable: false
+					}
+				}
+			}
+		}
+	},
+	getDispGridOptions() {
+		return {
+			pageable: {
+				refresh: true,
+				pageSizes: [10, 20, 50, 100],
+				buttonCount: 5
+			},
+			dataBound: (e) => {
+				this.dom.body.find(".edit_disp,.clone_disp,.view_disp").off("click").on("click", $.proxy(this.editDisp, this));
+				this.dom.body.find(".delete_disp").off("click").on("click", $.proxy(this.deleteDisp, this));
+			}
+		}
+	},
+	getDispDataSourceOptions() {
+		return {
+			pageSize: 5
+		}
+	},
+	editDisp: function(e) {
+		e.preventDefault();
+		let self = $(e.currentTarget);
+		let currentDisposalFacilityId = self.closest('a').attr('data-id');
+		let projEnvDisFacId = self.closest('a').attr('data-role');
+		let action = self.hasClass('view_disp') ? "view" : "edit";
+
+		let disposalFacilities = this.dom.globalTsdfDetails.projEnvDisposalFacility;
+		var ifExists = false;
+		$.each(disposalFacilities, (i, data) => {
+			if (data.projEnvDisposalFacilitiesId == projEnvDisFacId && data.status === 'Approved' && !userPrivilege.includes("SPM_HQ_ENV") && !userPrivilege.includes("FUZE_GUI_SUPPORT") && !userPrivilege.includes("SPM_GUI_SUPPORT")) {
+				ifExists = true;
+			}
+		});
+		if (ifExists) {
+			displayError("Error", "Facility has already been Approved. It cannot be edited!");
+		} else {
+			$.each(disposalFacilities, (i, data) => {
+				if (data.projEnvDisposalFacilitiesId == projEnvDisFacId) {
+					this.showAdditionalData(action, "WASTE_STREAM", data);
+					if (self.hasClass('clone_disp')) {
+						this.dom.modalDispContainer.find('input,select,textarea').not('.new-waste-data').val("");
+						this.dom.modalDispContainer.find(".facility-save-button").attr("data-proj-env-id", "");
+					}
+				}
+			});
+		}
+	},
+	deleteDisp: function(e) {
+		e.preventDefault();
+		let self = $(e.currentTarget);
+		let currentDisposalFacilityId = self.closest('a').attr('data-id');
+		let projEnvDisFacId = self.closest('a').attr('data-role');
+
+		var disposalFacilities = this.dom.globalTsdfDetails.projEnvDisposalFacility;
+		var ifExists = false;
+		var projEnvDisposalFacility = {};
+		projEnvDisposalFacility.projEnvDisposalFacilitiesId = projEnvDisFacId;
+		projEnvDisposalFacility.siteProjectsId = $("#site-project-id").val();
+		projEnvDisposalFacility.envDisposalFacilitiesId = currentDisposalFacilityId;
+
+		$.each(disposalFacilities, (i, data) => {
+			if (data.projEnvDisposalFacilitiesId == projEnvDisFacId){
+				if(data.status === 'Approved'  && !userPrivilege.includes("SPM_HQ_ENV") && !userPrivilege.includes("FUZE_GUI_SUPPORT") && !userPrivilege.includes("SPM_GUI_SUPPORT")){
+					ifExists = true;
+				}
+				projEnvDisposalFacility.version = data.version;
+				projEnvDisposalFacility.wasteDesc = data.wasteDesc;
+			}
+		});
+		if (ifExists) {
+			displayError("Error", "Facility has already been Approved. It cannot be deleted!");
+		} else {
+			projEnvDisposalFacility.status = 'Deleted';
+			this.mergeDisposalFacility(projEnvDisposalFacility, "WASTE_STREAM",() => {
+				this.getTsdfInfo();
+			});
+		}
+	},
+	transportGrid: function(transporters) {
+		let columns = this.getTransColumns();
+		let schema = this.getTransSchema();
+		let gridOptions = this.getTransGridOptions();
+		let dataSourceOptions = this.getTransDataSourceOptions(transporters);
+		let container = this.dom.body.find("#trans-selected-list");
+
+		createKendoGrid(container, columns, transporters, schema, gridOptions, dataSourceOptions);
+	},
+	getTransColumns: function() {
+		return [{
+				template: function(response) {
+					return `<div class='col-sm-12 padding-zero margin-zero'>
+								<a role='button' data-id=${response.envTransportersId} data-role=${response.projEnvTransportId} class='col-sm-3 k-grid-custom-edit btn btn-sm padding-zero margin-zero'><span><i class='padding-right text-link fa fa-pencil edit_trans'></i></span></a>
+								<a role='button' data-id=${response.envTransportersId} data-role=${response.projEnvTransportId} class='col-sm-3 k-grid-custom-delete btn btn-sm padding-zero margin-zero'><span><i class='text-brand-red fa fa-trash delete_trans'></i></span></a>
+								<a role='button' data-id=${response.envTransportersId} data-role=${response.projEnvTransportId} class='col-sm-3 k-grid-custom-clone btn btn-sm padding-zero margin-zero'><span><i class='text-link fa fa-copy clone_trans'></i></span></a>
+								<a role='button' data-id=${response.envTransportersId} data-role=${response.projEnvTransportId} class='col-sm-3 k-grid-custom-view btn btn-sm padding-zero margin-zero'><span><i class='text-link fa fa-eye view_trans'></i></span></a>
+							</div>`;
+				},
+				title: "Action",
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "projEnvTransportId",
+				title: "projEnvTransportId",
+				hidden: true,
+				type: "string",
+				attributes: {
+					"id": "projEnvTransportId",
+				},
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "envTransportersId",
+				title: "envTransportersId",
+				hidden: true,
+				type: "string",
+				attributes: {
+					"id": "envTransportersId",
+				},
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "propTsdf",
+				title: "Proposed Transporter",
+				media: "(min-width: 768px)"
+			}, {
+				field: "address",
+				title: "Address",
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "city",
+				title: "City",
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "state",
+				title: "State",
+				media: "(min-width: 768px)"
+			},
+			{
+				field: "zip",
+				title: "Zip",
+				media: "(min-width: 768px)"
+			}, {
+				field: "epaId",
+				title: "Epa Id",
+				media: "(min-width: 768px)"
+			},
+			// {
+			// 	field: "status",
+			// 	title: "Status",
+			// 	media: "(min-width: 768px)"
+			// },
+			{
+				field: "reviewedBy",
+				title: "Reviewed By",
+				media: "(min-width: 768px)"
+			},
+			{
+				title: "Items",
+				template: kendo.template($("#search-transporters-responsive").html()),
+				media: "(max-width: 767px)"
+			}
+		];
+	},
+	getTransSchema: function() {
+		return {
+			model: {
+				id: "projEnvTransportId",
+				fields: {
+					projEnvTransportId: {
+						editable: false
+					},
+					envTransportersId: {
+						editable: false
+					},
+					propTsdf: {
+						editable: false
+					},
+					address: {
+						editable: false
+					},
+					city: {
+						editable: false
+					},
+					state: {
+						editable: false
+					},
+					zip: {
+						editable: false
+					},
+					epaId: {
+						editable: false
+					},
+					// status: {
+					// 	editable: false
+					// },
+					reviewedBy: {
+						editable: false
+					}
+				}
+			}
+		}
+	},
+	getTransGridOptions() {
+		return {
+			pageable: {
+				refresh: true,
+				pageSizes: [10, 20, 50, 100],
+				buttonCount: 5
+			},
+			height: 0,
+			dataBound: (e) => {
+				this.dom.body.find(".edit_trans,.clone_trans,.view_trans").off("click").on("click", $.proxy(this.editTrans, this));
+				this.dom.body.find(".delete_trans").off("click").on("click", $.proxy(this.deleteTrans, this));
+			}
+		}
+	},
+	getTransDataSourceOptions(transporters) {
+		return {
+			pageSize: 5
+		}
+	},
+	editTrans: function(e) {
+		e.preventDefault();
+		let self = $(e.currentTarget);
+		let currentTransportId = self.closest('a').attr('data-id');
+		let projEnvTransportId = self.closest('a').attr('data-role');
+		let action = self.hasClass('view_trans') ? "view" : "edit";
+
+		let proposedTransporters = this.dom.globalTsdfDetails.projEnvTransport;
+		var ifExists = false;
+		$.each(proposedTransporters, (i, data) => {
+			if (data.projEnvTransportId == projEnvTransportId && data.status === 'Approved' && !userPrivilege.includes("SPM_HQ_ENV") && !userPrivilege.includes("FUZE_GUI_SUPPORT") && !userPrivilege.includes("SPM_GUI_SUPPORT")) {
+				ifExists = true;
+			}
+		});
+		if (ifExists) {
+			displayError("Error", "Transporter has already been Approved. It cannot be edited!");
+		} else {
+			$.each(proposedTransporters, (i, data) => {
+				if (data.projEnvTransportId == projEnvTransportId) {
+					this.showAdditionalData(action, "TRANSPORTER", data);
+					if (self.hasClass('clone_trans')) {
+						this.dom.modalTransContainer.find('input,select,textarea').not('.new-waste-data').val("");
+						this.dom.modalTransContainer.find(".facility-save-button").attr("data-proj-env-id", "");
+					}
+				}
+			});
+		}
+	},
+	deleteTrans: function(e) {
+		e.preventDefault();
+		let self = $(e.currentTarget);
+		let currentTransportId = self.closest('a').attr('data-id');
+		let projEnvTransportId = self.closest('a').attr('data-role');
+
+		var transportDetails = this.dom.globalTsdfDetails.projEnvTransport;
+		var ifExists = false;
+		var projEnvTransport = {};
+		projEnvTransport.projEnvTransportId = projEnvTransportId;
+		projEnvTransport.siteProjectsId = $("#site-project-id").val();
+		projEnvTransport.envTransportersId = currentTransportId;
+		$.each(transportDetails, (i, data) => {
+			if (data.projEnvTransportId == projEnvTransportId){
+				if(data.status === 'Approved'  && !userPrivilege.includes("SPM_HQ_ENV") && !userPrivilege.includes("FUZE_GUI_SUPPORT") && !userPrivilege.includes("SPM_GUI_SUPPORT")) {
+					ifExists = true;
+				}
+				projEnvTransport.version = data.version;
+				projEnvTransport.projEnvDisposalFacilitiesId = data.projEnvDisposalFacilitiesId;
+			}
+		});
+		if (ifExists) {
+			displayError("Error", "Transporter has already been Approved. It cannot be deleted!");
+		} else {
+			projEnvTransport.status = 'Deleted';
+			this.mergeDisposalFacility(projEnvTransport, "TRANSPORTER",() => {
+				this.getTsdfInfo();
+			});
+		}
+	},
+	mergeDisposalFacility: function(payload,type,callback) {
+		let endPoint = type === "WASTE_STREAM" ? "mergeProjEnvCloseoutDisposalFacilities" : "mergeProjEnvCloseoutTransport";
+		this.constructor.ajax.fireApi(payload, "env", endPoint, (response) => {
+			displayStickySuccess("Disposal Facility/Transporter sucessfully saved!!");
+			if (callback) {
+				callback();
+			}
+		});
+	},
+	mandatoryFieldsCheck: function(){
+		var isValid = true;
+		var msg = '';
+		var proposedTransporter = this.dom.globalTsdfDetails.projEnvTransport;
+		var disposalFacilities = this.dom.globalTsdfDetails.projEnvDisposalFacility;
+		var keys = [];
+		var ignoreList = ["comments", "lessorOwner","lessorOwnerComments", "unitsComments", "wasteDescComments", "projEnvDisposalFacilitiesId", "projEnvTransportId", "envTransportersId", "envDisposalFacilitiesId", "versionList"];
+		$.each(this.dom.globalTsdfDetails, (i, tsdfDetails) => {
+			if(i !== "taskStatus"){
+				$.each(tsdfDetails, (i, data) => {
+					if (data.status === 'Added') {
+						var keys = Object.keys(data);
+						var unselectedKeys = [];
+						$.each(keys, (i, keyData) =>{
+							if (data[keyData] === '' && ignoreList.indexOf(keyData) < 0) {
+								unselectedKeys.push(keyData);
+							}
+						});
+						if (unselectedKeys.length > 0) {
+							msg = 'Please enter <span class="text-brand-red">' + unselectedKeys.toString() + '</span> for <span class="text-brand-red">' + data.propTsdf + '</span>';
+							isValid = false;
+						}
+					}
+				});
+			}
+		});
+		if (isValid) {
+			$.each(disposalFacilities, (i, data) => {
+				if(data.lessorOwner === ''){
+					 msg = 'Please enter <span class="text-brand-red"> Lessor Owner </span> for <span class="text-brand-red">' + data.propTsdf + '</span>';
+					 isValid = false;
+				}else if (data.lessorOwner === 'Yes' && data.lessorOwnerComments === '') {
+					msg = 'Please enter <span class="text-brand-red"> Lessor Owner Comments </span> for <span class="text-brand-red">' + data.propTsdf + '</span>';
+					isValid = false;
+				}
+			});
+		}
+		if (isValid) {
+			$.each(proposedTransporter, (i, data) => {
+				if (data.projEnvDisposalFacilitiesId <= 0) {
+					msg = 'Please <span class="text-brand-red"> Link Disposal Facility </span> for <span class="text-brand-red">' + data.propTsdf + '</span>';
+					isValid = false;
+				}
+			});
+		}
+		if (isValid) {
+			$.each(disposalFacilities, (i, facility) => {
+			  isExists = false;
+			  $.each(proposedTransporter, (i, transporter) => {
+				if(transporter.projEnvDisposalFacilitiesId === facility.projEnvDisposalFacilitiesId){
+					isExists = true;
+				}
+			});
+			  if(!isExists){
+				  msg = 'Disposal Facility <span class="text-brand-red">' + facility.propTsdf + '-' + facility.wasteDesc + '</span> is not linked. Please add a transporter to it';
+				  isValid = false;
+			  }
+		  });
+		}
+		return {
+			status: isValid,
+			errMsg: msg
+		};
+	},
+	getCloseoutInfo: function() {
+		var container = $(".environmental-const-closeout-form");
+		var projectSearchRequest = {};
+		projectSearchRequest.siteProjectsId = $("#site-project-id").val();
+		this.constructor.ajax.fireApi(projectSearchRequest, "env", "getProjEnvCloseoutInfo", (closeoutInfo) => {
+			closeoutInfoVersion = closeoutInfo.version;
+			/** construction closeout information **/
+			container.find("#act_qty_waste").val(closeoutInfo.actualQuantityWaste);
+			container.find("#waste_qty_unit").val(closeoutInfo.actualQuantityUnits);
+			container.find("#date_ees_closeout_completion").val(closeoutInfo.eesClosutCompDate);
+			container.find("#contractor").val(closeoutInfo.contractor);
+			container.find("#deal_terminated").val(closeoutInfo.dealTerminated ? closeoutInfo.dealTerminated : "No");
+			container.find("#waste_generator").val(closeoutInfo.desigWasteGen);
+			container.find("#ees_comments").val(closeoutInfo.eesClosutComments);
+			container.find("#epa_id_cancelled").val(closeoutInfo.epIdCancelled);
+			container.find("#epa_id_required").val(closeoutInfo.epaIdReqd ? closeoutInfo.epaIdReqd : "No");
+			container.find("#oversight_consultant").val(closeoutInfo.osConsultant);
+			container.find("#date_work_completed").val(closeoutInfo.workCompDate);
+		});
+	
+	},
+	saveEnvCloseoutInfo: function(saveFlag) {
+		var container = $(".environmental-const-closeout-form");
+		var closeoutInfo = {};
+		closeoutInfo.siteProjectsId = $("#site-project-id").val();
+		closeoutInfo.version = closeoutInfoVersion;
+	
+		/** construction closeout information **/
+		closeoutInfo.epaIdReqd = container.find("#epa_id_required").val();
+		closeoutInfo.actualQuantityWaste = container.find("#act_qty_waste").val();
+		closeoutInfo.actualQuantityUnits = container.find("#waste_qty_unit").val();
+		closeoutInfo.dealTerminated = container.find("#deal_terminated").val();
+		closeoutInfo.desigWasteGen = container.find("#waste_generator").val();
+		closeoutInfo.eesClosutComments = container.find("#ees_comments").val();
+		closeoutInfo.epIdCancelled = container.find("#epa_id_cancelled").val();
+		closeoutInfo.osConsultant = container.find("#oversight_consultant").val();
+		closeoutInfo.contractor = container.find("#contractor").val();
+		closeoutInfo.workCompDate = container.find("#date_work_completed").val();
+		closeoutInfo.eesClosutCompDate = container.find("#date_ees_closeout_completion").val();
+	
+		this.constructor.ajax.fireApi(closeoutInfo, "env", "mergeProjEnvCloseoutInfo", (response) => {
+			if(saveFlag){
+				displayStickySuccess("Environmental Closeout Details have been saved successfully.");
+			}
+			this.getCloseoutInfo();
+		});
+	}
+	
+}
+
+$(function(){
+	closeoutModule.postProcess();
+});
+
+//# sourceURL=closeoutNew.js
