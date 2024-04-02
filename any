@@ -171,3 +171,40 @@ AFTER INSERT OR UPDATE ON USER_LOCATION_DETAILS
 FOR EACH ROW
 INSERT INTO USER_DETAILS_HISTORY (user_id, old_value, new_value, changed_by_user_id)
 VALUES (NEW.user_id, NULL, CONCAT(NEW.city, ', ', NEW.state), NEW.user_id);
+
+
+
+
+
+Tax Bond Certificates for 
+Closeout Milestone
+
+
+Objective
+For a subset of sites in MA, RI, and CT - Verizon is experiencing issues where general contractors based outside of state are not paying appropriate tax bonds for material cost (dubbed “Non Resident Contractor” or NRC fees). When the GC does not pay NRC fees, Verizon is liable to pay these costs themselves. This is costing Verizon ~$3M per year.
+SPM Requirements
+Closeout Document Milestone Changes
+Document Upload Task Changes
+Introduce a new selectable document subtype called “Tax Bond Certificate”
+Create a new picklist field within this task:
+Field Name: In State GC?
+Field Data Type: Picklist Field
+Field Tooltip: Are all general contractors assigned to this project performing work as a resident contractor (registered with state and remitting S&U tax returns) of the state of SITE_ADDRESS_STATE? 
+SITE_ADDRESS_STATE will be the same state as the Project Level Physical Site Address State: MA, CT, or RI
+Required Field: Yes
+Selectable Values:
+Yes
+No
+Default Value: Yes
+Create a new date field called “Tax Bond Certificate Uploaded (F)/(A)”
+Field Name: Tax Bond Certificate Uploaded
+Field Data Type: (F)/(A) date
+Field Definition / Tooltip: 
+This date verifies NRC fees have been paid by the Verizon General Contractor and appropriate tax bond receipts have been received by Verizon if NRC fees apply to this project
+Field Requirements:
+The Actual Date field will be required to finalize the Documents Uploaded Task if the following conditions are met:
+Construction Completed Milestone Status != N/A (construction was performed on this project)
+Project Level Physical Site Address State is MA, CT, or RI
+In State GC Picklist is set to “No”
+Otherwise, this field will not be required 
+
