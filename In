@@ -48,4 +48,32 @@ Disable Copy, Paste using ShortCuts and Right Click on Password Field.
 3."Create Separate API for 
 Adding New User to DB
 Resetting the User Name in the DB
-Validating the Login Information against the username passed and give a session token back if the user is present and if the user is not present dont give session token and give validation message"																									
+
+
+
+
+create one javascript function to satisfied below conditions:																							
+The Actual Date field will be required to finalize the Documents Uploaded Task if the following conditions are met:
+1)Construction Completed Milestone Status != N/A (construction was performed on this project)
+2)Project Level Physical Site Address State is MA, CT, or RI
+3)In State GC Picklist is set to “No”
+4)Otherwise, this field will not be required
+5)Editable field?: Forecast field editable, Actual date read only
+while creating function refer below function for referance
+ updateAMStatus: function() {
+        var siteProjectId = this.dom.projectId;
+        var projTracker = {};
+        projTracker.siteProjectsId = siteProjectId;
+  
+        this.constructor.ajax.fireApi(projTracker, "regulatory-licenses", "updateAMStatus", (response) => {
+            console.log(response);
+        });
+    },
+below function where you add you conditions
+	testFunc: function(){
+		//Here you need to write all the conditions & make the field mandatory
+		var details = getProjectDetails();
+		
+		addToolTip(".inStateGC",`Are all general contractors assigned to this project performing work as a resident contractor (registered with state and remitting S&U tax returns) of the state of ${details.siteInfo.state}?`);
+    },
+
