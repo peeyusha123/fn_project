@@ -77,3 +77,26 @@ below function where you add you conditions
 		addToolTip(".inStateGC",`Are all general contractors assigned to this project performing work as a resident contractor (registered with state and remitting S&U tax returns) of the state of ${details.siteInfo.state}?`);
     },
 
+
+finalizeDocumentsUploadedTask: function() {
+    var details = getProjectDetails();
+    
+    // Conditions
+    var constructionCompleted = details.milestoneStatus !== "N/A";
+    var inStateGC = details.inStateGC === "No";
+    var state = details.siteInfo.state;
+    var stateRequirementsMet = state === "MA" || state === "CT" || state === "RI";
+    
+    // Make the field mandatory if all conditions are met
+    if (constructionCompleted && stateRequirementsMet && inStateGC) {
+        // Make Actual Date field required
+        $(".actualDate").prop("required", true); // Assuming the Actual Date field has a class of "actualDate"
+    } else {
+        // Make Actual Date field not required
+        $(".actualDate").prop("required", false); // Assuming the Actual Date field has a class of "actualDate"
+    }
+    
+    // Make Forecast field editable
+    $(".forecast").prop("readonly", false); // Assuming the Forecast field has a class of "forecast"
+},
+
