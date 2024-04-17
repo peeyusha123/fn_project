@@ -1,0 +1,195 @@
+Create a new picklist field within this task:
+Field Name: In State GC?
+Field Data Type: Picklist Field
+Field Tooltip: Are all general contractors assigned to this project performing work as a resident contractor (registered with state and remitting S&U tax returns) of the state of SITE_ADDRESS_STATE?
+SITE_ADDRESS_STATE will be the same state as the Project Level Physical Site Address State: MA, CT, or RI
+Required Field: Yes
+Selectable Values:
+Yes
+No
+Default Value: Yes
+Create a new date field called “Tax Bond Certificate Uploaded (F)/(A)”
+Field Name: Tax Bond Certificate Uploaded
+Field Data Type: (F)/(A) date
+Field Definition / Tooltip:
+This date verifies NRC fees have been paid by the Verizon General Contractor and appropriate tax bond receipts have been received by Verizon if NRC fees apply to this project
+Field Requirements:
+The Actual Date field will be required to finalize the Documents Uploaded Task if the following conditions are met:
+Construction Completed Milestone Status != N/A (construction was performed on this project)
+Project Level Physical Site Address State is MA, CT, or RI
+In State GC Picklist is set to “No”
+Otherwise, this field will not be required
+Editable field?: Forecast field editable, Actual date read only
+
+above is a ticket assign to me i have completed but today is my code review test i wann explain code changes .. i given a code below pls give me best and shortest informanl explaination for 
+  today code review?
+
+//closeout-doc.jsp
+<div class="col-xs-12 col-sm-12 padding-left-right-zero padding-bottom margin-top">
+<div class="col-xs-12 col-sm-12 padding-left-right-zero padding-bottom margin-top testingg">
+	<div class="col-xs-12 col-sm-6 col-md-4 padding-left-right-zero group_one">
+		<div class="display-flex single_date opt-field padding-left-right-zero national_fields">
+		  <div class="col-sm-6 opt-label-section background-gray-light col-xs-6"><label class="opt-label" data-toggle="tooltip" data-placement="top" data-original-title="Date when Verizon approves the Closeout package">Closeout Package Approved</label></div>
+@@ -63,17 +63,31 @@
+		     <b class="fa fa-check-circle opt_icon opt_field_check_green border-zero disable nf_disable"></b>
+		  </div>
+		</div>
+		<div class="select_picklist opt-field padding-left-right-zero display-flex national_fields">
+		  	<div class="col-sm-6 col-xs-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="Mount PMI Result">Mount PMI Result</label></div>
+		  	<div class="col-sm-6 col-xs-6 padding-left-right-zero border-left opt-content-section opt-content-single-select">
+		    	<select id="mountPmiResult" class="disable select_picklist_select mountPmiResult form-control border-zero input-sm padding-right-zero nf_disable">
+				    <option value="">Nothing Selected</option>
+	                <c:forEach var="mntPmiResult" items="${applicationScope.ContextCache.projectServiceSettings['mountPMIResult']}">
+	                    <option value="<c:out value='${mntPmiResult.key}'/>"><c:out value="${mntPmiResult.value}"/></option>
+	                </c:forEach>
+				</select>
+		  	</div>
+        </div>
+		<div class="display-flex single_date opt-field padding-left-right-zero national_fields">
+		  <div class="col-sm-6 opt-label-section background-gray-light col-xs-6"><label class="opt-label" data-toggle="tooltip" data-placement="top" data-original-title="Mount PMI Submitted">Mount PMI Submitted</label></div>
+		  <div class="date-picker opt-date-picker col-sm-3 col-xs-3  padding-left-right-zero  display-flex border-left opt-forecast-section">
+           <b class=" opt-field-forecast-actual-icon opt_icon disable background-white">F</b>
+           <input id="closeoutPmiSubmittedFcDt" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Mount PMI Submitted Forecast Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy"
+             class="disable datepicker  closeoutPmiSubmittedFcDt nf_disable form-control input-sm  border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+           <span class="input-group-btn">
+               <button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+                   <span class="vz-icon-today"></span>
+               </button>
+           </span>  <b class="fa-lg opt_field_lock border-zero opt_icon disable hide"></b>
+           <b class="fa fa-times-circle fa-lg opt_icon disable opt_field_na border-zero"></b>
+         </div>
+         <div class="date-picker opt-date-picker col-sm-3 col-xs-3  padding-left-right-zero  display-flex border-left opt-actual-section">
+           <b class="opt-field-forecast-actual-icon opt_icon disable background-white">A</b>
+           <input id="closeoutPmiSubmittedAcDt" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Mount PMI Submitted Actual Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy"
+              class="disable datepicker closeoutPmiSubmittedAcDt nf_disable form-control input-sm  border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+            <span class="input-group-btn">
+                <button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+                    <span class="vz-icon-today"></span>
+                </button>
+            </span>
+            <b class="fa fa-check-circle opt_icon opt_field_check_green border-zero disable nf_disable"></b>
+         </div>
+		</div>
+	</div>
+	<div class="col-xs-12 col-sm-6 col-md-4 padding-right-zero group_two">
+		<div class="display-flex single_date opt-field padding-left-right-zero national_fields">
+@@ -89,33 +103,6 @@
+		     <b class="fa fa-check-circle opt_icon opt_field_check_green border-zero disable nf_disable"></b>
+		  </div>
+		</div>
+		<div class="display-flex single_date opt-field padding-left-right-zero national_fields">
+		  <div class="col-sm-6 opt-label-section background-gray-light col-xs-6"><label class="opt-label" data-toggle="tooltip" data-placement="top" data-original-title="Mount PMI Submitted">Mount PMI Submitted</label></div>
+		  <div class="date-picker opt-date-picker col-sm-3 col-xs-3  padding-left-right-zero  display-flex border-left opt-forecast-section">
+            <b class=" opt-field-forecast-actual-icon opt_icon disable background-white">F</b>
+            <input id="closeoutPmiSubmittedFcDt" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Mount PMI Submitted Forecast Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy"
+              class="disable datepicker  closeoutPmiSubmittedFcDt nf_disable form-control input-sm  border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+            <span class="input-group-btn">
+                <button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+                    <span class="vz-icon-today"></span>
+                </button>
+            </span>  <b class="fa-lg opt_field_lock border-zero opt_icon disable hide"></b>
+            <b class="fa fa-times-circle fa-lg opt_icon disable opt_field_na border-zero"></b>
+          </div>
+          <div class="date-picker opt-date-picker col-sm-3 col-xs-3  padding-left-right-zero  display-flex border-left opt-actual-section">
+            <b class="opt-field-forecast-actual-icon opt_icon disable background-white">A</b>
+            <input id="closeoutPmiSubmittedAcDt" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Mount PMI Submitted Actual Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy"
+               class="disable datepicker closeoutPmiSubmittedAcDt nf_disable form-control input-sm  border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+             <span class="input-group-btn">
+                 <button type="submit" id="btn-date-picker" class="btn btn-default btn-xs" tabindex="0">
+                     <span class="vz-icon-today"></span>
+                 </button>
+             </span>
+             <b class="fa fa-check-circle opt_icon opt_field_check_green border-zero disable nf_disable"></b>
+          </div>
+		</div>
+	</div>
+	<div class="col-xs-12 col-sm-6 col-md-4 padding-right-zero group_three">
+		<div class="display-flex single_date opt-field padding-left-right-zero national_fields">
+		  <div class="col-sm-6 opt-label-section background-gray-light col-xs-6"><label class="opt-label" data-toggle="tooltip" data-placement="top" data-original-title="Date when Fiber closeout package is uploaded into FUZE">Fiber COP Uploaded</label></div>
+		  <div class="date-picker opt-date-picker col-sm-6  padding-left-right-zero  display-flex border-left opt-single-date-section opt-content-section col-xs-6">
+@@ -143,6 +130,47 @@
+			 </div>
+        </div>
+	</div>
+	<div class="col-xs-12 col-sm-6 col-md-4 padding-right-zero group_three">
+  <div class="select_picklist opt-field padding-left-right-zero display-flex national_fields">
+		 <div class="col-sm-6 col-xs-6 opt-label-section background-gray-light"><label class="opt-label"  >In State GC?</label></div>
+         <div class="col-sm-6 col-xs-6 padding-left-right-zero border-left opt-content-section opt-content-single-select">
+        <select id="inStateGC" class=" select_picklist_select inStateGC form-control border-zero input-sm padding-right-zero " data-toggle="tooltip" data-placement="top" >
+			<option value="">Nothing Selected</option>
+				<c:forEach var="polar" items="${applicationScope.ContextCache.fuzeCommonSettings['allYesNo']}">
+                    <option value="<c:out value='${polar.key}'/>">
+                       	<c:out value="${polar.value}" />
+                    </option>
+                </c:forEach>
+          </select>
+       </div>
+   </div>
+  <div class="display-flex single_date opt-field padding-left-right-zero national_fields">
+	<div class="col-sm-6 opt-label-section background-gray-light col-xs-6"><label class="opt-label" data-toggle="tooltip" data-placement="top" data-original-title="This date verifies NRC fees have been paid by the Verizon General Contractor and appropriate tax bond receipts have been received by Verizon if NRC fees apply to this project">Tax Bond Certificate Uploaded</label></div>
+      
+          <div class="date-picker opt-date-picker col-sm-3 col-xs-3  padding-left-right-zero  display-flex border-left opt-forecast-section">
+			 <b class=" opt-field-forecast-actual-icon opt_icon disable background-white">F</b>
+               <input id="taxBondCertUploadFcDt" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Tax Bond Certificate Uploaded Forecast Date"
+               close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy" class="disable datepicker taxBondCertUploadFcDt nf_disable form-control input-sm border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value=""/>
+                <b class="fa-lg opt_field_lock border-zero opt_icon disable hide"></b>
+           </div>
+           <div class="date-picker opt-date-picker col-sm-3 col-xs-3  padding-left-right-zero  display-flex border-left opt-actual-section taxBondMandate">
+			  <b class="opt-field-forecast-actual-icon opt_icon disable background-white">A</b>
+               <input id="taxBondCertUploadAcDt" type="text" data-toggle="tooltip" data-placement="top" data-original-title="Tax Bond Certificate Uploaded Actual Date" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy" class="disable datepicker taxBondCertUploadAcDt nf_disable form-control input-sm border-zero padding-right-zero background-image-none" aria-required="false" aria-invalid="false" value="" required disabled readonly/>
+           </div>
+       </div>
+  
+     <div class="select_picklist opt-field padding-left-right-zero display-flex national_fields">
+           <div class="col-sm-6 col-xs-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="Mount PMI Result">Mount PMI Result</label></div>
+           <div class="col-sm-6 col-xs-6 padding-left-right-zero border-left opt-content-section opt-content-single-select">
+               <select id="mountPmiResult" class="disable select_picklist_select mountPmiResult form-control border-zero input-sm padding-right-zero nf_disable">
+                   <option value="">Nothing Selected</option>
+                   <c:forEach var="mntPmiResult" items="${applicationScope.ContextCache.projectServiceSettings['mountPMIResult']}">
+                       <option value="<c:out value='${mntPmiResult.key}'/>"><c:out value="${mntPmiResult.value}"/></option>
+                   </c:forEach>
+               </select>
+           </div>
+       </div>
+   </div>
+
+//closeoutNew.js
+taxBondADateMandatory: function(){
+		var details = getProjectDetails();
+		addToolTip(".inStateGC",`Are all general contractors assigned to this project performing work as a resident contractor (registered with state and remitting S&U tax returns) of the state of ${details.siteInfo.state}?`);
+		let inStateValue = this.dom.docUploadContainer.find(".inStateGC").val();
+		var constructionCompleteStatus = $("#PHYSICAL_CONSTRUCTION_COMPLETE").attr('data-status');
+		
+		if (["MA", "CT", "RI"].includes(details.siteInfo.state) && inStateValue === "No" && constructionCompleteStatus !=="N/A" ){
+			this.dom.docUploadContainer.find(".taxBondCertUploadAcDt").addClass("empty");
+			this.dom.docUploadContainer.find(".taxBondMandate").addClass("mandatory-field");
+		}else{
+			this.dom.docUploadContainer.find(".taxBondCertUploadAcDt").removeClass("empty");
+			this.dom.docUploadContainer.find(".taxBondMandate").removeClass("mandatory-field");
+		}		
+    },
+    
+    onChangeInStateGC: function(e){
+    	this.taxBondADateMandatory();  	
+    },
+//project.js
+  var msg = "Please check the checkbox to certify that the as-built parameters have been verified";
+							  }else if(id === "isNepaSubmitCertified"){
+								  var msg = "Please select the checkbox to certify that you are completing this task under the requirements of the Compliance Manual.";
+							  } else {
+							  } else if(id === "taxBondCertUploadAcDt"){
+								  var msg = "Please Upload Tax Bond Certificate to Populate "+ '<span class="text-brand-red">' + title + '</span>'+ " field.";
+							  }else {
+								  var msg = "Please enter value in " + '<span class="text-brand-red">' + title + '</span>' + " field";
+							  }
+							  displayError("Validation Report", msg);
+@@ -6697,6 +6699,9 @@ function displayFieldsData(container,response, callback){
+		    }
+		}
+	});
+	if(container.find('#CLOSEOUT_DOCUMENTS_UPLOAD').length > 0) {
+		closeoutModule.testFunc();
+	}
+	if(container.find('#IN_BUILDING_AND_VENUE').length > 0) {
+		rfdsModule.updateCategoryText(container);
+	}
