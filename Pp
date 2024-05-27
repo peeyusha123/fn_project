@@ -424,3 +424,35 @@ function submitPasswordResetForm() {
   // Once the password is successfully reset, you can close the modal
   closePasswordResetModal();
 }
+
+
+
+
+
+Dear Verizon India Payroll Team,
+
+I am writing to inform you that I am currently unable to submit the "Calculate Your Tax and Declare Investments for the Year 2024-2025" form, as the submission option is disabled.
+
+As a fresher who joined on June 26, 2023, I did not receive any prior communication regarding this form. Today, I learned about it from my fellow freshers.
+
+Could you please assist me in resolving this issue? If there are any alternative steps I should take or further information required from my end, please let me know.
+
+Thank you for your assistance.
+
+Best regards,
+[Your Name]
+[Your Employee ID]
+[Your Contact Information]
+
+This email concisely explains your situation and politely asks for assistance.
+
+
+
+
+
+
+
+
+Message ChatGPT
+
+ChatGPT can make mistakes. Chec
