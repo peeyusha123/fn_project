@@ -1,3 +1,100 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SPM Tracker</title>
+    <link rel="stylesheet" type="text/css" href="path/to/your/css/file.css">
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<h6 class="teat-brand-red margin-top">@BAMWIDTH Callsigns</h6>
+
+<div class="col-md-12 padding-zero section-divider-bottom">
+    <div class="radio vzhs-radio test-bold border-none margin-top-bottom">
+        <label>Does the signal extend into the country at levels specified in the Agreement between The FCC and their counterpart?</label>
+        &nbsp;
+        <input name="signalExtend" role="radio" data-reg-service="VZREGSERVICE" value="yes" id="signalExtendYes" type="radio">
+        <label for="signalExtendYes">Yes</label>
+        <input name="signalExtend" role="radio" data-reg-service="VZREGSERVICE" value="no" id="signalExtendNo" type="radio" checked>
+        <label for="signalExtendNo">No</label>
+    </div>
+
+    <div id="notificationTimeoutDiv" class="hidden">
+        <label for="notificationTimeout">Notification Timeout Date</label>
+        <input type="date" id="notificationTimeout" name="notificationTimeout">
+    </div>
+
+    <div id="agreementTimeoutDiv" class="hidden">
+        <label for="agreementTimeout">Agreement Timeout Date</label>
+        <input type="date" id="agreementTimeout" name="agreementTimeout">
+    </div>
+
+    <label>Upload Agreement/Notification</label>
+    <div class="custom-file-upload vertical-align-middle">
+        <div class="margin-top-bottom">
+            <input type="file" name="fileUpload" class="file-upload" accept=".doc, .docx, .pdf">
+        </div>
+        <input type="hidden" name="category" id="category" value="projects">
+        <input type="hidden" name="subCategory" id="subCategory" value="INTERNATIONAL BORDER DOC">
+        <input type="hidden" name="description" id="description" value="General Documents">
+        <input type="hidden" name="uri" id="uri" value="document-gateway/document">
+    </div>
+
+    <button type="submit" class="btn btn-danger">Upload Document</button>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var signalExtendYes = document.getElementById('signalExtendYes');
+        var signalExtendNo = document.getElementById('signalExtendNo');
+        var notificationTimeoutDiv = document.getElementById('notificationTimeoutDiv');
+        var agreementTimeoutDiv = document.getElementById('agreementTimeoutDiv');
+
+        signalExtendYes.addEventListener('change', function() {
+            if (signalExtendYes.checked) {
+                agreementTimeoutDiv.classList.remove('hidden');
+                notificationTimeoutDiv.classList.add('hidden');
+            }
+        });
+
+        signalExtendNo.addEventListener('change', function() {
+            if (signalExtendNo.checked) {
+                notificationTimeoutDiv.classList.remove('hidden');
+                agreementTimeoutDiv.classList.add('hidden');
+            }
+        });
+
+        // Initialize the fields based on the current state
+        if (signalExtendYes.checked) {
+            agreementTimeoutDiv.classList.remove('hidden');
+        } else {
+            notificationTimeoutDiv.classList.remove('hidden');
+        }
+    });
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //p1.html..
 <!DOCTYPE html>
 <html lang="en">
