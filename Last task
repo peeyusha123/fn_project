@@ -1,3 +1,18 @@
+Add Notification Timeout Date and Agreement Timeout Date fields
+1. If 'does the signal strength extend into a country at levels above' is NO, add a new field 'Notification Timeout Date'.
+
+     This field should have a prefix with the service label (e.g., 700MHz Notification Sent    Date).
+
+   There should be a DB field for each possible service - C-Band, 750, 850, 1900, 2100.
+
+   This field should be editable in SPM tracker in the Regulatory callsign tracker        object/module when Int’l Border Task status = active.
+
+  This field will be auto-populated with a calculated date (Notification Sent Date + 30 days).
+
+2. If 'does the signal strength extend into a country at levels above' is YES, add a new field 'Agreement Timeout Date'.
+
+   This field should have a prefix with the service label (e.g., 700MHz Agreement Sent Date).
+
 
 var mapping = {};
 	    	mapping["band700m"] = "700 Mhz";
@@ -111,9 +126,44 @@ var mapping = {};
 	    	}
 	    },
 
+above is my task and related script code you need to provide me jsp code related to js code ..i tried so much  implemented small jsp code but it is not correct 
 
+below i provided the jsp code which i tried , this for your referance:-
+<h6 class="teat-brand-red margin-top">@BAMWIDTH Callsigns</h6>
 
+<div class="col-md-12 padding-zero section-divider-bottom">
+    <div class="radio vzhs-radio test-bold border-none margin-top-bottom">
+        <label>Does the signal extend into the country at levels specified in the Agreement between The FCC and their counterpart?</label>
+        &nbsp;
+        <input name="signalExtend" role="radio" data-reg-service="VZREGSERVICE" value="yes" id="signalExtendYes" type="radio">
+        <label for="signalExtendYes">Yes</label>
+        <input name="signalExtend" role="radio" data-reg-service="VZREGSERVICE" value="no" id="signalExtendNo" type="radio" checked>
+        <label for="signalExtendNo">No</label>
+    </div>
 
+    <div id="notificationTimeoutDiv" class="hidden">
+        <label for="notificationTimeout">Notification Timeout Date</label>
+        <input type="date" id="notificationTimeout" name="notificationTimeout">
+    </div>
+
+    <div id="agreementTimeoutDiv" class="hidden">
+        <label for="agreementTimeout">Agreement Timeout Date</label>
+        <input type="date" id="agreementTimeout" name="agreementTimeout">
+    </div>
+
+    <label>Upload Agreement/Notification</label>
+    <div class="custom-file-upload vertical-align-middle">
+        <div class="margin-top-bottom">
+            <input type="file" name="fileUpload" class="file-upload" accept=".doc, .docx, .pdf">
+        </div>
+        <input type="hidden" name="category" id="category" value="projects">
+        <input type="hidden" name="subCategory" id="subCategory" value="INTERNATIONAL BORDER DOC">
+        <input type="hidden" name="description" id="description" value="General Documents">
+        <input type="hidden" name="uri" id="uri" value="document-gateway/document">
+    </div>
+
+    <button type="submit" class="btn btn-danger">Upload Document</button>
+</div>
 
 
 
