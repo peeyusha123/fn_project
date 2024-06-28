@@ -1,3 +1,126 @@
+
+var mapping = {};
+	    	mapping["band700m"] = "700 Mhz";
+	    	mapping["band850m"] = "850 Mhz";
+	    	mapping["band1900m"] = "1900 Mhz";
+	    	mapping["band2100m"] = "2100 Mhz";
+			mapping["cband"] = "CBAND";
+
+	    	var map = {};
+	    	var renderTable = false;
+	    	var filteredReponse = {};
+	    	this.constructor.ajax.fireApi(callSignsReq, "regulatory-licenses", "getCallSignsApproval", (response)=> {
+	    		filteredReponse["band700m"] = response.band700m;
+	    		filteredReponse["band850m"] = response.band850m;
+	    		filteredReponse["band1900m"] = response.band1900m;
+	    		filteredReponse["band2100m"] = response.band2100m;
+				filteredReponse["cband"] = response.cband;				
+
+	    		$.each(filteredReponse, (i, data)=> { i="band700m",data=[{_}]
+	    			if (data && data.length) {
+	    				// map[i] = mapping[i];
+
+	    				renderTable = false;
+	    				if (data[0].intlBorder700 === "TRUE" && data[0].intlBorderNon700 === "TRUE") {
+	    					renderTable = true;
+	    				} else if (i === "band700m" && data[0].intlBorder700 === "TRUE" && data[0].intlBorderNon700 === "FALSE") {
+	    					renderTable = true;
+	    				} else if (i !== "band700m" && data[0].intlBorder700 === "FALSE" && data[0].intlBorderNon700 === "TRUE") {
+	    					renderTable = true;
+					    }else if (i == "cband" && data[0].intlBorderCBand === "TRUE") {
+	    				 	renderTable = true;
+	    				}
+	    				if (callSignsReq.refType === "AWS") { // for BAS
+																// review
+
+							this.loadAWSCallsigns(data, i);
+	    				}
+	    				if (renderTable) {
+							map[i] = mapping[i];
+	    					this.loadCallSignDetails(data, i);
+	    				}
+	    			}
+	    		});
+	    		setCallSigns(map);
+	    	});
+	    },
+
+	    loadCallSignDetails: function(response, callSignId){
+	    	var title;
+
+	    	if (response && response.length !== 0) {
+	    		var templateHeader = this.dom.body.find(".international-table-header-template").html();
+	    		if (callSignId === "band700m") {
+	    			title = "700 Mhz"
+	    		} else if (callSignId === "band850m") {
+	    			title = "850 Mhz"
+	    		} else if (callSignId === "band1900m") {
+	    			title = "1900 Mhz"
+	    		} else if (callSignId === "band2100m") {
+	    			title = "2100 Mhz"
+	    		}else if (callSignId === "cband") {
+	    			title = "C-BAND";
+	    		}
+	    		var tableHeader = templateHeader.replace(/@BANDWIDTH/g, title).replace(/@ID/g, callSignId).replace(/@VZREGSERVICE/g, response[0].vzRegService).replace(/@DOC_CATEGORY/g, title.replace(" Mhz", ""));
+	    		// $.each(response, function(i, data) {
+	    		// tableModifiedHeader = tableHeader.replace(/@VZREGSERVICE/g,
+				// data.vzRegService);
+	    		// });
+	    		this.dom.body.find(".international-callsign-tables").append(tableHeader);
+	    		let tableId = this.dom.body.find("#" + callSignId + "-international-colnames");
+	    		let columns = this.getCallsignsColumns(false); // don't hide
+																// last 2 cols
+	    		
+
+	    		createKendoGrid(tableId, columns, response);
+
+	    		if (callSignId === "band700m") {
+	    			if (response[0].intlBorderExtendsFor700Mhz === 'Yes') {
+	    				this.appendFccRadioValues(".band700m", true, false);
+	    			} else {
+	    				this.appendFccRadioValues(".band700m", false, true);
+	    			}
+	    		} else if (callSignId === "band850m") {
+	    			if (response[0].intlBorderExtendsForCellular === 'Yes') {
+	    				this.appendFccRadioValues(".band850m", true, false);
+	    			} else {
+	    				this.appendFccRadioValues(".band850m", false, true);
+	    			}
+	    		} else if (callSignId === "band1900m") {
+	    			if (response[0].intlBorderExtendsForPCS === 'Yes') {
+	    				this.appendFccRadioValues(".band1900m", true, false);
+	    			} else {
+	    				this.appendFccRadioValues(".band1900m", false, true);
+	    			}
+	    		} else if (callSignId === "band2100m") {
+	    			if (response[0].intlBorderExtendsForAWS === 'Yes') {
+	    				this.appendFccRadioValues(".band2100m", true, false);
+	    			} else {
+	    				this.appendFccRadioValues(".band2100m", false, true);
+	    			}
+	    		}
+				else if (callSignId === "cband") {
+	    			if (response[0].intlBorderExtendsForCBand === 'Yes') {
+	    				this.appendFccRadioValues(".cband", true, false);
+	    			} else {
+	    				this.appendFccRadioValues(".cband", false, true);
+	    			}
+	    		}
+	    	} else {
+	    		console.info("No Callsigns");
+	    	}
+	    },
+
+
+
+
+
+
+
+
+
+
+--------------------------------------------------------
 <!DOCTYPE html>
 <html lang="en">
   <head>
