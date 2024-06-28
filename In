@@ -1,3 +1,30 @@
+
+<div class="international-callsign-tables"></div>
+
+<div id="international-border-document-table" data-ref-type="SITE_INTL_BORDER_AGREEMENTS" class="spm-grid-styles"></div>
+
+<div class="documents-result col-xs-12 col-sm-12 padding-zero international-border-documents-list margin-top hide"></div>
+
+<div class="international-table-header-template hide">
+    <h6 class="text-brand-red margin-top">@BANDWIDTH Callsigns</h6>
+    <div class="col-md-12 padding-zero section-divider-bottom">
+        <div id="@ID-international-colnames" class="spm-grid-styles"></div>
+        <div class="radio vzbs-radio text-bold border-none margin-top-bottom">
+            Does the signal extend into the country at levels above those specified in the Agreement between the FCC and their counterpart? : &nbsp;
+            <input name="@ID" role="radio" data-reg-service="@VZREGSERVICE" value="Yes" id="signalextend-yes" type="radio" class="@ID-yes fcc-radio" disabled="disabled">
+            <label>Yes</label>
+            <input name="@ID" role="radio" data-reg-service="@VZREGSERVICE" value="No" id="signalextend-no" type="radio" class="@ID-no fcc-radio" disabled="disabled" checked>
+            <label>No</label>
+        </div>
+
+
+
+
+
+
+
+
+
 //sign up
 
 Create a Sign Up Modal with User Name, Password and Submit and Reset Storage Button which will open on clicking of Sign Up Button from the Login Page
