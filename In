@@ -1,5 +1,28 @@
 
 $(document).ready(function() {
+    // Function to handle radio button change
+    $(".fcc-radio").on("change", function() {
+        var isChecked = $(this).prop("checked");
+        if ($(this).val() === "Yes" && isChecked) {
+            $("#agreement-date-field").show();
+            $("#notification-date-field").hide();
+            // Here you can set the Agreement Timeout Date value as needed
+            // For example, $("#agreement-date").val("set your date here");
+        } else if ($(this).val() === "No" && isChecked) {
+            $("#agreement-date-field").hide();
+            $("#notification-date-field").show();
+            // Here you can set the Notification Timeout Date value as needed
+            // For example, $("#notification-date").val("set your date here");
+        }
+    });
+
+    // Trigger change event on page load if needed
+    $(".fcc-radio:checked").trigger("change");
+});
+
+
+
+$(document).ready(function() {
     $('.fcc-radio').change(function() {
         if ($('#signal-extend-yes').prop('checked')) {
             $('#agreementTimeoutDateField').show();
