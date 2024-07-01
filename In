@@ -1,4 +1,18 @@
 
+I am writing to seek assistance with adding my father and mother to my insurance policy for the year 2024. Despite several attempts, I have been unable to complete the process.
+
+Could you please provide guidance on the steps I need to follow or inform me of any specific requirements that need to be met for successful addition? Additionally, if there are any documents or information that I need to submit, kindly let me know.
+
+I would appreciate your prompt assistance in resolving this matter.
+
+Thank you for your support.
+
+Best regards,
+
+
+
+
+
 $(document).ready(function() {
     // Function to handle radio button change
     $(".fcc-radio").on("change", function() {
