@@ -1,3 +1,23 @@
+<div class="col-xs-12 col-sm-12 col-md-12 margin-top mobile-padding-left-right-0 ipad-padding-left-right-0 ight-0">
+    <label class="col-sm-5 col-xs-12 col-md-5 padding-left-right-zero opt-label">Date Submitted to Environmental Compliance: </label>
+    <div class="col-xs-12 col-sm-7 col-md-7 padding-zero">
+        <div class="date-picker">
+            <input id="env_submit_territory_date" type="text" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy" class="col-xs-12 datepicker form-control-spm env-submit-territory-date disable" aria-required="false" aria-invalid="false" data-toggle="tooltip" data-placement="top" data-original-title="Date Submitted to Environmental Compliance">
+            <span class="input-group-btn">
+            </span>
+        </div>
+    </div>
+</div>
+....
+
+
+
+
+
+
+
+
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
