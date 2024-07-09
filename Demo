@@ -1,1184 +1,1084 @@
-<div class="col-xs-12 col-sm-12 col-md-12 margin-top mobile-padding-left-right-0 ipad-padding-left-right-0 ight-0">
-    <label class="col-sm-5 col-xs-12 col-md-5 padding-left-right-zero opt-label">Date Submitted to Environmental Compliance: </label>
-    <div class="col-xs-12 col-sm-7 col-md-7 padding-zero">
-        <div class="date-picker">
-            <input id="env_submit_territory_date" type="text" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy" class="col-xs-12 datepicker form-control-spm env-submit-territory-date disable" aria-required="false" aria-invalid="false" data-toggle="tooltip" data-placement="top" data-original-title="Date Submitted to Environmental Compliance">
-            <span class="input-group-btn">
-            </span>
-        </div>
-    </div>
+ getCallSignsWrap: function(callSignsReq) {
+
+	    	var mapping = {};
+	    	mapping["band700m"] = "700 Mhz";
+	    	mapping["band850m"] = "850 Mhz";
+	    	mapping["band1900m"] = "1900 Mhz";
+	    	mapping["band2100m"] = "2100 Mhz";
+			mapping["cband"] = "CBAND";
+
+	    	var map = {};
+	    	var renderTable = false;
+	    	var filteredReponse = {};
+	    	this.constructor.ajax.fireApi(callSignsReq, "regulatory-licenses", "getCallSignsApproval", (response)=> {
+	    		filteredReponse["band700m"] = response.band700m;
+	    		filteredReponse["band850m"] = response.band850m;
+	    		filteredReponse["band1900m"] = response.band1900m;
+	    		filteredReponse["band2100m"] = response.band2100m;
+				filteredReponse["cband"] = response.cband;				
+
+	    		$.each(filteredReponse, (i, data)=> {
+	    			if (data && data.length) {
+	    				// map[i] = mapping[i];
+
+	    				renderTable = false;
+	    				if (data[0].intlBorder700 === "TRUE" && data[0].intlBorderNon700 === "TRUE") {
+	    					renderTable = true;
+	    				} else if (i === "band700m" && data[0].intlBorder700 === "TRUE" && data[0].intlBorderNon700 === "FALSE") {
+	    					renderTable = true;
+	    				} else if (i !== "band700m" && data[0].intlBorder700 === "FALSE" && data[0].intlBorderNon700 === "TRUE") {
+	    					renderTable = true;
+					    }else if (i == "cband" && data[0].intlBorderCBand === "TRUE") {
+	    				 	renderTable = true;
+	    				}
+	    				if (callSignsReq.refType === "AWS") { // for BAS
+																// review
+
+							this.loadAWSCallsigns(data, i);
+	    				}
+	    				if (renderTable) {
+							map[i] = mapping[i];
+	    					this.loadCallSignDetails(data, i);
+	    				}
+	    			}
+	    		});
+	    		setCallSigns(map);
+	    	});
+	    },
+
+	    loadCallSignDetails: function(response, callSignId){
+	    	var title;
+
+	    	if (response && response.length !== 0) {
+	    		var templateHeader = this.dom.body.find(".international-table-header-template").html();
+	    		if (callSignId === "band700m") {
+	    			title = "700 Mhz"
+	    		} else if (callSignId === "band850m") {
+	    			title = "850 Mhz"
+	    		} else if (callSignId === "band1900m") {
+	    			title = "1900 Mhz"
+	    		} else if (callSignId === "band2100m") {
+	    			title = "2100 Mhz"
+	    		}else if (callSignId === "cband") {
+	    			title = "C-BAND";
+	    		}
+	    		
+	    		var doc_check;
+				var optionSelectedYes = $(this.dom.body).find("#signalextend-yes");
+				var optionSelectedNo  = $(this.dom.body).find("#signalextend-no");
+					
+				doc_check = optionSelectedYes.prop("checked")?"AGREEMENT":optionSelectedNo.prop("checked")?"NOTIFICATION":false;					
+				
+	    		
+	    		var tableHeader = templateHeader.replace(/@BANDWIDTH/g, title).replace(/@ID/g, callSignId).replace(/@VZREGSERVICE/g, response[0].vzRegService).replace(/@DOC_CHECK/g, (doc_check?doc_check:"")).replace(/@DOC_CATEGORY/g, title.replace(" Mhz", ""));
+	    		// $.each(response, function(i, data) {
+	    		// tableModifiedHeader = tableHeader.replace(/@VZREGSERVICE/g,
+				// data.vzRegService);
+	    		// });
+	    		
+	    		this.dom.body.find(".international-callsign-tables").append(tableHeader);
+	    		let tableId = this.dom.body.find("#" + callSignId + "-international-colnames");
+	    		let columns = this.getCallsignsColumns(false); // don't hide
+																// last 2 cols
+	    		
+
+	    		createKendoGrid(tableId, columns, response);
+
+	    		if (callSignId === "band700m") {
+	    			if (response[0].intlBorderExtendsFor700Mhz === 'Yes') {
+	    				this.appendFccRadioValues(".band700m", true, false);
+	    			} else {
+	    				this.appendFccRadioValues(".band700m", false, true);
+	    			}
+	    		} else if (callSignId === "band850m") {
+	    			if (response[0].intlBorderExtendsForCellular === 'Yes') {
+	    				this.appendFccRadioValues(".band850m", true, false);
+	    			} else {
+	    				this.appendFccRadioValues(".band850m", false, true);
+	    			}
+	    		} else if (callSignId === "band1900m") {
+	    			if (response[0].intlBorderExtendsForPCS === 'Yes') {
+	    				this.appendFccRadioValues(".band1900m", true, false);
+	    			} else {
+	    				this.appendFccRadioValues(".band1900m", false, true);
+	    			}
+	    		} else if (callSignId === "band2100m") {
+	    			if (response[0].intlBorderExtendsForAWS === 'Yes') {
+	    				this.appendFccRadioValues(".band2100m", true, false);
+	    			} else {
+	    				this.appendFccRadioValues(".band2100m", false, true);
+	    			}
+	    		}
+				else if (callSignId === "cband") {
+	    			if (response[0].intlBorderExtendsForCBand === 'Yes') {
+	    				this.appendFccRadioValues(".cband", true, false);
+	    			} else {
+	    				this.appendFccRadioValues(".cband", false, true);
+	    			}
+	    		}
+	    	} else {
+	    		console.info("No Callsigns");
+	    	}
+	    },
+
+	    appendFccRadioValues: function(className, value1, value2) {
+	    	this.dom.body.find(className + "-yes").prop("checked", value1);
+	    	this.dom.body.find(className + "-no").prop("checked", value2);
+			this.dom.body.find(".fcc-radio").off('change').on('change', $.proxy(this.changeFccRadio, this));
+	    },
+
+	    getBasData: function() {
+	    	var callSignsReq = {};
+	    	callSignsReq.refType = "AWS";
+	    	callSignsReq.searchKey = this.dom.projectId;
+	    	this.getCallSignsWrap(callSignsReq);
+	    },
+
+	    loadAWSCallsigns: function(response, i){
+
+	    	if(i === "band2100m" && response !== null && response !== undefined){
+	    		let columns = this.getCallsignsColumns(true);
+	    		
+	    		// grid should only contain rows where freqBandCode === "A"
+	    		response = response.filter(data => data.freqBandCode === "A");
+
+	    		// perform the following logic for each row in the response
+	    		response.forEach(data => {
+	    			this.dom.body.find("#bas-market").val(data.basMarket);
+	    			this.basMarketShow();
+	    			this.dom.body.find("#signalextend-" + data.isSiteWithinBasRange).prop("checked", true);
+	    			this.dom.body.find(".bas-doc-upload").addClass("hide");
+	    			if (this.dom.body.find("#signalextend-" + data.isSiteWithinBasRange).val() === "Yes") {
+	    				this.dom.body.find(".bas-doc-upload").removeClass("hide");
+	    			}
+	    		});
+	    		createKendoGrid("#bas-review-callsigns-table", columns, response);
+	    	}
+	    },
+	    
+	    getCallsignsColumns: function(extraColumns){
+	    	return [{
+	    		field: "callSigns", 
+	    		title: "Callsigns",
+	    		media: "(min-width: 768px)"
+	    	}, {
+	    		field: "freqBandCode", 
+	    		title: "Block",
+	    		media: "(min-width: 768px)"
+	    	},{
+	    		field: "entityName", 
+	    		title: "Licensee Name",
+	    		media: "(min-width: 768px)"
+	    	},{
+	    		field: "whollyOwned", 
+	    		title: "Wholly Owned",
+	    		media: "(min-width: 768px)"
+	    	},{
+	    		field: "maxErp", 
+	    		title: "ERP",
+	    		media: "(min-width: 768px)"
+	    	}, {
+	    		field: "freqRange1", 
+	    		title: "Freq Range 1",
+	    		media: "(min-width: 768px)"
+	    	}, {
+	    		field: "freqRange2", 
+	    		title: "Freq Range 2",
+	    		media: "(min-width: 768px)"
+	    	}, {
+	    		field: "freqRange3", 
+	    		title: "Freq Range 3",
+	    		media: "(min-width: 768px)"
+	    	}, {
+	    		field: "freqRange4", 
+	    		title: "Freq Range 4",
+	    		media: "(min-width: 768px)"
+	    	}, {
+	    		field: "borderDistance", 
+	    		title: "Border Distance(mi)",
+	    		hidden: extraColumns,
+	    		media: "(min-width: 768px)"
+	    	}, {
+	    		field: "country", 
+	    		title: "Country", 
+	    		hidden: extraColumns,
+	    		media: "(min-width: 768px)"
+	    	}, {
+	    		template: kendo.template(this.dom.body.find("#intl-callsigns-responsive-grid-template").html()),
+	    		media: "(max-width: 767px)"
+	    	}];
+	    },
+
+	    basMarketShow: function() {
+	    	this.dom.body.find(".bas-market-data").empty();
+	    	var val = this.dom.body.find("#bas-market").val();
+	    	if (val !== "" && val !== undefined) {
+	    		this.dom.body.find(".bas-market-data").append($("." + val).html());
+	    	}
+	    },
+
+	    updateRfdsCallSigns: function(rfdsCallSigns, callback) {
+	    	this.constructor.ajax.fireApi(rfdsCallSigns, "project", "updateRfdsCallSigns", (response)=> {
+	    		if (callback) {
+	    			callback();
+	    		}
+	    	});
+	    },
+
+	    getCarrierAgreementTypes: function(callback) {
+	    	this.constructor.ajax.fireMetaServiceAPI("project", "project", "getCarrierAgreementTypes", (response)=> {
+	    		carrierAgreementReportType = response;
+	    		this.dom.body.find("#doc-report-type-list").empty();
+	    		this.dom.body.find("#doc-report-type-list").append($("<option></option>").prop("value", "").text("Nothing Selected").prop('selected', 'true'));
+	    		$.each(response, (i, data)=> {
+	    			if (data !== null && data !== undefined && i !== 'CONTOUR_EXTENSION_BEYOND_40') {
+	    				this.dom.body.find("#doc-report-type-list").append($("<option></option>").prop("value", i).text(data));
+	    			}
+	    		});
+	    		if (callback) {
+	    			callback(response);
+	    		}
+	    	});
+	    },
+
+
+
+	    displayExtensionAgreement: function(reportType, isReportRequired, callsigns) {
+	    	var cgsaCallsigns = this.dom.body.find("#callsign-list-CONTOUR_EXTENSION_BEYOND_40").val();
+	    	var template = this.dom.body.find(".carrier-agreement-template").html();
+	    	this.dom.body.find(".carrier-agreements-select-block").find('#' + reportType).find(".carrier-agreements-selected-block").empty();
+	    	if (isReportRequired === "Yes") {
+	    		if (cgsaCallsigns === null) {
+	    			this.dom.body.find('#' + reportType + '_Yes').prop('checked', false);
+	    			this.dom.body.find('#' + reportType + '_No').prop('checked', true);
+	    			displayError("Error", "Please select callsigns for CGSA Border");
+	    			return false;
+	    		}
+	    		this.dom.body.find(".carrier-agreements-select-block").find('#' + reportType).find(".carrier-agreements-selected-block").append(template.replace(/@REPORT_TYPE_VAL/g, reportType));
+	    		this.dom.body.find("#callsign-list-" + reportType).empty();
+	    		if(cgsaCallsigns !== undefined && cgsaCallsigns !== null){
+	    			if (cgsaCallsigns.length >1) {
+	    				$.each(cgsaCallsigns, (i, data)=> {
+	    					this.dom.body.find("#callsign-list-EXTENSION_AGREEMENT").append($("<option></option>").prop("value", data).text(callSignFrequency[data]));
+	    				});
+	    			}else{
+	    				this.dom.body.find("#callsign-list-EXTENSION_AGREEMENT").append($("<option></option>").prop("value", cgsaCallsigns).text(callSignFrequency[cgsaCallsigns]));
+	    			}
+	    	    	this.dom.body.find(".carrier-agrmt-callsign-list").off('change').on('change', $.proxy(this.changeCarrierAgrmtCallsignList, this));
+	    		}	
+	    		if (callsigns !== undefined && callsigns !== null) {
+	    			this.dom.body.find("#callsign-list-" + reportType).val(callsigns.split(","));
+	    		}
+	    		this.dom.body.find("#callsign-list-" + reportType).selectpicker('refresh');
+	    	}
+	    },
+
+	    displayContourExtension: function(reportType, isReportRequired, callsigns) {
+	    	var cgsaCallsigns = this.dom.body.find("#callsign-list-CONTOUR_EXTENSION_INTO_UNLICENSED_AREA").val();
+	    	var template = this.dom.body.find(".carrier-agreement-template").html();
+	    	this.dom.body.find(".carrier-agreements-select-block").find('#' + reportType).find(".carrier-agreements-selected-block").empty();
+	    	if (isReportRequired === "Yes") {
+	    		this.dom.body.find("#EXTENSION_AGREEMENT").removeClass('hide');
+	    		if (cgsaCallsigns === null) {
+	    			this.dom.body.find('#' + reportType + '_Yes').prop('checked', false);
+	    			this.dom.body.find('#' + reportType + '_No').prop('checked', true);
+	    			displayError("Error", "Please select callsigns for CGSA Border");
+	    			return false;
+	    		}
+	    		$(".carrier-agreements-select-block").find('#' + reportType).find(".carrier-agreements-selected-block").append(template.replace(/@REPORT_TYPE_VAL/g, reportType));
+	    		this.dom.body.find("#callsign-list-" + reportType).empty();
+	    		if(cgsaCallsigns !== undefined && cgsaCallsigns !== null){
+	    			if (cgsaCallsigns.length >1) {
+	    				$.each(cgsaCallsigns, (i, data)=> {
+	    					this.dom.body.find("#callsign-list-CONTOUR_EXTENSION_BEYOND_40").append($("<option></option>").prop("value", data).text(callSignFrequency[data]));
+	    				});
+	    			}else{
+	    				this.dom.body.find("#callsign-list-CONTOUR_EXTENSION_BEYOND_40").append($("<option></option>").prop("value", cgsaCallsigns).text(callSignFrequency[cgsaCallsigns]));
+	    			}
+			    	this.dom.body.find(".carrier-agrmt-callsign-list").off('change').on('change', $.proxy(this.changeCarrierAgrmtCallsignList, this));
+	    		}
+	    		if (callsigns !== undefined && callsigns !== null) {
+	    			this.dom.body.find("#callsign-list-" + reportType).val(callsigns.split(","));
+	    		}
+	    		this.dom.body.find("#callsign-list-" + reportType).selectpicker('refresh');
+	    	}else{
+	    		this.dom.body.find("#EXTENSION_AGREEMENT").addClass('hide');
+	    	}
+	    },
+
+	    addCallSigns: function(reportType, isReportRequired, callsigns, action) {
+	    	var self =rfdsModule;
+	    	var template = self.dom.body.find(".carrier-agreement-template").html();
+	    	self.dom.body.find(".carrier-agreements-select-block").find('#' + reportType).find(".carrier-agreements-selected-block").empty();
+
+	    	if (isReportRequired === "Yes") {
+	    		if(reportType !== "CONTOUR_EXTENSION_INTO_UNLICENSED_AREA"){
+	    			self.dom.body.find(".carrier-agreements-select-block").find('#' + reportType).find(".carrier-agreements-selected-block").append(template.replace(/@REPORT_TYPE_VAL/g, reportType));
+	    		}else{
+	    			console.log("The Report Type is CONTOUR_EXTENSION_INTO_UNLICENSED_AREA")
+	    		}
+	    	}else {
+
+	    		if(reportType === "CONTOUR_EXTENSION_INTO_UNLICENSED_AREA" &&  isReportRequired === "No"){
+
+	    			self.dom.body.find("#CONTOUR_EXTENSION_BEYOND_40").removeClass('hide');
+
+	    			self.dom.body.find(".carrier-agreements-select-block").find('#' + reportType).find(".carrier-agreements-selected-block").append(template.replace(/@REPORT_TYPE_VAL/g, reportType));
+	    		}else{
+	    			console.log("The Report Type is not CONTOUR_EXTENSION_INTO_UNLICENSED_AREA")
+	    		}
+	    		if(reportType === "CONTOUR_EXTENSION_BEYOND_40") {
+	    			self.dom.body.find("#EXTENSION_AGREEMENT_No").prop("checked",false);
+	    			self.dom.body.find("#EXTENSION_AGREEMENT").addClass('hide')
+	    		}
+	    	}
+	    	self.getProjCallSignsCommon(reportType, isReportRequired, callsigns, action);
+
+	    },
+
+	    getProjCallSignsCommon: function(reportType, isReportRequired, callsigns, action){
+	    	var carrierAgreementsContainer = this.dom.body.find(".carrier-agreements-select-block");
+	    	this.dom.body.find("#callsign-list-" + reportType).empty();
+	    	this.getProjCallSigns(reportType, (response)=> {
+	    		if (!jQuery.isEmptyObject(response)) {
+	    			$.each(response, (i, data)=> {
+	    				if (data !== null && data !== undefined) {
+	    					this.dom.body.find("#callsign-list-" + reportType).append($("<option></option>").prop("value", i).text(data));
+	    				}
+	    			});
+	    	    	this.dom.body.find(".carrier-agrmt-callsign-list").off('change').on('change', $.proxy(this.changeCarrierAgrmtCallsignList, this));
+	    			if (callsigns !== undefined && callsigns !== null) {
+	    				this.dom.body.find("#callsign-list-" + reportType).val(callsigns.split(","));
+	    			}
+	    			this.dom.body.find("#callsign-list-" + reportType).selectpicker('refresh');
+	    			if (isReportRequired === "Yes" || isReportRequired === "" || isReportRequired === undefined){
+	    				reportType === "CONTOUR_EXTENSION_INTO_UNLICENSED_AREA" ? this.dom.body.find("#CONTOUR_EXTENSION_BEYOND_40, #EXTENSION_AGREEMENT").addClass('hide') : "";
+	    			}else{
+	    				reportType === "CONTOUR_EXTENSION_INTO_UNLICENSED_AREA" ? this.dom.body.find("#CONTOUR_EXTENSION_BEYOND_40").removeClass('hide') : "";
+	    			}
+	    			if (reportType === "CONTOUR_EXTENSION_INTO_UNLICENSED_AREA" && isReportRequired === "Yes") {
+	    				this.dom.body.find('#CONTOUR_EXTENSION_BEYOND_40_No').prop('checked', true);
+	    				this.dom.body.find('#CONTOUR_EXTENSION_BEYOND_40_Yes').prop('checked', false);
+	    				this.dom.body.find('#EXTENSION_AGREEMENT_No').prop('checked', true);
+	    				this.dom.body.find('#EXTENSION_AGREEMENT_Yes').prop('checked', false);
+	    				this.dom.body.find("#callsign-list-CONTOUR_EXTENSION_BEYOND_40, #callsign-list-EXTENSION_AGREEMENT").empty();
+	    				this.dom.body.find("#callsign-list-CONTOUR_EXTENSION_BEYOND_40, #callsign-list-EXTENSION_AGREEMENT").change();
+
+	    			}else {
+	    				console.log("850 callsigns are going as no");
+	    			}
+	    		} else {
+	    			reportType === "CONTOUR_EXTENSION_INTO_UNLICENSED_AREA" ? this.dom.body.find("#CONTOUR_EXTENSION_BEYOND_40, #EXTENSION_AGREEMENT").addClass('hide') : "";
+	    			reportType === "CONTOUR_EXTENSION_BEYOND_40" ? this.dom.body.find("#EXTENSION_AGREEMENT").removeClass('hide') : "";
+	    			this.dom.body.find(".carrier-agreements-select-block").find('#' + reportType).find(".carrier-agreements-selected-block").empty();
+
+	    			if (reportType === "CONTOUR_EXTENSION_INTO_UNLICENSED_AREA") {
+	    				
+	    				carrierAgreementsContainer.find("#CONTOUR_EXTENSION_INTO_UNLICENSED_AREA").attr("data-850-callsigns", "No");
+	    				$('#CONTOUR_EXTENSION_INTO_UNLICENSED_AREA_No, #CONTOUR_EXTENSION_INTO_UNLICENSED_AREA_Yes, #CONTOUR_EXTENSION_BEYOND_40_No, #CONTOUR_EXTENSION_BEYOND_40_Yes, #EXTENSION_AGREEMENT_No, #EXTENSION_AGREEMENT_Yes').prop('checked', false);
+	    				$("#callsign-list-CONTOUR_EXTENSION_INTO_UNLICENSED_AREA, #callsign-list-CONTOUR_EXTENSION_BEYOND_40, #callsign-list-EXTENSION_AGREEMENT").empty();
+	    				$("#callsign-list-CONTOUR_EXTENSION_INTO_UNLICENSED_AREA, #callsign-list-CONTOUR_EXTENSION_BEYOND_40, #callsign-list-EXTENSION_AGREEMENT").change();
+
+	    				// Delay in setting the dom
+	    				setTimeout(()=> {
+	    					this.dom.body.find('#CONTOUR_EXTENSION_INTO_UNLICENSED_AREA').addClass('hide');
+	    					this.dom.body.find('#CONTOUR_EXTENSION_INTO_UNLICENSED_AREA, #CONTOUR_EXTENSION_BEYOND_40, #EXTENSION_AGREEMENT').removeClass("mandatory_label_before");
+	    					if(action && action === "CHANGE" && isReportRequired === "Yes" ){ //NTSCE-10311
+								this.mergeProjCarrierAgreementDetails(reportType , displayMessage("No CallSigns Available for "+ reportType));
+							}else{
+								this.mergeProjCarrierAgreementDetails(reportType);
+							}
+	    				}, 100);
+
+	    			}else {
+
+	    				this.dom.body.find('#' + reportType + '_No').prop('checked', true);
+
+	    				// Delay in setting the dom
+	    				setTimeout(()=> {
+							if(action && action === "CHANGE" && isReportRequired === "Yes" ){ //NTSCE-10311
+								this.mergeProjCarrierAgreementDetails(reportType , displayMessage("No CallSigns Available for"+ reportType));
+							}else{
+								this.mergeProjCarrierAgreementDetails(reportType);
+							}
+	    				}, 100);
+
+
+	    			}
+	    			this.dom.body.find('#' + reportType + '_Yes').prop('checked', false);
+	    		}
+	    	});
+	    },
+
+	    getProjCallSigns: function(reportType, callback) {
+	    	var projectSearchRequest = {};
+	    	projectSearchRequest.siteProjectsId = this.dom.projectId;
+	    	projectSearchRequest.searchKey = reportType;
+	    	this.constructor.ajax.fireApi(projectSearchRequest, "project", "getProjCallSigns", (response)=> {
+				var isESValid=response.isESValid;
+			    var isCbandSiteOrProject=response.isCbandSiteOrProject;
+				var isContigUnlicensed=response.CONTIG_50_SQMI_UNLICENSED;
+			    delete response["isESValid"];
+			    delete response["isCbandSiteOrProject"];
+				delete response["CONTIG_50_SQMI_UNLICENSED"];	
+
+	    		if (reportType === "") {
+	    			callSignFrequency = response;
+	    		} else if (reportType === "8Cs") {
+	    			cellularCallSigns = [];
+	    			$.each(response, (callsign, frequency)=> {
+	    				cellularCallSigns.push(callsign);
+	    			});
+	    		}
+				var cbandFound = Object.values(response).find(a => a.match("C-Band"));
+				if(reportType === ""){ // ONLY ON LOAD
+					if(cbandFound){
+						if(isCbandSiteOrProject == "true" && isESValid == "true" ){
+							this.constructor.mandateESDocs = true;
+							let payload ={
+			                		 siteProjectsId : this.dom.siteProjectsId,
+									 siteInfoId : this.dom.siteInfoId  
+			                   }
+							this.constructor.ajax.fireApi(payload,"rfds-callsign","getAtollEarthStationData",(res)=>{
+									this.atollTransmitterGrid(res,"rfds-cband-table");
+							})
+							this.dom.body.find('.c-band-body .rfds-cband-template').removeClass('hide');
+
+							$("#c-band-gNB-equipment-type").val(projectDetailsWrapper.projAdditionalInfo.cbEqType);
+							if(projectDetailsWrapper.projAdditionalInfo.earth_station_agreement == 'true'){
+								$("#earth-station-agreement").prop("checked",true);
+							}else{
+								$("#earth-station-agreement").prop("checked",false);
+							}
+							var esdma= projectDetailsWrapper.projAdditionalInfo.esdma.split(',')
+							$("#earth-station-design-mitigation-applied").val(esdma);
+							$("#earth-station-design-mitigation-applied").selectpicker('refresh');
+							this.dom.body.find('.c-band-body .earth-station-fields').removeClass('hide');
+
+						}else{
+							this.constructor.mandateESDocs = false;
+							this.dom.body.find('.c-band-body .rfds-cband-template').addClass('hide');
+							this.dom.body.find('.c-band-body .earth-station-fields').addClass('hide');
+						}
+						
+						this.dom.body.find('.c-band-header, .c-band-body').removeClass('hide');
+					}else{
+						this.dom.body.find('.c-band-header, .c-band-body').addClass('hide');
+					}
+				
+				}
+	    		if(["CONTOUR_EXTENSION_INTO_UNLICENSED_AREA","CONTOUR_EXTENSION_BEYOND_40","EXTENSION_AGREEMENT"].includes(reportType) || reportType === ""){
+	    			var callsigns850 = Object.values(response).find(a => a.match('850'));
+					
+	    			if(callsigns850){
+						this.dom.validate850 = true;
+	    				this.dom.body.find('#CONTOUR_EXTENSION_INTO_UNLICENSED_AREA, .850_callsigns_header').removeClass('hide');
+	    				this.dom.body.find("#CONTOUR_EXTENSION_INTO_UNLICENSED_AREA").attr("data-850-callsigns", "Yes");
+	    			}else{
+						this.dom.validate850 = false;
+	    				this.dom.body.find("#CONTOUR_EXTENSION_INTO_UNLICENSED_AREA").attr("data-850-callsigns", "No");
+	    				this.dom.body.find('#CONTOUR_EXTENSION_INTO_UNLICENSED_AREA_No, #CONTOUR_EXTENSION_INTO_UNLICENSED_AREA_Yes, #CONTOUR_EXTENSION_BEYOND_40_No, #CONTOUR_EXTENSION_BEYOND_40_Yes, #EXTENSION_AGREEMENT_No, #EXTENSION_AGREEMENT_Yes').prop('checked', false);
+	    				this.dom.body.find("#callsign-list-CONTOUR_EXTENSION_INTO_UNLICENSED_AREA, #callsign-list-CONTOUR_EXTENSION_BEYOND_40, #callsign-list-EXTENSION_AGREEMENT").empty();
+	    				this.dom.body.find("#callsign-list-CONTOUR_EXTENSION_INTO_UNLICENSED_AREA, #callsign-list-CONTOUR_EXTENSION_BEYOND_40, #callsign-list-EXTENSION_AGREEMENT").change();
+	    			}
+					if(isContigUnlicensed == 'No'){
+						this.dom.body.find('#CONTIG_50_SQMI_UNLICENSED').removeClass('hide');
+						this.dom.body.find('#CONTIG_50_SQMI_UNLICENSED_No').prop('checked', true);
+						this.dom.body.find('#CONTIG_50_SQMI_UNLICENSED_Yes').prop('checked', false);
+					}else if(isContigUnlicensed == 'Yes'){
+						this.dom.body.find('#CONTIG_50_SQMI_UNLICENSED').removeClass('hide');
+						this.dom.body.find('#CONTIG_50_SQMI_UNLICENSED_Yes').prop('checked', true);
+						this.dom.body.find('#CONTIG_50_SQMI_UNLICENSED_No').prop('checked', false);
+						
+					}
+	    		}
+	    		if (callback) {
+	    			callback(response);
+	    		}
+	    	});
+	    },
+
+
+	    mergeProjCarrierAgreementDetails:function(reportType, callback){
+
+	    	var projCarrierAgreementDetails = {};
+
+	    	var callSigns = this.dom.body.find("#callsign-list-" + reportType).val();
+	    	var isReportRequired = this.dom.body.find('input[name=' + reportType + ']:checked').val() === undefined ? "" : this.dom.body.find('input[name=' + reportType + ']:checked').val();
+
+	    	projCarrierAgreementDetails.reportType = reportType;
+	    	projCarrierAgreementDetails.siteProjectsId = this.dom.projectId;
+	    	projCarrierAgreementDetails.isReportRequired = isReportRequired;
+
+	    	if (callSigns !== undefined && callSigns !== null) {
+	    		projCarrierAgreementDetails.callSigns = callSigns.join(',');
+	    	}
+	    	this.constructor.ajax.fireApi(projCarrierAgreementDetails, "project", "mergeProjCarrierAgreementDetails", ()=> {
+
+	    		this.dom.body.find("#" + reportType).attr('data-report-required', isReportRequired);
+
+	    		if (reportType === "CONTOUR_EXTENSION_BEYOND_50") {
+	    			var projCallSignMerge = {};
+	    			var projReg850 = {};
+	    			projReg850.contourExtensionBeyond50 = isReportRequired;
+	    			projReg850.siteProjectsId = this.dom.projectId;
+	    			projCallSignMerge.projReg850 = projReg850;
+	    	
+	    			this.constructor.ajax.fireApi(projCallSignMerge, "regulatory-licenses", "mergeCallSignsWrap");
+	    		}
+
+	    		if( reportType === "CONTOUR_EXTENSION_INTO_UNLICENSED_AREA" && isReportRequired === "Yes"){
+	    			// Clean up the data
+	    			this.dom.body.find("#CONTOUR_EXTENSION_BEYOND_40_No").prop("checked",true);
+	    			this.dom.body.find("#CONTOUR_EXTENSION_BEYOND_40_Yes").prop("checked",false);
+	    			this.dom.body.find("#EXTENSION_AGREEMENT_No").prop("checked",true);
+	    			this.dom.body.find("#EXTENSION_AGREEMENT_Yes").prop("checked",false);
+	    			this.mergeProjCarrierAgreementDetails("CONTOUR_EXTENSION_BEYOND_40");
+	    		}else if(reportType === "CONTOUR_EXTENSION_BEYOND_40" && isReportRequired === "No"){
+	    			this.mergeProjCarrierAgreementDetails("EXTENSION_AGREEMENT");
+	    		}
+
+	    		if(callback){
+	    			callback();
+	    		}
+	    	});
+	    },
+
+
+	    getProjCarrierAgreements: function(callback) {
+	    	var projCarrierAgreementDetails = {};
+	    	projCarrierAgreementDetails.siteProjectsId = this.dom.projectId;
+	    	this.constructor.ajax.fireApi(projCarrierAgreementDetails, "project", "getProjCarrierAgreementDetails", (response)=> {
+	    		setCarrierAgreements(response);
+	    		$.each(response, (i, data)=> {
+	    			if (data !== null && data !== undefined) {
+	    				if (data.isReportRequired === 'No') {
+	    					this.dom.body.find("#doc-report-type-list option[value=" + data.reportType + "]").remove();
+	    				}
+	    			}
+	    		});
+	    		if (callback) {
+	    			callback(response);
+	    		}
+	    	});
+	    },
+
+	    displayCarrierAgreements: function(response) {
+	    	// console.log(this);
+	    	var self = rfdsModule;
+	    	var extensionAgreementData = {};
+	    	var contourAgreementData = {};
+	    	$.each(response, (i, data)=> {
+	    		if (data !== null && data !== undefined) {
+	    			var reportType = data.reportType;
+	    			self.dom.body.find("#" + reportType).attr('data-report-required', data.isReportRequired);
+	    			self.dom.body.find('#' + reportType + '_' + data.isReportRequired).prop('checked', true);
+	    			if (reportType !== "EXTENSION_AGREEMENT" && reportType !== "CONTOUR_EXTENSION_BEYOND_40" && data.isReportRequired !== "No") {
+	    				self.addCallSigns(reportType, data.isReportRequired, data.callSigns);
+	    			}else if (reportType === "EXTENSION_AGREEMENT") {
+	    				extensionAgreementData = data;
+	    			}else if(reportType === "CONTOUR_EXTENSION_BEYOND_40"){
+	    				contourAgreementData = data;
+	    			}
+	    		}
+	    	});
+	    	setTimeout(()=> {
+	    		if (contourAgreementData) {
+	    			self.dom.body.find('#' + contourAgreementData.reportType + '_' + contourAgreementData.isReportRequired).prop('checked', true);
+	    			self.displayContourExtension(contourAgreementData.reportType, contourAgreementData.isReportRequired, contourAgreementData.callSigns);
+	    		}
+	    		if (extensionAgreementData) {
+	    			self.dom.body.find('#' + extensionAgreementData.reportType + '_' + extensionAgreementData.isReportRequired).prop('checked', true);
+	    			self.displayExtensionAgreement(extensionAgreementData.reportType, extensionAgreementData.isReportRequired, extensionAgreementData.callSigns);
+	    		}
+	    	}, 1000);
+	    },
+
+	    getRfdsInserviceDocuments: function(obj, docids, finalizeField) {
+	    	uploadedCallSigns = [];
+	    	uploadedReportTypes = [];
+			uploadedDocumnetsFor850Callsigns = [];
+	    	var self =rfdsModule;
+	    	var esDoc=false;
+	    	$(".rfds-inservice-documents-block").empty();
+			var taskId = rfdsModule.dom.body.find(".finalize-task-button").attr('role');
+	    	var documentWrapper = {};
+	    	documentWrapper.refType = "RFDS_INSERVICE_DOCUMENTS",
+	    	documentWrapper.refNum = $("#site-project-id").val();
+	    	documentWrapper.status = "uploaded";
+	    	documentWrapper.siteInfoId = $("#site-info-id").val();
+	    	self.dom.parent.find('#earthStationExceptionStatus').attr('disabled', 'disabled');
+			self.dom.parent.find('#earthStationExceptionStatus').val("");
+			var validation = null;
+			searchDocuments(documentWrapper, (docList) => {
+				$.each(docList, (i, data) => {
+					if (data !== null && data !== undefined) {
+						if (data.category === 'ES_POINT_ANALYSIS') {
+							self.dom.parent.find('#earthStationExceptionStatus').removeAttr("disabled");
+							self.dom.parent.find('#earthStationExceptionStatus').val(rfdsModule.constructor.esStatus);
+						}
+						rfdsModule.displayRfdsInserviceDocuments(docList, data.subCategory);
+						uploadedCallSigns.push(data.subCategory);
+						if(data.category === "8Cs" || data.category === "SHAPE_FILES"){
+							uploadedDocumnetsFor850Callsigns.push(data);
+						}
+						uploadedReportTypes.push(data.category);
+					}
+				});
+				if (finalizeField == "Yes") {
+					validation = mileStoneFinalize.uploadInserviceDocValidateModule(false);
+					if (validation.status) {
+						completeWorkStep("INSERVICE_DOCUMENTS", taskId, function (wsStatusresponse, siteProjectsId) {
+								populateWorkStepStatus(wsStatusresponse, siteProjectsId, "COMPLETE", "INSERVICE_DOCUMENTS", "RFDS");
+						});
+					}
+				}
+			});
+
+	    },
+	    displayRfdsInserviceDocuments: function(docList, subCategory){
+	    	// set label + subCat
+	    	if (this.dom.body.find(".rfds-inservice-documents-block").find("." + subCategory).length === 0) {
+	    		var headTemplate = this.dom.body.find(".rfds-inservice-doc-template-head").html();
+	    		this.dom.body.find(".rfds-inservice-documents-block").append(
+	    			headTemplate.replace(/@SUB_CATEGORY/g, subCategory)
+	    			.replace(/@FREQUENCY_BAND_CODE/g, callSignFrequency[subCategory])
+	    		);
+	    	}
+	    	var tableId = "#rfds-inservice-document-table-" + subCategory;
+
+	    	let columns = this.getRfdsInserviceDocColumns();
+
+	    	// filter out docs where subCat does not match with what is passed
+			// as param
+	    	// also convertUnixDate while looping anyway
+	    	let documentList = [];
+	    	docList = docList.forEach(doc => {
+	    		if(doc.subCategory === subCategory){
+	    			doc.uploadedDate = convertUnixDate(doc.uploadedDate);
+	    			documentList.push(doc);
+	    		}
+	    	});
+	    	var gridOptions = { 
+				dataBound: this.commonShowDocsAfterGridLoad,
+	    	}
+	    	createKendoGrid(tableId, columns, documentList, null, gridOptions);
+	    	this.dom.body.find(tableId).kendoTooltip({
+	            filter: "td:nth-child(3)", // this filter selects the second
+											// column's cells
+	            position: "right",
+	            content: (e)=>{
+	              var dataItem = this.dom.body.find(tableId).data("kendoGrid").dataItem(e.target.closest("tr"));
+	              var content = dataItem.documentSize === "N/A" ? "N/A": dataItem.documentSize + " Bytes";
+	              return content;
+	            }
+	          }).data("kendoTooltip");
+	    	this.dom.body.find(tableId).parents(".documents-result").removeClass("hide");
+	    },
+	    
+	    
+	    getRfdsInserviceDocColumns: function() {
+	    	return [{
+	    		field: "action", 
+	    		title: "Action", 
+	    		width: 55,
+	    		template: `<b class="k-delete-document text-brand-red vz-icon-delete fa fa-trash fa-bold-icon disable" id="#:documentID#"></b>`,
+	    		filterable:false,
+	    		attributes: {
+	    			"class": "text-align-center"
+	    		}
+	    	}, {
+	    		field: "title",
+	    		title: "Documnet Name", 
+	    		template: (response)=>{
+	    			var vendorPath = `<a href="#" id="${response.documentID}" data-path="${response.path+ "?"+new Date().getTime()}" class="text-underline text-link download-documents">${response.title}</a>`;
+	    			var nonVendorPath =`<a href="${response.path+ "?" + new Date().getTime()}" id="${response.documentID}" data-path="${response.path+ "?"+new Date().getTime()}" class="text-underline text-link" target="_blank">${response.title}</a>`;
+	    			if ($('#isVendorCheck').val()== "true") {
+	    				return vendorPath;
+	    			} else{
+	    				return nonVendorPath;
+	    			}
+	    		}
+	    	}, 
+	    	{
+	    		field:"documentSizeHuman",
+	    		title:"Size"
+	    	},
+	    	{
+	    		field: "category", 
+	    		title: "Category"
+	    	}, {
+	    		field: "uploadedDate",
+	    		title: "Upload Date", 
+	    		type: "date"
+	    	}, {
+	    		field: "uploadedBy",
+	    		title: "Upload By"
+	    	}];
+	    },
+	    changeFccRadio: function(e){
+			var self  = $(e.currentTarget);
+    		var fccRequiredObject = {};
+    		var radioVal = self.val();
+    		var regService = self.data('reg-service');
+    		var selectedBandName = self.data('reg-service');
+    		fccRequiredObject.siteProjectsId = this.dom.projectId;
+    		var bandNames = ['700Mhz', 'Cellular', 'PCS', 'AWS', 'C-Band'];
+    		for (var key = 0; key < bandNames.length; key++) {
+    			var value = bandNames[key];
+    			if (selectedBandName === value) {
+					selectedBandName = selectedBandName === 'C-Band'? 'CBand':selectedBandName;
+    				fccRequiredObject['intlBorderExtendsFor' + selectedBandName] = radioVal
+    				fccRequiredObject.vzRegService = regService;
+    				this.updateRfdsCallSigns(fccRequiredObject);
+    				break;
+    			}
+    		}
+    		var callSignId = self.attr("name");
+			if(radioVal === 'Yes'){
+				
+				$("#"+callSignId +"-notificationTimeoutDiv").addClass("hide");
+				$("#"+callSignId +"-agreementTimeoutDiv").removeClass("hide");
+			}
+			else{
+			$("#"+callSignId +"-agreementTimeoutDiv").addClass("hide");
+			$("#"+callSignId +"-notificationTimeoutDiv").removeClass("hide");	
+			}
+    		var subCategory="";
+    		if (callSignId === "band700m") {
+                    subCategory = "700"
+                } else if (callSignId === "band850m") {
+                    subCategory = "850"
+                } else if (callSignId === "band1900m") {
+                    subCategory = "1900"
+                } else if (callSignId === "band2100m") {
+                    subCategory = "2100"
+                }else if (callSignId === "cband") {
+                    subCategory = "C-BAND";
+                }
+               subCategory = 'INTERNATIONAL_BORDER_'+  (radioVal === 'No' ? 'NOTIFICATION' : 'AGREEMENT' )+'_'+subCategory;
+               $("#"+callSignId+"-form").find("#subCategory").val(subCategory);                
+	    },
+	    changeUploadRfdsInserviceDocuments: function(e){
+    		e.preventDefault();
+    		var form = this.dom.body.find('.rfds-inservice-template .upload-form');
+    		var formId = form.attr("id");
+    		var subCategory = this.dom.parent.find("#inservice-callsign-list").val();
+    		if (subCategory !== null && subCategory !== "" && subCategory !== undefined) {
+//    			this.dom.parent.find("#" + formId).find('#subCategory').val(subCategory);
+//    			this.dom.parent.find("#" + formId).find('#bandwidth').val(callSignFrequency[subCategory].replace(/-/g, "^"));
+//    			uploadDocument(this.dom.siteInfoId, formId, this.getRfdsInserviceDocuments);
+	    		this.dom.parent.find("#" + formId).find('#subCategory').val(subCategory);
+	    		this.dom.parent.find("#" + formId).find('#bandwidth').val(JSON.stringify(callSignFrequency));
+	    		uploadDocumentWithMultipleCategories(this.dom.siteInfoId, formId, this.getRfdsInserviceDocuments, null, "Yes");
+    		} else {
+    			displayError("Error", "Please select the callsigns the document is applicable to");
+    			this.dom.parent.find("#" + formId)[0].reset();
+    		}
+	    },
+	    changeDocReportTypeList: function(){	    	
+			var reportTypeVal = this.dom.body.find("#doc-report-type-list").val();
+			var reportTypeText = this.dom.body.find("#doc-report-type-list option:selected").text();
+			if (reportTypeVal === "" && reportTypeVal === undefined) {
+				displayError("Error", "Please select the Report Type !!");
+				return false;
+			}
+			if (this.dom.body.find(".rfds-inservice-selected-block").find("." + reportTypeVal).length > 0) {
+				displayError("Error", "Report type '" + reportTypeText + "' already added.!!");
+				return false;
+			}
+			this.dom.body.find("#inservice-callsign-list").empty();
+			if (reportTypeVal !== 'EXTENSION_AGREEMENT' && reportTypeVal !== "FIELD_STRENGTH" && reportTypeVal !== "CONTOUR_EXTENSION_BEYOND_40" 
+				&& reportTypeVal !== "5G_FIELD_STRENGTH" && reportTypeVal !== "CONTOUR_EXTENSION_INTO_UNLICENSED_AREA" && reportTypeVal !== "CBAND_FIELD_STRENGTH") {
+				this.getProjCallSigns(reportTypeVal, (response)=> {
+					//this.dom.body.find("#inservice-callsign-list").append($("<option></option>").prop("value", "").text(""));
+					if (!jQuery.isEmptyObject(response)) {
+						$.each(response, (i, data)=> {
+							if (data !== null && data !== undefined) {
+								this.dom.body.find("#inservice-callsign-list").append($("<option></option>").prop("value", i).text(data));
+								this.dom.body.find("#inservice-callsign-list").selectpicker("refresh");
+							}
+						});
+					} else {
+						displayMessage("No CallSigns available");
+						this.dom.body.find(".rfds-inservice-selected-block").empty();
+						return false;
+					}
+				});
+			} else {
+				var carrierAgreements = getCarrierAgreements();
+				this.getProjCallSigns("", (response)=> {
+					$.each(carrierAgreements, (i, data)=> {
+						if (data !== null && data !== undefined) {
+							if (data.reportType === reportTypeVal && data.isReportRequired === "Yes") {
+								//this.dom.body.find("#inservice-callsign-list").append($("<option></option>").prop("value", "").text(""));
+								$.each((data.callSigns).split(","), (i, data)=> {
+									this.dom.body.find("#inservice-callsign-list").append($("<option></option>").prop("value", data).text(callSignFrequency[data]));
+									this.dom.body.find("#inservice-callsign-list").selectpicker("refresh");
+								});
+							}
+						}
+					});
+				});
+			}
+			var template = this.dom.body.find(".rfds-inservice-template").html();
+			this.dom.body.find(".rfds-inservice-selected-block").empty();
+			this.dom.body.find(".rfds-inservice-selected-block").append(
+				template.replace(/@REPORT_TYPE_TEXT/g, reportTypeText)
+				.replace(/@REPORT_TYPE_VAL/g, reportTypeVal)
+				.replace(/@SITE_PROJECTS_ID/g, this.dom.projectId)
+			);
+			this.dom.body.find(".upload-rfds-inservice-documents").off('change').on('change', $.proxy(this.changeUploadRfdsInserviceDocuments, this));
+	    },
+	    changeCallsignListExtenstionAgreement: function(){
+    		var callsigns = this.dom.body.find("#callsign-list-CONTOUR_EXTENSION_BEYOND_40").val();
+    		if (callsigns === null) {
+    			displayError("Error", "Please select callsigns for CGSA border");
+    		}
+	    },
+	    clickCarrierAgreementsRadio: function(e) {
+	    	var self =rfdsModule;
+	    		var isReportRequired = $(e.currentTarget).val();
+	    		var reportType = $(e.currentTarget).attr('name');
+	    		self.mergeProjCarrierAgreementDetails(reportType, ()=>{
+	    			if (reportType === "EXTENSION_AGREEMENT") {
+	    				self.displayExtensionAgreement(reportType, isReportRequired)
+	    			}else if(reportType === "CONTOUR_EXTENSION_BEYOND_40"){
+	    				self.displayContourExtension(reportType, isReportRequired);
+	    			}else{
+	    				self.addCallSigns(reportType, isReportRequired, null, "CHANGE");
+	    			}
+	    		});
+	    },
+	    changeCarrierAgrmtCallsignList: function(e){
+    		e.preventDefault();
+    		if($(e.currentTarget).is('select')){
+    			var id = $(e.currentTarget).attr('id');
+    			var reportType = id.replace(/callsign-list-/g, "");
+        		this.mergeProjCarrierAgreementDetails(reportType);
+    		}
+	    },
+	    changeBasMarket: function(){
+    		e.preventDefault();
+    		this.basMarketShow();
+	    },
+	    clickMitigationRadio: function(e){
+			let self = $(e.currentTarget);
+    		this.saveRfe(self.attr("name"), self.val(),"");
+	    },
+	    clickPowerAdjustmentRadio: function(e){
+	    	let self = $(e.currentTarget);
+	    	if(self.val().toLowerCase() == 'no'){
+	    		this.dom.body.find(".atoll-transmitter-section").addClass("hide");
+	    		this.saveRfe("3RD_PARTY_EME_ASSESSEMENT", "",self.val());
+	    		this.dom.body.find("#poweradjustment_yes").prop("checked", false);
+	    	}
+	    	else if(self.val().toLowerCase() == 'yes'){
+    		this.saveRfe("3RD_PARTY_EME_ASSESSEMENT", "",self.val());
+    		this.dom.body.find("#poweradjustment_no").prop("checked", false);
+    		this.getAtollTransmitterData();
+	    	
+	    	}
+	    },
+	    clickExistingMarketWithIn: function(){
+	    	var value = this.dom.body.find("input[name='existingmarketwithin']").val();
+	    	this.dom.body.find(".bas-doc-upload").addClass('hide');
+    		if (value === "Yes") {
+    			this.dom.body.find(".bas-doc-upload").removeClass('hide');
+    		}
+	    },
+	    changeRfeReportTypeList: function(msg){
+	    			var options={
+	    					title:'CONFIRM NOTIFICATION', 
+	    		    		body: msg,
+	    		    		confirmBtn:	`<button type="submit" class="btn btn-sm btn-default pull-right make-rfe-yes-btn" data-dismiss="modal">Dismiss</button>`,
+	    		    		backdrop:"static",
+	    		    		keyboard:"false"
+	    				};
+	    			Fuzehelper.commonConfirmationModalPopup("make-rfe-rave-modal",options,()=>{
+	    				var makeRfeRaveModal = $("#make-rfe-rave-modal");
+	    				makeRfeRaveModal.modal("show");
+	    				makeRfeRaveModal.find('.make-rfe-yes-btn').off("click").on("click",()=>{
+	    					 this.dom.body.find("#rfe-report-type-list").val("");
+	    				});
+	    			});
+	    },
+	    clickCreateRfdsWorkstep: function(){
+	    	 this.dom.body.find(".createRfdsLoading").addClass("fa-spinner fa-spin");
+	    		var id =  this.dom.body.find('.create-rfds-workstep').attr('id');
+	    		var taskId = this.dom.body.find('.create-rfds-workstep').attr('role');
+	    		var $this = this.dom.body.find('.create-rfds-workstep');
+	    		var milestoneName = $this.closest('.panel .panel-default').attr('id');
+	    		var proj = {};
+	    		proj.siteProjectsId = this.dom.projectId;
+	    		proj.source = "Projects";
+	    		proj.siteInfoId = this.dom.siteInfoId;
+	    		this.constructor.ajax.fireApi(proj, "rfds", "mergeRfdsProject", (response)=> {
+	    			this.listRfdsProjects();
+	    			this.dom.body.find(".createRfdsLoading").removeClass("fa-spinner fa-spin");
+	    			completeWorkStep(id, taskId, (response, siteProjectsId)=> {
+	    				populateWorkStepStatus(response, siteProjectsId, id, milestoneName);
+	    			});
+	    		});
+	    },
+
+//.jsp
+
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="vp" uri="/WEB-INF/vendor-project.tld"%>
+<%@ taglib prefix="fuze" uri="/WEB-INF/fuze.tld"%>
+<h5 class="text-brand-red margin-top-zero col-sm-12">International Border</h5>
+<div class="international-callsign-tables"></div>
+<div class="documents-result col-xs-12 col-sm-12 padding-zero international-border-documents-list margin-top hide">
+	<div id="international-border-document-table" data-ref-type="SITE_INTL_BORDER_AGREEMENTS" class="spm-grid-styles"></div>
 </div>
-....
+<div class="international-table-header-template hide">
+	<h6 class="text-brand-red margin-top">@BANDWIDTH Callsigns</h6>
+	<div class="col-md-12 padding-zero section-divider-bottom">
+		<div id="@ID-international-colnames" class="spm-grid-styles">
+		</div>
+		<div class="radio vzbs-radio text-bold border-none margin-top-bottom">Does the signal extend into the country at levels above those specified in the Agreement between the FCC and their counterpart? :&nbsp;
+			<input name="@ID" role="radio" data-reg-service="@VZREGSERVICE" value="Yes" id="signalextend-yes" type="radio" class="@ID-yes fcc-radio disable" disabled="disabled">
+			<label>Yes</label>
+			<input name="@ID" role="radio" data-reg-service="@VZREGSERVICE" value="No" id="signalextend-no" type="radio" class="@ID-no fcc-radio disable" disabled="disabled" checked>
+			<label>No</label>
+		</div>
+		<div id="@ID-notificationTimeoutDiv" >
+		        <label for="notificationTimeout">Notification Timeout Date</label>
+		        <input type="date" id="notificationTimeout" name="notificationTimeout">
+		    </div>
+		
+		    <div id="@ID-agreementTimeoutDiv"  >
+		        <label for="agreementTimeout">Agreement Timeout Date</label>
+		        <input type="date" id="agreementTimeout" name="agreementTimeout">
+		    </div>
 
-
-
-
-
-
-
-
-
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>SPM Tracker</title>
-    <link rel="stylesheet" type="text/css" href="path/to/your/css/file.css">
-    <style>
-        .hidden {
-            display: none;
-        }
-    </style>
-</head>
-<body>
-
-<h6 class="teat-brand-red margin-top">@BAMWIDTH Callsigns</h6>
-
-<div class="col-md-12 padding-zero section-divider-bottom">
-    <div class="radio vzhs-radio test-bold border-none margin-top-bottom">
-        <label>Does the signal extend into the country at levels specified in the Agreement between The FCC and their counterpart?</label>
-        &nbsp;
-        <input name="signalExtend" role="radio" data-reg-service="VZREGSERVICE" value="yes" id="signalExtendYes" type="radio">
-        <label for="signalExtendYes">Yes</label>
-        <input name="signalExtend" role="radio" data-reg-service="VZREGSERVICE" value="no" id="signalExtendNo" type="radio" checked>
-        <label for="signalExtendNo">No</label>
-    </div>
-
-    <div id="notificationTimeoutDiv" class="hidden">
-        <label for="notificationTimeout">Notification Timeout Date</label>
-        <input type="date" id="notificationTimeout" name="notificationTimeout">
-    </div>
-
-    <div id="agreementTimeoutDiv" class="hidden">
-        <label for="agreementTimeout">Agreement Timeout Date</label>
-        <input type="date" id="agreementTimeout" name="agreementTimeout">
-    </div>
-
-    <label>Upload Agreement/Notification</label>
-    <div class="custom-file-upload vertical-align-middle">
-        <div class="margin-top-bottom">
-            <input type="file" name="fileUpload" class="file-upload" accept=".doc, .docx, .pdf">
-        </div>
-        <input type="hidden" name="category" id="category" value="projects">
-        <input type="hidden" name="subCategory" id="subCategory" value="INTERNATIONAL BORDER DOC">
-        <input type="hidden" name="description" id="description" value="General Documents">
-        <input type="hidden" name="uri" id="uri" value="document-gateway/document">
-    </div>
-
-    <button type="submit" class="btn btn-danger">Upload Document</button>
+		<div class="col-sm-12 padding-left-right-zero margin-top @ID-container hide">
+			<div class="col-sm-6 col-md-4 padding-left-right-zero group_one">
+				<div class="col-xs-12 col-sm-12 select_picklist opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement Type</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section opt-content-single-select">
+						<select class="select_picklist_select form-control border-zero input-sm padding-right-zero mandatory-field empty" data-toggle="tooltip">
+							<option value="">Nothing Selected</option>
+							<option value="SINGLE_SITE">Single-Site</option>
+							<option value="MULTI_SITE">Multi-Site</option>
+						</select>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-12 text_varchar opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement Applicable Site ID</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section">
+						<input class="form-control input-sm padding-right-zero text_varchar_input border-zero mandatory-field empty" disabled readonly data-toggle="tooltip"/>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-12 text_varchar opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement Applicable Band Class</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section">
+						<input class="form-control input-sm padding-right-zero text_varchar_input border-zero mandatory-field empty" data-toggle="tooltip" value="@VZREGSERVICE"/>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-6 col-md-4 padding-left-right-zero group_two">
+				<div class="col-xs-12 col-sm-12 select_picklist opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement Border Proximity Threshold (meters)</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section opt-content-single-select">
+						<input type="number" class="select_picklist_select form-control border-zero input-sm padding-right-zero mandatory-field empty" data-toggle="tooltip" oninput="numberDecimalsValidation(event)"/>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-12 text_varchar opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement Field Strength Border Limit (dBu)</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section">
+						<input type="number" class="form-control input-sm padding-right-zero text_varchar_input border-zero mandatory-field empty" data-toggle="tooltip" oninput="numberDecimalsValidation(event)"/>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-12 text_varchar opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement PFSD Border Limit (dBm/m2/MHz)</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section">
+						<input class="form-control input-sm padding-right-zero text_varchar_input border-zero mandatory-field empty" data-toggle="tooltip" oninput="numberDecimalsValidation(event)"/>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-6 col-md-4 padding-left-right-zero group_three">
+				<div class="col-xs-12 col-sm-12 select_picklist opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement PSD Border Limit (dBm/MHz)</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section opt-content-single-select">
+						<input type="number" class="select_picklist_select form-control border-zero input-sm padding-right-zero mandatory-field empty" data-toggle="tooltip" oninput="numberDecimalsValidation(event)"/>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-12 text_varchar opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement RSRP Border Limit (dBm)</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section">
+						<input class="form-control input-sm padding-right-zero text_varchar_input border-zero mandatory-field empty" data-toggle="tooltip" oninput="numberDecimalsValidation(event)"/>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-12 text_varchar opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement RSSI Border Limit (dBm)</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section">
+						<input type="number" class="form-control input-sm padding-right-zero text_varchar_input border-zero mandatory-field empty" data-toggle="tooltip" oninput="numberDecimalsValidation(event)"/>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="doc-upload-@ID">
+			<div class="margin-top-bottom">
+				<label>Upload Agreement/Notification :</label>
+				<div class="custom-file-upload vertical-align-middle">
+					<label class="lbl-file-upload"><i class="fa fa-upload fa-bold vertical-align-middle padding-right padding-xs" aria-hidden="true"></i> Drag File Here / Click Here To Upload</label>
+					<form method="post" enctype="multipart/form-data" id="@ID-form" action="service/invoke/upload" target="upload-target" class="inline-block upload-international-form upload-form">
+						<input type="hidden" name="refNum" id="refNumDocuments" value="">
+						<input type="hidden" name="refType" id="refType" value="SITE_INTL_BORDER_AGREEMENTS">
+						<input type="hidden" name="service" id="service" value=""> 
+						<input type="hidden" name="category" id="category" value="projects"> 
+						<input type="hidden" name="subCategory" id="subCategory" value="INTERNATIONAL_BORDER_@DOC_CHECK_@DOC_CATEGORY"> 
+						<input type="hidden" name="description" id="description" value="General Documents">
+						<input type="hidden" name="siteInfoJSON" id="siteInfoJSONDocuments">
+						<input type="hidden" name="uri" id="uri" value="document-gateway/document-service/document/documentUpload">
+						<iframe name="upload-target" id="upload-target" style="display: none;" onload=""></iframe>
+						<!-- SPM GUI Fortify often misused file upload vulnerability fix -->
+						<input class="col-md-8 btn btn-default btn-sm input-field padding-zero disable auto-upload-doc" type="${applicationScope.ContextCache.projectServiceSettings['guiConstants']['FILE_TYPE']}" data-table="#international-border-document-table" name="file" id="browse-files">
+						<!-- SPM GUI Fortify often misused file upload vulnerability fix -->
+						<!-- <button type="submit" id="upload-@NAME-button" href="#" data-toggle="" data-target="" role="button" class="btn btn-danger btn-sm input-field upload-international-document disable common_doc_upload_btn"> <i class="fa fa-spinner fa-spin finalize-spinner hide"></i><b>Upload Document</b></button> -->
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var signalExtendYes = document.getElementById('signalExtendYes');
-        var signalExtendNo = document.getElementById('signalExtendNo');
-        var notificationTimeoutDiv = document.getElementById('notificationTimeoutDiv');
-        var agreementTimeoutDiv = document.getElementById('agreementTimeoutDiv');
-
-        signalExtendYes.addEventListener('change', function() {
-            if (signalExtendYes.checked) {
-                agreementTimeoutDiv.classList.remove('hidden');
-                notificationTimeoutDiv.classList.add('hidden');
-            }
-        });
-
-        signalExtendNo.addEventListener('change', function() {
-            if (signalExtendNo.checked) {
-                notificationTimeoutDiv.classList.remove('hidden');
-                agreementTimeoutDiv.classList.add('hidden');
-            }
-        });
-
-        // Initialize the fields based on the current state
-        if (signalExtendYes.checked) {
-            agreementTimeoutDiv.classList.remove('hidden');
-        } else {
-            notificationTimeoutDiv.classList.remove('hidden');
-        }
-    });
-</script>
-
-</body>
-</html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//p1.html..
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="p2.css" />
-
-    <title>Login Page</title>
-  </head>
-  <body>
-    <form id="loginForm">
-      <label for="username">Username:</label>
-      <input
-        type="text"
-        id="newUsername"
-        placeholder="Enter the User Name"
-        autocomplete="newUsername"
-      />
-
-      <label for="password">Password:</label>
-      <input
-        type="password"
-        id="newPassword"
-        placeholder="Enter the Password"
-        autocomplete="newPassword"
-      />
-
-      <button type="button" id="submitBtn" disabled>Submit</button>
-      <button type="button" id="resetBtn" style="display: none">Reset</button>
-      <button type="button" id="signupBtn" onclick="openSignUpModal()">
-        Sign Up
-      </button>
-
-      <button
-        type="button"
-        id="resetPasswordBtn"
-        onclick="openResetPasswordModal()"
-      >
-        Password Reset
-      </button>
-    </form>
-
-    <div id="signUpModalContainer"></div>
-    <div id="signUpModal" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closeSignUpModal()">&times;</span>
-        <h2>Sign Up</h2>
-        <form id="signUpForm">
-          <label for="signupUsername">Username:</label>
-          <input
-            type="text"
-            id="signupUsername"
-            placeholder="Enter the User Name"
-            autocomplete="signupUsername"
-          />
-
-          <label for="signupPassword">Password:</label>
-          <input
-            type="password"
-            id="signupPassword"
-            placeholder="Enter the Password"
-            autocomplete="signupPassword"
-          />
-
-          <button
-            type="button"
-            id="signupSubmitBtn"
-            onclick="submitSignUpForm()"
-          >
-            Submit
-          </button>
-          <button type="button" id="signupResetBtn" onclick="resetSignUpForm()">
-            Reset
-          </button>
-          <button type="button" id="resetStorageBtn">Reset Storage</button>
-        </form>
-      </div>
-    </div>
-    <div id="resetPasswordModal" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closeResetPasswordModal()">&times;</span>
-        <h2>Password Reset</h2>
-        <form id="resetPasswordForm">
-          <label for="resetUsername">Username:</label>
-          <input
-            type="text"
-            id="resetUsername"
-            placeholder="Enter the User Name"
-            autocomplete="resetUsername"
-          />
-          <button type="button" id="resetPasswordBtn">Reset Password</button>
-        </form>
-      </div>
-    </div>
-    <script defer src="p3.js"></script>
-    <script defer src="p4.js"></script>
-  </body>
-</html>
-
-//p2.css,,,,,
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-}
-
-form {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  width: 300px;
-  text-align: center;
-}
-
-input {
-  width: 100%;
-  padding: 8px;
-  margin: 8px 0;
-  box-sizing: border-box;
-}
-
-button {
-  background-color: #4caf50;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-button:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-
-.error {
-  color: red;
-}
-
-.modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgb(0, 0, 0);
-  background-color: rgba(0, 0, 0, 0.4);
-  padding-top: 60px;
-}
-
-.modal-content {
-  background-color: #fefefe;
-  margin: 5% auto;
-  padding: 20px;
-  border: 1px solid #888;
-  width: 80%;
-}
-
-.close {
-  color: #aaa;
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-  color: black;
-  text-decoration: none;
-  cursor: pointer;
-}
-//p3.js...
-document.getElementById("signupPassword").addEventListener("cut", function (e) {
-  e.preventDefault();
-  showDisabledAlert();
-});
-
-document
-  .getElementById("signupPassword")
-  .addEventListener("copy", function (e) {
-    e.preventDefault();
-    showDisabledAlert();
-  });
-
-document
-  .getElementById("signupPassword")
-  .addEventListener("paste", function (e) {
-    e.preventDefault();
-    showDisabledAlert();
-  });
-
-document
-  .getElementById("signupPassword")
-  .addEventListener("contextmenu", function (e) {
-    e.preventDefault();
-    showDisabledAlert();
-  });
-
-function showDisabledAlert() {
-  // Show Bootstrap Error alert in the Modal
-  const signUpModalContent = document.querySelector(
-    "#signUpModal .modal-content"
-  );
-  signUpModalContent.innerHTML += `
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-      Copy, paste, and right-click disabled for the password field.
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-  `;
-}
-
-document.getElementById("newUsername").addEventListener("blur", function () {
-  validateField("newUsername");
-  updateResetButtonVisibility();
-  updateSubmitButtonState();
-});
-
-document.getElementById("newPassword").addEventListener("blur", function () {
-  validateField("newPassword");
-  updateResetButtonVisibility();
-  updateSubmitButtonState();
-});
-
-document.getElementById("submitBtn").addEventListener("click", function () {
-  submitForm();
-});
-
-document.getElementById("resetBtn").addEventListener("click", function () {
-  resetForm();
-});
-
-function validateField(field) {
-  const element = document.getElementById(field);
-  if (element.value.trim() === "") {
-    element.style.border = "2px solid red";
-  } else {
-    element.style.border = "1px solid #ccc";
-  }
-}
-
-function updateResetButtonVisibility() {
-  const usernameField = document.getElementById("newUsername");
-  const passwordField = document.getElementById("newPassword");
-  const resetButton = document.getElementById("resetBtn");
-
-  if (usernameField.value !== "" && passwordField.value !== "") {
-    resetButton.style.display = "inline-block";
-  } else {
-    resetButton.style.display = "none";
-  }
-}
-
-function updateSubmitButtonState() {
-  const usernameField = document.getElementById("newUsername");
-  const passwordField = document.getElementById("newPassword");
-  const submitButton = document.getElementById("submitBtn");
-
-  if (usernameField.value === "" && passwordField.value === "") {
-    submitButton.disabled = true;
-  } else {
-    submitButton.disabled = false;
-  }
-}
-
-function submitForm() {
-  const username = document.getElementById("newUsername").value;
-  const password = document.getElementById("newPassword").value;
-
-  if (username === "" || password === "") {
-    alert("Username and password are mandatory");
-    if (username === "") {
-      document.getElementById("newUsername").style.border = "2px solid red";
-      document.getElementById("newUsername").focus();
-    } else {
-      document.getElementById("newUsername").style.border = "1px solid #ccc";
-      document.getElementById("newPassword").style.border = "2px solid red";
-      document.getElementById("newPassword").focus();
-    }
-    return;
-  }
-
-  const userObject = {
-    userName: username,
-    pwd: password,
-  };
-
-  // Retrieve the existing user list from local storage
-  let userList = JSON.parse(localStorage.getItem("userList")) || [];
-
-  // Push the new user object to the user list
-  userList.push(userObject);
-
-  // Store the updated user list back to local storage
-  localStorage.setItem("userList", JSON.stringify(userList));
-
-  console.log("User List after submission:", userList);
-
-  // Additional logic for local storage validation can be added here
-
-  // Log the username and password JSON list data in the console
-  console.log(
-    "Username and Password JSON List Data:",
-    JSON.stringify(userList)
-  );
-}
-
-function resetForm() {
-  document.getElementById("newUsername").value = "";
-  document.getElementById("newPassword").value = "";
-  updateResetButtonVisibility();
-  updateSubmitButtonState();
-}
-document
-  .getElementById("resetStorageBtn")
-  .addEventListener("click", function () {
-    // Clear the stored local storage list
-    localStorage.removeItem("userList");
-    console.log("Local Storage List cleared");
-  });
-
-function openSignUpModal() {
-  const signUpModal = document.getElementById("signUpModal");
-  signUpModal.style.display = "block";
-}
-
-function closeSignUpModal() {
-  const signUpModal = document.getElementById("signUpModal");
-  signUpModal.style.display = "none";
-}
-
-function submitSignUpForm() {
-  const username = document.getElementById("signupUsername").value;
-  const password = document.getElementById("signupPassword").value;
-
-  if (!/^[a-zA-Z]+$/.test(username)) {
-    // Show Bootstrap Error alert in the Modal
-    const signUpModalContent = document.querySelector(
-      "#signUpModal .modal-content"
-    );
-    signUpModalContent.innerHTML += `
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        User Name cannot contain special characters or numbers. Choose another name and try again.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    `;
-    // Place the cursor in the Username Field
-    document.getElementById("signupUsername").focus();
-    return;
-  }
-  // Validate password
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^])(?=.*\d)[a-zA-Z\d!@#$%^]{8,}$/;
-  if (!passwordRegex.test(password)) {
-    // Show Bootstrap Error alert in the Modal
-    const signUpModalContent = document.querySelector(
-      "#signUpModal .modal-content"
-    );
-    signUpModalContent.innerHTML += `
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-      Password must have at least 8 characters, including at least 1 lowercase letter, 1 uppercase letter, 1 digit, and 1 special character (!@#$%^).
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-  `;
-    // Place the cursor in the Password Field
-    document.getElementById("signupPassword").focus();
-    return;
-  }
-  // Retrieve the existing user list from local storage
-  let userList = JSON.parse(localStorage.getItem("userList")) || [];
-
-  // Check if the username already exists
-  if (userList.some((user) => user.userName === username)) {
-    // Show Bootstrap Error alert in the Modal
-    const signUpModalContent = document.querySelector(
-      "#signUpModal .modal-content"
-    );
-    signUpModalContent.innerHTML += `
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        User Name already taken. Choose another name and try again.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    `;
-    // Place the cursor in the Username Field
-    document.getElementById("signupUsername").focus();
-    return;
-  }
-
-  const userObject = {
-    userName: username,
-    pwd: password,
-  };
-
-  // Push the new user object to the user list
-  userList.push(userObject);
-
-  // Store the updated user list back to local storage
-  localStorage.setItem("userList", JSON.stringify(userList));
-
-  console.log("User List after signup:", userList);
-
-  // Close the modal after successful signup
-  closeSignUpModal();
-
-  // Show Bootstrap Success alert in the Modal on the Top of Login Screen
-  const loginForm = document.getElementById("loginForm");
-  loginForm.insertAdjacentHTML(
-    "afterbegin",
-    `
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
-        User is created.
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    `
-  );
-
-  // Set timeout to remove the success alert after 5 seconds
-  setTimeout(() => {
-    document.querySelector(".alert-success").remove();
-  }, 5000);
-}
-
-above is login and sign up code .. now lets try password reset page .. while creating below conditions must  be satisfied..
-Create a Password Reset Screen with User Name and Reset  Button which will open on clicking of Password Reset Button from the Login Page
-Add a place holder in the User Name box as Enter the User Name
-Disable the Reset Button if User Name Field is empty.
-Once the User Name is entered Check if the entered username is present in the Local Storage 
-Add Validation not to enter,paste special characters in User Name
-If Present the Open a Pop Up Modal with Name as Password Reset Modal which will contain Non Editable User Name and New Password and Retype New Password Fields and a Submit Button.
-On Click of the Submit Button in Password Reset Modal find the username and set this new password for the username in local storage.
-Add Validation to check if Password has 8 Characters, Min 1 Lower Case, Min 1 Upper Case and Min 1 Special Character
-Allowed Special Characters in Password (!@#$%^) and anything out of this then throw an Error Message stating that the Special Character should be within this.
-Disable Copy, Paste using ShortCuts and Right Click on Password Field.
-On Click of the Submit Button in Password Reset Modal check if New Password and Reset Password Values martch and if not and show BootStrap Success alert in the Modal  Stating  "Password does not match" on the Top of  Password Reset Screen 
-BootStrap alert should have a X Mark to close also the message should disappear automatically in 5 seconds or by clicking the X Mark.
-If all Validations are good then close the Password Reset Modal and show BootStrap Success alert in the Modal  Stating  "User Password Reset Success" on the Top of  Login Screen 
-
-
-// Function to open the password reset modal
-function openResetPasswordModal() {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "block";
-}
-
-// Function to close the password reset modal
-function closeResetPasswordModal() {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "none";
-}
-
-// Function to open the password reset modal
-function openResetPasswordModal() {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "block";
-
-  // Add event listener to the input field for real-time validation
-  const userNameInput = document.getElementById("userNameInput");
-  userNameInput.addEventListener("input", handleUserNameInputChange);
-
-  // Initially disable the Reset Button
-  const resetButton = document.getElementById("resetButton");
-  resetButton.disabled = true;
-}
-
-// Function to close the password reset modal
-function closeResetPasswordModal() {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "none";
-}
-
-// Function to handle input change in the User Name field
-function handleUserNameInputChange() {
-  const userNameInput = document.getElementById("userNameInput");
-  const resetButton = document.getElementById("resetButton");
-
-  // Enable the Reset Button only if the User Name field is not empty
-  resetButton.disabled = !userNameInput.value.trim();
-}
-
-
-
-new...
-
-// Existing code in your p4.js file
-
-// Function to open the password reset modal
-function openResetPasswordModal() {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "block";
-
-  // Add event listener to the input field for real-time validation
-  const userNameInput = document.getElementById("enterUserName");
-  userNameInput.addEventListener("input", handleUserNameInputChange);
-
-  // Initially disable the Reset Button
-  const resetButton = document.getElementById("resetPasswordButton");
-  resetButton.disabled = true;
-}
-
-// Function to close the password reset modal
-function closeResetPasswordModal() {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "none";
-}
-
-// Function to handle input change in the User Name field
-function handleUserNameInputChange() {
-  const userNameInput = document.getElementById("enterUserName");
-  const resetButton = document.getElementById("resetPasswordButton");
-
-  // Enable the Reset Button only if the User Name field is not empty
-  resetButton.disabled = !userNameInput.value.trim();
-
-  // Update button style based on disabled state
-  if (resetButton.disabled) {
-    resetButton.style.backgroundColor = "#d3d3d3"; /* Light gray background color */
-    resetButton.style.color = "#a9a9a9"; /* Dark gray text color */
-    resetButton.style.cursor = "not-allowed"; /* Display not-allowed cursor when disabled */
-  } else {
-    resetButton.style.backgroundColor = "#4caf50"; /* Green background color */
-    resetButton.style.color = "white"; /* White text color */
-    resetButton.style.cursor = "pointer"; /* Change cursor on hover */
-  }
-}
-
-
-new..
-create table user (id number(19,0) generated as identity, password varchar2(255 char), username varchar2(255 char), primary key (id))" via jdbc statement
-
-
-new....
-
-
-
-Open sidebar
-ChatGPT 3.5
-
-User
-create or replace FUNCTION        "FUNC_PROJ_PRE_REQ" (siteProjectsId NUMBER, milestoneName VARCHAR2)
-RETURN CLOB
-AS
-preReq CLOB;
-v_check VARCHAR2(32);
-v_bool Boolean;
-v_dismantlement VARCHAR2(32);
-v_whereClause VARCHAR2(64);
-v_query CLOB;
-tableName VARCHAR2(1024);
-dataList CLOB;
-fieldsData CLOB;
-powerCompltDt VARCHAR2(64);
-v_hubTransportVendor VARCHAR2(32);
---v_transportType VARCHAR2(64);
-BEGIN
-    BEGIN
-	SELECT CASE WHEN SP.TYPE = 'Modification' AND (PAI.PROJ_MOD_TYPE IS NULL OR PAI.PROJ_MOD_TYPE IN ('DISMANTLEMENT')) THEN 'false' ELSE 'true' END INTO v_dismantlement
-	FROM SITE_PROJECTS SP
-	INNER JOIN PROJ_ADDITIONAL_INFO PAI ON PAI.SITE_PROJECTS_ID = SP.SITE_PROJECTS_ID
-	AND SP.SITE_PROJECTS_ID = siteProjectsId;
-    EXCEPTION WHEN NO_DATA_FOUND THEN
-	    v_dismantlement := 'false';
-    END;
-    IF(v_dismantlement = 'true') THEN
-	-- FOR FIELDS IN (SELECT * FROM ENUM_REFERENCE WHERE GROUP_NAME = 'PROJECTS_SETTINGS' AND SUB_TYPE = 'PRE_REQ'
-	 -- )LOOP
-	  --DBMS_OUTPUT.PUT_LINE('Field Name: '||FIELDS.NAME);
-	    dataList := NULL;
-	    FOR FIELD_LIST IN (SELECT MODULE,TABLE_NAME,dbms_xmlgen.convert(RTRIM(XMLAGG(XMLELEMENT(E,D,'||'',''||')).EXTRACT('E/text()').getCLOBVal(),'||'),1) AS fields FROM
-				(SELECT MODULE,TABLE_NAME,
-                CASE WHEN TABLE_NAME = 'VDU_ORCHESTRATION' AND FIELD_NAME != 'VCP_FE_INSTALLATION_AC_DT' 
-                    THEN '''"' || TITLE || '":"''' || ' || CASE WHEN COUNT(' || FIELD_NAME || ') = COUNT(*) THEN TO_CHAR(MAX(' || FIELD_NAME || '),''MM/DD/RRRR'') ELSE '''' END ||' || '''"'''
-                WHEN TABLE_NAME = 'VDU_ORCHESTRATION' AND FIELD_NAME = 'VCP_FE_INSTALLATION_AC_DT' 
-                    THEN '''"' || TITLE || '":"''' || '||CASE WHEN COUNT(' || FIELD_NAME || ') = COUNT(*) THEN TO_CHAR(MAX(TO_DATE(' || FIELD_NAME || ',''MM/DD/RRRR'')),''MM/DD/RRRR'') ELSE '''' END ||' || '''"'''
-                ELSE '''"' || TITLE || '":"''' || '||' || FIELD_NAME || '||' || '''"''' END AS D
-				FROM FUZE_TRACKER_FIELD_CONFIG FTFC
-				WHERE
-				FIELD_NAME IN (SELECT  MMM.DEPENDENT_FIELD FROM PROJ_MAJOR_MILESTONE_MAPPING MMM
-				    inner join FUZE_TRACKER_FIELD_CONFIG FTFC on MMM.MAJOR_MILESTONE = FTFC.FIELD_NAME
-				    where MMM.IS_MANDATORY in ('C','MC','VDU')
-				    and FTFC.EDIT_RULE = 'CALCULATED_DATE'
-				    and FTFC.workstep_name = milestoneName
-				    )
-				) T GROUP BY MODULE,TABLE_NAME
-	    ) LOOP
-		DBMS_OUTPUT.PUT_LINE('MODULE NAME ::'||FIELD_LIST.MODULE);
-		 DBMS_OUTPUT.PUT_LINE('FIELDS::'||FIELD_LIST.fields);
-	       IF(FIELD_LIST.TABLE_NAME = 'SPM_PROJECT_TRACKER') THEN
-		    v_whereClause := 'FUZE_PROJECT_ID';
-		ELSE
-		    v_whereClause := 'SITE_PROJECTS_ID';
-		END IF;
-		IF (FIELD_LIST.TABLE_NAME NOT IN ( 'PROJECT_TRACKER_WORKSTEP_STATUS','VDU_ORCHESTRATION')) THEN
-		    v_query := 'SELECT ' || to_char(FIELD_LIST.fields) || '
-				FROM SITE_PROJECTS SP
-				LEFT OUTER JOIN ' || FIELD_LIST.TABLE_NAME || ' T ON T.'||v_whereClause||' = SP.SITE_PROJECTS_ID
-				WHERE SP.SITE_PROJECTS_ID = ' || siteProjectsId;
-		    DBMS_OUTPUT.PUT_LINE(v_query);
-		    EXECUTE IMMEDIATE v_query into fieldsData;
-		    DBMS_OUTPUT.PUT_LINE('IF fieldsData::'|| fieldsData );
-        ELSIF(FIELD_LIST.TABLE_NAME = 'VDU_ORCHESTRATION')THEN
-
-             v_query := 'SELECT ' || to_char(FIELD_LIST.fields) || '
-				FROM SITE_PROJECTS SP
-				LEFT OUTER JOIN ' || FIELD_LIST.TABLE_NAME || ' T ON T.'||v_whereClause||' = SP.SITE_PROJECTS_ID
-                AND VRAN_ORCHESTRATION_PATH = ''FULL_ORCHESTRATION''
-				WHERE SP.SITE_PROJECTS_ID = ' || siteProjectsId;
-                DBMS_OUTPUT.PUT_LINE(v_query);
-
-		    DBMS_OUTPUT.PUT_LINE('IF fieldsData::'|| fieldsData );
-
-            EXECUTE IMMEDIATE v_query into fieldsData;
-		    DBMS_OUTPUT.PUT_LINE('IF fieldsData::'|| fieldsData );
-		ELSE
-		    SELECT dbms_xmlgen.convert(XMLAGG(XMLELEMENT(E,FLDDATA,',')).EXTRACT('E/text()').getCLOBVal(),1) INTO fieldsData
-		    FROM (
-			SELECT '"' || FTFC.TITLE || '":"' || PTWS1.COMPLETED_DATE ||'"' AS FLDDATA
-			FROM FUZE_TRACKER_FIELD_CONFIG FTFC
-			inner join (
-			    SELECT * FROM (
-								SELECT MAJOR_MS_CANDIDATE_SELECTION_COMPLETED_DATE, MAJOR_MS_ACTIVATION_COMPLETED_DATE,MINOR_MS_ACTIVATION_NON_RF_COMPLETED_DATE,MINOR_MS_AE_COMPLETED_DATE,MINOR_MS_CANDIDATE_ACCEPTED_COMPLETED_DATE,MINOR_MS_CANDIDATE_SUBMITTED_COMPLETED_DATE,
-				MINOR_MS_CONSTRUCTION_REVIEW_COMPLETED_DATE,MINOR_MS_RF_ACCEPT_RANKING_COMPLETED_DATE,MINOR_MS_TRANSPORT_REVIEW_COMPLETED_DATE,MINOR_MS_CLOSEOUT_DOCUMENTS_UPLOAD_COMPLETED_DATE,
-				MINOR_MS_PHOTO_DOCUMENTS_COMPLETED_DATE,MINOR_MS_CREATE_CQ_COMPLETED_DATE,MINOR_MS_CQ_EQUIPMENT_COMPLETED_DATE,MINOR_MS_IP_COMPLETE_COMPLETED_DATE,
-				MINOR_MS_READY_FOR_ASSURANCE_COMPLETED_DATE,MINOR_MS_RF_COMPLETE_DATE,MINOR_MS_SP_COMPLETE_COMPLETED_DATE,MINOR_MS_TRANSPORT_COMPLETE_COMPLETED_DATE,
-				MINOR_MS_CONSTRUCTION_READY_COMPLETED_DATE,MINOR_MS_PRE_TCN_COMPLETED_DATE,MINOR_MS_CREATE_PROJECT_COMPLETED_DATE,
-				MINOR_MS_CONFIRM_E911_ADDRESS_COMPLETED_DATE,MINOR_MS_CONFIRM_E911_SUBMITTED_COMPLETED_DATE,MINOR_MS_CONFIRM_TVW_RECEIVED_COMPLETED_DATE,MINOR_MS_EDGE_EQUIPMENT_CLOSEOUT_COMPLETED_DATE,
-				MINOR_MS_EDGE_EQUIPMENT_INFORMATION_COMPLETED_DATE,MINOR_MS_EDGE_EQUIPMENT_INSTALL_COMPLETED_DATE,MINOR_MS_EDGE_FUNDING_COMPLETED_DATE,MINOR_MS_EDGE_INTEGRATE_COMPLETED_DATE,
-				MINOR_MS_EDGE_PROJECT_INFO_COMPLETED_DATE,MINOR_MS_EDGE_PSC_VETTING_COMPLETED_DATE,MINOR_MS_EDGE_VENDOR_SERVICE_INSTALL_COMPLETED_DATE,MINOR_MS_ENVIRONMENTAL_REVIEW_COMPLETED_DATE,
-				MINOR_MS_GLOBAL_EHS_REVIEW_COMPLETED_DATE,MINOR_MS_TERRITORY_REVIEW_COMPLETED_DATE,MINOR_MS_TSDF_REVIEW_COMPLETED_DATE,MINOR_MS_BOM_COMPLETE_COMPLETED_DATE,MINOR_MS_EQUIPMENT_PROCUREMENT_COMPLETE_COMPLETED_DATE,
-				MAJOR_MS_HUB_READY_COMPLETED_DATE,MINOR_MS_INTEGRATION_COMPLETED_DATE,MINOR_MS_LEASING_COMPLETED_DATE,MAJOR_MS_NETWORK_ASSURANCE_COMPLETED_DATE,MINOR_MS_PERMITTING_COMPLETED_DATE,
-				MINOR_MS_CONSTRUCTION_FORM_COMPLETED_DATE,MINOR_MS_ENV_CONST_CLOSEOUT_INFO_COMPLETED_DATE,
-				MINOR_MS_POST_TCN_COMPLETED_DATE,MINOR_MS_RFE_MITIGATION_DOCS_COMPLETED_DATE,MINOR_MS_POWER_VETTING_COMPLETED_DATE,MINOR_MS_POWER_COMPLETE_COMPLETED_DATE,MINOR_MS_POWER_UTILITIES_TERMINATION_COMPLETED_DATE,MINOR_MS_UTILITY_INFORMATION_COMPLETED_DATE,
-				MINOR_MS_PSC_CONSTRUCTION_COMPLETED_DATE,MINOR_MS_PSC_DESIGN_COMPLETED_DATE,MINOR_MS_PSC_PRE_CONSTRUCTION_COMPLETED_DATE,MINOR_MS_PSC_PROJ_DETAILS_COMPLETED_DATE,MINOR_MS_PSLC_FUNDING_COMPLETED_DATE,
-				MAJOR_MS_REAL_ESTATE_COMPLETED_DATE,MINOR_MS_AM_FURTHER_STUDY_COMPLETED_DATE,MINOR_MS_ASR_FORM_COMPLETED_DATE,MINOR_MS_FAA_FORM_COMPLETED_DATE,MINOR_MS_FULL_CONSTRUCTION_APPROVAL_COMPLETED_DATE,
-				MINOR_MS_GROUND_ONLY_APPROVAL_COMPLETED_DATE,MINOR_MS_STRUCTURE_FORM_COMPLETED_DATE,MINOR_MS_SUBMIT_FOR_NEPA_COMPLETED_DATE,MINOR_MS_SURVEY_COMPLETED_DATE,MINOR_MS_REGULATORY_DISMANTLEMENT_COMPLETED_DATE,
-				MINOR_MS_REGULATORY_INSERVICE_COMPLETED_DATE,MINOR_MS_CARRIER_AGREEMENT_COMPLETED_DATE,MINOR_MS_CREATE_RFDS_COMPLETED_DATE,MINOR_MS_INSERVICE_DOCUMENTS_COMPLETED_DATE,MINOR_MS_INTERNATIONAL_BORDER_COMPLETED_DATE,
-				MINOR_MS_QUIET_ZONE_COMPLETED_DATE,MINOR_MS_RFE_COMPLETED_DATE,MINOR_MS_SUBMIT_RFDS_COMPLETED_DATE,MINOR_MS_RFDS_IBV_COMPLETED_DATE,MINOR_MS_SELECT_VENDOR_COMPLETED_DATE,MINOR_MS_MICROWAVE_COMPLETED_DATE,MINOR_MS_ONE_FIBER_COMPLETED_DATE,
-				MINOR_MS_TRANSPORT_CONTRACT_COMPLETED_DATE,MINOR_MS_TRANSPORT_DELIVERY_COMPLETED_DATE,MINOR_MS_ZONING_COMPLETED_DATE,MINOR_MS_EQUIPMENT_COMPLETED_DATE, MAJOR_MS_PHYSICAL_CONSTRUCTION_COMPLETE_COMPLETED_DATE, MAJOR_MS_TRANSPORT_COMPLETED_DATE, MINOR_MS_CONQUEST_COMPLETED_DATE, MAJOR_MS_POWER_COMPLETED_DATE, MINOR_MS_ENVIRONMENT_DUE_DILIGENCE_COMPLETED_DATE, MINOR_MS_REGULATORY_COMPLETED_DATE,
-				MINOR_MS_VCP_ORCHESTRATION_COMPLETED_DATE,MAJOR_MS_RTC_COMPLETED_DATE,MINOR_MS_CONSTRUCTION_48HR_REVIEW_COMPLETED_DATE,MINOR_MS_RF_48HR_REVIEW_COMPLETED_DATE,MINOR_MS_BUILD_CONSTRUCTION_COMPLETE_COMPLETED_DATE,MINOR_MS_ENVIRONMENTAL_NOTICE_TO_CONTRACTOR_COMPLETED_DATE,MINOR_MS_REGULATORY_48HR_REVIEW_COMPLETED_DATE,MINOR_MS_REGULATORY_CONSTRUCTION_SR_COMPLETED_DATE,
-                MINOR_MS_VCP_FAR_EDGE_INSTALLATION_COMPLETED_DATE,MINOR_MS_DC_DISCOVERY_COMPLETED_DATE,MINOR_MS_FAR_EDGE_INSTANTIATION_COMPLETED_DATE,MINOR_MS_VDU_DAY_0_COMPLETE_COMPLETED_DATE,
-                MINOR_MS_VDU_DAY_1_COMPLETE_COMPLETED_DATE,MINOR_MS_VDU_DEPLOY_READINESS_COMPLETED_DATE,MINOR_MS_VCP_SUBCLOUD_DEPLOYMENT_INITIATED_COMPLETED_DATE
-				FROM PROJECT_TRACKER_WORKSTEP_STATUS WHERE SITE_PROJECTS_ID = siteProjectsId
-			    ) UNPIVOT INCLUDE NULLS( COMPLETED_DATE FOR FIELD_NAME IN (
-							MAJOR_MS_CANDIDATE_SELECTION_COMPLETED_DATE AS 'MAJOR_MS_CANDIDATE_SELECTION_COMPLETED_DATE',
-			    MAJOR_MS_ACTIVATION_COMPLETED_DATE AS 'MAJOR_MS_ACTIVATION_COMPLETED_DATE',
-			    MINOR_MS_ACTIVATION_NON_RF_COMPLETED_DATE AS 'MINOR_MS_ACTIVATION_NON_RF_COMPLETED_DATE',
-			    MINOR_MS_AE_COMPLETED_DATE AS 'MINOR_MS_AE_COMPLETED_DATE',
-			    MINOR_MS_CANDIDATE_ACCEPTED_COMPLETED_DATE AS 'MINOR_MS_CANDIDATE_ACCEPTED_COMPLETED_DATE',
-			    MINOR_MS_CANDIDATE_SUBMITTED_COMPLETED_DATE AS 'MINOR_MS_CANDIDATE_SUBMITTED_COMPLETED_DATE',
-			    MINOR_MS_CONSTRUCTION_REVIEW_COMPLETED_DATE AS 'MINOR_MS_CONSTRUCTION_REVIEW_COMPLETED_DATE',
-			    MINOR_MS_RF_ACCEPT_RANKING_COMPLETED_DATE AS 'MINOR_MS_RF_ACCEPT_RANKING_COMPLETED_DATE',
-			    MINOR_MS_TRANSPORT_REVIEW_COMPLETED_DATE AS 'MINOR_MS_TRANSPORT_REVIEW_COMPLETED_DATE',
-			    MINOR_MS_CLOSEOUT_DOCUMENTS_UPLOAD_COMPLETED_DATE AS 'MINOR_MS_CLOSEOUT_DOCUMENTS_UPLOAD_COMPLETED_DATE',
-			    MINOR_MS_PHOTO_DOCUMENTS_COMPLETED_DATE AS 'MINOR_MS_PHOTO_DOCUMENTS_COMPLETED_DATE',
-			    MINOR_MS_CREATE_CQ_COMPLETED_DATE AS 'MINOR_MS_CREATE_CQ_COMPLETED_DATE',
-			    MINOR_MS_CQ_EQUIPMENT_COMPLETED_DATE AS 'MINOR_MS_CQ_EQUIPMENT_COMPLETED_DATE',
-			    MINOR_MS_IP_COMPLETE_COMPLETED_DATE AS 'MINOR_MS_IP_COMPLETE_COMPLETED_DATE',
-			    MINOR_MS_READY_FOR_ASSURANCE_COMPLETED_DATE AS 'MINOR_MS_READY_FOR_ASSURANCE_COMPLETED_DATE',
-			    MINOR_MS_RF_COMPLETE_DATE AS 'MINOR_MS_RF_COMPLETE_DATE',
-			    MINOR_MS_SP_COMPLETE_COMPLETED_DATE AS 'MINOR_MS_SP_COMPLETE_COMPLETED_DATE',
-			    MINOR_MS_TRANSPORT_COMPLETE_COMPLETED_DATE AS 'MINOR_MS_TRANSPORT_COMPLETE_COMPLETED_DATE',
-			    MINOR_MS_CONSTRUCTION_READY_COMPLETED_DATE AS 'MINOR_MS_CONSTRUCTION_READY_COMPLETED_DATE',
-			    MINOR_MS_PRE_TCN_COMPLETED_DATE AS 'MINOR_MS_PRE_TCN_COMPLETED_DATE',
-			    MINOR_MS_CREATE_PROJECT_COMPLETED_DATE AS 'MINOR_MS_CREATE_PROJECT_COMPLETED_DATE',
-			    MINOR_MS_CONFIRM_E911_ADDRESS_COMPLETED_DATE AS 'MINOR_MS_CONFIRM_E911_ADDRESS_COMPLETED_DATE',
-			    MINOR_MS_CONFIRM_E911_SUBMITTED_COMPLETED_DATE AS 'MINOR_MS_CONFIRM_E911_SUBMITTED_COMPLETED_DATE',
-			    MINOR_MS_CONFIRM_TVW_RECEIVED_COMPLETED_DATE AS 'MINOR_MS_CONFIRM_TVW_RECEIVED_COMPLETED_DATE',
-			    MINOR_MS_EDGE_EQUIPMENT_CLOSEOUT_COMPLETED_DATE AS 'MINOR_MS_EDGE_EQUIPMENT_CLOSEOUT_COMPLETED_DATE',
-			    MINOR_MS_EDGE_EQUIPMENT_INFORMATION_COMPLETED_DATE AS 'MINOR_MS_EDGE_EQUIPMENT_INFORMATION_COMPLETED_DATE',
-			    MINOR_MS_EDGE_EQUIPMENT_INSTALL_COMPLETED_DATE AS 'MINOR_MS_EDGE_EQUIPMENT_INSTALL_COMPLETED_DATE',
-			    MINOR_MS_EDGE_FUNDING_COMPLETED_DATE AS 'MINOR_MS_EDGE_FUNDING_COMPLETED_DATE',
-			    MINOR_MS_EDGE_INTEGRATE_COMPLETED_DATE AS 'MINOR_MS_EDGE_INTEGRATE_COMPLETED_DATE',
-			    MINOR_MS_EDGE_PROJECT_INFO_COMPLETED_DATE AS 'MINOR_MS_EDGE_PROJECT_INFO_COMPLETED_DATE',
-			    MINOR_MS_EDGE_PSC_VETTING_COMPLETED_DATE AS 'MINOR_MS_EDGE_PSC_VETTING_COMPLETED_DATE',
-			    MINOR_MS_EDGE_VENDOR_SERVICE_INSTALL_COMPLETED_DATE AS 'MINOR_MS_EDGE_VENDOR_SERVICE_INSTALL_COMPLETED_DATE',
-			    MINOR_MS_ENVIRONMENTAL_REVIEW_COMPLETED_DATE AS 'MINOR_MS_ENVIRONMENTAL_REVIEW_COMPLETED_DATE',
-			    MINOR_MS_GLOBAL_EHS_REVIEW_COMPLETED_DATE AS 'MINOR_MS_GLOBAL_EHS_REVIEW_COMPLETED_DATE',
-			    MINOR_MS_TERRITORY_REVIEW_COMPLETED_DATE AS 'MINOR_MS_TERRITORY_REVIEW_COMPLETED_DATE',
-			    MINOR_MS_TSDF_REVIEW_COMPLETED_DATE AS 'MINOR_MS_TSDF_REVIEW_COMPLETED_DATE',
-			    MINOR_MS_BOM_COMPLETE_COMPLETED_DATE AS 'MINOR_MS_BOM_COMPLETE_COMPLETED_DATE',
-			    MINOR_MS_EQUIPMENT_PROCUREMENT_COMPLETE_COMPLETED_DATE AS 'MINOR_MS_EQUIPMENT_PROCUREMENT_COMPLETE_COMPLETED_DATE',
-			    MAJOR_MS_HUB_READY_COMPLETED_DATE AS 'MAJOR_MS_HUB_READY_COMPLETED_DATE',
-			    MINOR_MS_INTEGRATION_COMPLETED_DATE AS 'MINOR_MS_INTEGRATION_COMPLETED_DATE',
-			    MINOR_MS_LEASING_COMPLETED_DATE AS 'MINOR_MS_LEASING_COMPLETED_DATE',
-			    MAJOR_MS_NETWORK_ASSURANCE_COMPLETED_DATE AS 'MAJOR_MS_NETWORK_ASSURANCE_COMPLETED_DATE',
-			    MINOR_MS_PERMITTING_COMPLETED_DATE AS 'MINOR_MS_PERMITTING_COMPLETED_DATE',
-			    MINOR_MS_CONSTRUCTION_FORM_COMPLETED_DATE AS 'MINOR_MS_CONSTRUCTION_FORM_COMPLETED_DATE',
-			    MINOR_MS_ENV_CONST_CLOSEOUT_INFO_COMPLETED_DATE AS 'MINOR_MS_ENV_CONST_CLOSEOUT_INFO_COMPLETED_DATE',
-			    MINOR_MS_POST_TCN_COMPLETED_DATE AS 'MINOR_MS_POST_TCN_COMPLETED_DATE',
-			    MINOR_MS_RFE_MITIGATION_DOCS_COMPLETED_DATE AS 'MINOR_MS_RFE_MITIGATION_DOCS_COMPLETED_DATE',
-			    MINOR_MS_POWER_COMPLETE_COMPLETED_DATE AS 'MINOR_MS_POWER_COMPLETE_COMPLETED_DATE',
-		MINOR_MS_POWER_VETTING_COMPLETED_DATE AS 'MINOR_MS_POWER_VETTING_COMPLETED_DATE',
-			    MINOR_MS_POWER_UTILITIES_TERMINATION_COMPLETED_DATE AS 'MINOR_MS_POWER_UTILITIES_TERMINATION_COMPLETED_DATE',
-			    MINOR_MS_UTILITY_INFORMATION_COMPLETED_DATE AS 'MINOR_MS_UTILITY_INFORMATION_COMPLETED_DATE',
-			    MINOR_MS_PSC_CONSTRUCTION_COMPLETED_DATE AS 'MINOR_MS_PSC_CONSTRUCTION_COMPLETED_DATE',
-			    MINOR_MS_PSC_DESIGN_COMPLETED_DATE AS 'MINOR_MS_PSC_DESIGN_COMPLETED_DATE',
-			    MINOR_MS_PSC_PRE_CONSTRUCTION_COMPLETED_DATE AS 'MINOR_MS_PSC_PRE_CONSTRUCTION_COMPLETED_DATE',
-			    MINOR_MS_PSC_PROJ_DETAILS_COMPLETED_DATE AS 'MINOR_MS_PSC_PROJ_DETAILS_COMPLETED_DATE',
-			    MINOR_MS_PSLC_FUNDING_COMPLETED_DATE AS 'MINOR_MS_PSLC_FUNDING_COMPLETED_DATE',
-			    MAJOR_MS_REAL_ESTATE_COMPLETED_DATE AS 'MAJOR_MS_REAL_ESTATE_COMPLETED_DATE',
-			    MINOR_MS_AM_FURTHER_STUDY_COMPLETED_DATE AS 'MINOR_MS_AM_FURTHER_STUDY_COMPLETED_DATE',
-			    MINOR_MS_ASR_FORM_COMPLETED_DATE AS 'MINOR_MS_ASR_FORM_COMPLETED_DATE',
-			    MINOR_MS_FAA_FORM_COMPLETED_DATE AS 'MINOR_MS_FAA_FORM_COMPLETED_DATE',
-			    MINOR_MS_FULL_CONSTRUCTION_APPROVAL_COMPLETED_DATE AS 'MINOR_MS_FULL_CONSTRUCTION_APPROVAL_COMPLETED_DATE',
-			    MINOR_MS_GROUND_ONLY_APPROVAL_COMPLETED_DATE AS 'MINOR_MS_GROUND_ONLY_APPROVAL_COMPLETED_DATE',
-			    MINOR_MS_STRUCTURE_FORM_COMPLETED_DATE AS 'MINOR_MS_STRUCTURE_FORM_COMPLETED_DATE',
-			    MINOR_MS_SUBMIT_FOR_NEPA_COMPLETED_DATE AS 'MINOR_MS_SUBMIT_FOR_NEPA_COMPLETED_DATE',
-			    MINOR_MS_SURVEY_COMPLETED_DATE AS 'MINOR_MS_SURVEY_COMPLETED_DATE',
-			    MINOR_MS_REGULATORY_DISMANTLEMENT_COMPLETED_DATE AS 'MINOR_MS_REGULATORY_DISMANTLEMENT_COMPLETED_DATE',
-			    MINOR_MS_REGULATORY_INSERVICE_COMPLETED_DATE AS 'MINOR_MS_REGULATORY_INSERVICE_COMPLETED_DATE',
-			    MINOR_MS_CARRIER_AGREEMENT_COMPLETED_DATE AS 'MINOR_MS_CARRIER_AGREEMENT_COMPLETED_DATE',
-			    MINOR_MS_CREATE_RFDS_COMPLETED_DATE AS 'MINOR_MS_CREATE_RFDS_COMPLETED_DATE',
-			    MINOR_MS_INSERVICE_DOCUMENTS_COMPLETED_DATE AS 'MINOR_MS_INSERVICE_DOCUMENTS_COMPLETED_DATE',
-			    MINOR_MS_INTERNATIONAL_BORDER_COMPLETED_DATE AS 'MINOR_MS_INTERNATIONAL_BORDER_COMPLETED_DATE',
-			    MINOR_MS_QUIET_ZONE_COMPLETED_DATE AS 'MINOR_MS_QUIET_ZONE_COMPLETED_DATE',
-			    MINOR_MS_RFE_COMPLETED_DATE AS 'MINOR_MS_RFE_COMPLETED_DATE',
-			    MINOR_MS_SUBMIT_RFDS_COMPLETED_DATE AS 'MINOR_MS_SUBMIT_RFDS_COMPLETED_DATE',
-			    MINOR_MS_RFDS_IBV_COMPLETED_DATE AS 'MINOR_MS_RFDS_IBV_COMPLETED_DATE',
-			    MINOR_MS_SELECT_VENDOR_COMPLETED_DATE AS 'MINOR_MS_SELECT_VENDOR_COMPLETED_DATE',
-			    MINOR_MS_MICROWAVE_COMPLETED_DATE AS 'MINOR_MS_MICROWAVE_COMPLETED_DATE',
-			    MINOR_MS_ONE_FIBER_COMPLETED_DATE AS 'MINOR_MS_ONE_FIBER_COMPLETED_DATE',
-			    MINOR_MS_TRANSPORT_CONTRACT_COMPLETED_DATE AS 'MINOR_MS_TRANSPORT_CONTRACT_COMPLETED_DATE',
-			    MINOR_MS_TRANSPORT_DELIVERY_COMPLETED_DATE AS 'MINOR_MS_TRANSPORT_DELIVERY_COMPLETED_DATE',
-			    MINOR_MS_ZONING_COMPLETED_DATE AS 'MINOR_MS_ZONING_COMPLETED_DATE',
-			    MINOR_MS_EQUIPMENT_COMPLETED_DATE AS 'MINOR_MS_EQUIPMENT_COMPLETED_DATE',
-			    MAJOR_MS_PHYSICAL_CONSTRUCTION_COMPLETE_COMPLETED_DATE AS 'MAJOR_MS_PHYSICAL_CONSTRUCTION_COMPLETE_COMPLETED_DATE',
-			    MAJOR_MS_TRANSPORT_COMPLETED_DATE AS 'MAJOR_MS_TRANSPORT_COMPLETED_DATE',
-			    MINOR_MS_CONQUEST_COMPLETED_DATE as 'MINOR_MS_CONQUEST_COMPLETED_DATE',
-			    MAJOR_MS_POWER_COMPLETED_DATE as 'MAJOR_MS_POWER_COMPLETED_DATE',
-			    MINOR_MS_ENVIRONMENT_DUE_DILIGENCE_COMPLETED_DATE AS 'MINOR_MS_ENVIRONMENT_DUE_DILIGENCE_COMPLETED_DATE',
-			    MINOR_MS_REGULATORY_COMPLETED_DATE AS 'MINOR_MS_REGULATORY_COMPLETED_DATE',
-			    MINOR_MS_VCP_ORCHESTRATION_COMPLETED_DATE AS 'MINOR_MS_VCP_ORCHESTRATION_COMPLETED_DATE',
-			    MAJOR_MS_RTC_COMPLETED_DATE AS 'MAJOR_MS_RTC_COMPLETED_DATE',
-		MINOR_MS_CONSTRUCTION_48HR_REVIEW_COMPLETED_DATE AS 'MINOR_MS_CONSTRUCTION_48HR_REVIEW_COMPLETED_DATE',
-				MINOR_MS_RF_48HR_REVIEW_COMPLETED_DATE AS 'MINOR_MS_RF_48HR_REVIEW_COMPLETED_DATE',
-				MINOR_MS_BUILD_CONSTRUCTION_COMPLETE_COMPLETED_DATE AS 'MINOR_MS_BUILD_CONSTRUCTION_COMPLETE_COMPLETED_DATE',
-				MINOR_MS_ENVIRONMENTAL_NOTICE_TO_CONTRACTOR_COMPLETED_DATE AS 'MINOR_MS_ENVIRONMENTAL_NOTICE_TO_CONTRACTOR_COMPLETED_DATE',
-				MINOR_MS_REGULATORY_48HR_REVIEW_COMPLETED_DATE AS 'MINOR_MS_REGULATORY_48HR_REVIEW_COMPLETED_DATE',
-				MINOR_MS_REGULATORY_CONSTRUCTION_SR_COMPLETED_DATE AS 'MINOR_MS_REGULATORY_CONSTRUCTION_SR_COMPLETED_DATE',
-                MINOR_MS_VCP_FAR_EDGE_INSTALLATION_COMPLETED_DATE AS 'MINOR_MS_VCP_FAR_EDGE_INSTALLATION_COMPLETED_DATE',
-                MINOR_MS_DC_DISCOVERY_COMPLETED_DATE AS 'MINOR_MS_DC_DISCOVERY_COMPLETED_DATE',
-                MINOR_MS_FAR_EDGE_INSTANTIATION_COMPLETED_DATE AS 'MINOR_MS_FAR_EDGE_INSTANTIATION_COMPLETED_DATE',
-                MINOR_MS_VDU_DAY_0_COMPLETE_COMPLETED_DATE AS 'MINOR_MS_VDU_DAY_0_COMPLETE_COMPLETED_DATE',
-                MINOR_MS_VDU_DAY_1_COMPLETE_COMPLETED_DATE AS 'MINOR_MS_VDU_DAY_1_COMPLETE_COMPLETED_DATE',
-                MINOR_MS_VDU_DEPLOY_READINESS_COMPLETED_DATE AS 'MINOR_MS_VDU_DEPLOY_READINESS_COMPLETED_DATE',
-                MINOR_MS_VCP_SUBCLOUD_DEPLOYMENT_INITIATED_COMPLETED_DATE AS 'MINOR_MS_VCP_SUBCLOUD_DEPLOYMENT_INITIATED_COMPLETED_DATE'
-			    ) )
-			) PTWS1 on FTFC.FIELD_NAME = PTWS1.FIELD_NAME
-			WHERE FTFC.FIELD_NAME IN (
-				SELECT	MMM.DEPENDENT_FIELD FROM PROJ_MAJOR_MILESTONE_MAPPING MMM
-				    inner join FUZE_TRACKER_FIELD_CONFIG FTFC on MMM.MAJOR_MILESTONE = FTFC.FIELD_NAME
-				    where MMM.IS_MANDATORY in ('C','MC')
-				    and FTFC.EDIT_RULE = 'CALCULATED_DATE'
-				    and FTFC.workstep_name = milestoneName
-			    )
-			AND FTFC.MODULE = FIELD_LIST.MODULE
-		    );
-		 DBMS_OUTPUT.PUT_LINE('ELSE fieldsData::'|| fieldsData );
-		END IF;
-		IF(fieldsData IS NOT NULL) THEN
-		   dataList := dataList || fieldsData;
-		END IF;
-		DBMS_OUTPUT.PUT_LINE('dataList'|| dataList );
-	    END LOOP;
-	    --hubReadychanges start
-	   IF(milestoneName = 'HUB_READY')THEN
-		BEGIN
-
-		    /*
-		    SELECT TRANSPORT_VENDOR,ELECTRIC_COMPLT_AC_DT INTO v_hubTransportVendor,powerCompltDt
-		    FROM PROJ_DEPENDENT_PROJECTS PDP
-		    INNER JOIN PROJ_ST_FIELDS_DATA STP ON STP.SITE_PROJECTS_ID = PDP.SITE_PROJECTS_ID
-		    INNER JOIN PROJ_TRANSPORT_ATTRIBUTES PTA ON PTA.SITE_PROJECTS_ID = PDP.SITE_PROJECTS_ID
-		    WHERE PDP.PARENT_SITE_PROJECTS_ID = siteProjectsId AND UPPER(PDP.DEPENDENCY_TYPE)='HUB_READY';
-			*/
-
-		    SELECT TRANSPORT_VENDOR INTO v_hubTransportVendor
-		    FROM ENTITY_ASSOCIATION_MAP PDP
-		    INNER JOIN PROJ_TRANSPORT_ATTRIBUTES PTA ON PTA.SITE_PROJECTS_ID = PDP.PARENT_ID
-		    WHERE PDP.CHILD_ID = siteProjectsId AND UPPER(PDP.ASSOCIATION_SUB_TYPE)='HUB_READY';
-
-		EXCEPTION WHEN NO_DATA_FOUND THEN
-			v_hubTransportVendor := 'N/A';
-		END;
-
-			IF(v_hubTransportVendor = 'N/A')THEN
-			BEGIN
-				SELECT TRANSPORT_VENDOR into v_hubTransportVendor FROM PROJ_TRANSPORT_ATTRIBUTES WHERE SITE_PROJECTS_ID= siteProjectsId;
-
-			EXCEPTION WHEN NO_DATA_FOUND THEN
-				v_hubTransportVendor := 'N/A';
-			END;
-			END IF;
-		dataList := dataList || '"Hub Transport Vendor":"' || v_hubTransportVendor || '"';
-		DBMS_OUTPUT.PUT_LINE('Hub_REAdy :: '|| dataList );
-	    END IF;
-		--hubReadychanges end
-
-		--TransportM Enhancement
-	   /* IF(milestoneName = 'TRANSPORT')THEN
-		BEGIN
-		    SELECT TRANSPORT_TYPE INTO v_transportType
-			FROM PROJ_TRANSPORT_ATTRIBUTES PTA
-			WHERE PTA.SITE_PROJECTS_ID = siteProjectsId;
-		EXCEPTION WHEN NO_DATA_FOUND THEN
-		    v_hubTransportVendor := 'N/A';
-		    powerCompltDt := null;
-		END;
-		dataList := dataList || '"Transport Type":"' || v_transportType || '"';
-		DBMS_OUTPUT.PUT_LINE('Hub_REAdy :: '|| dataList );
-	    END IF; */
-
-	     DBMS_OUTPUT.PUT_LINE(dataList);
-	    preReq := preReq || '"' || milestoneName || '":{' || RTRIM(dataList,',') || '},';
-       --  END LOOP;
-    END IF;
-    preReq := '{' || RTRIM(preReq,',') || '}';
-    --DBMS_OUTPUT.PUT_LINE('preReq : '||preReq);
-    RETURN preReq;
-END;
-
-
-
-Please explain above function line by line?
-
-ChatGPT
-Sure, let's break down the provided PL/SQL function FUNC_PROJ_PRE_REQ:
-
-CREATE OR REPLACE FUNCTION "FUNC_PROJ_PRE_REQ" (siteProjectsId NUMBER, milestoneName VARCHAR2) RETURN CLOB AS: This line defines the function named FUNC_PROJ_PRE_REQ which takes two parameters siteProjectsId of type NUMBER and milestoneName of type VARCHAR2, and returns a CLOB data type.
-
-preReq CLOB; v_check VARCHAR2(32); v_bool Boolean; v_dismantlement VARCHAR2(32); v_whereClause VARCHAR2(64); v_query CLOB; tableName VARCHAR2(1024); dataList CLOB; fieldsData CLOB; powerCompltDt VARCHAR2(64); v_hubTransportVendor VARCHAR2(32);: Declarations of various variables used within the function.
-
-The BEGIN keyword marks the beginning of the main block of the function.
-
-BEGIN: This marks the beginning of a nested block within the main block.
-
-SELECT CASE WHEN SP.TYPE = 'Modification' AND (PAI.PROJ_MOD_TYPE IS NULL OR PAI.PROJ_MOD_TYPE IN ('DISMANTLEMENT')) THEN 'false' ELSE 'true' END INTO v_dismantlement FROM SITE_PROJECTS SP INNER JOIN PROJ_ADDITIONAL_INFO PAI ON PAI.SITE_PROJECTS_ID = SP.SITE_PROJECTS_ID AND SP.SITE_PROJECTS_ID = siteProjectsId;: This SQL query selects the value of v_dismantlement based on conditions from the tables SITE_PROJECTS and PROJ_ADDITIONAL_INFO.
-
-EXCEPTION WHEN NO_DATA_FOUND THEN v_dismantlement := 'false';: If no data is found in the previous query, it sets v_dismantlement to 'false'.
-
-END;: Marks the end of the nested block.
-
-IF(v_dismantlement = 'true') THEN: Begins an IF condition based on the value of v_dismantlement.
-
-dataList := NULL;: Initializes the dataList variable.
-
-Nested loops and conditional statements follow, executing dynamic SQL queries based on certain conditions and constructing dataList accordingly.
-
-Various SQL queries are executed using EXECUTE IMMEDIATE to fetch data dynamically based on the provided siteProjectsId and milestoneName.
-
-Data retrieved from the queries is concatenated into the dataList.
-
-Additional logic specific to certain milestones, like HUB_READY, is implemented.
-
-Finally, preReq is constructed as a JSON string containing milestone data fetched from the database.
-
-The constructed preReq is returned as the output of the function.
-
-The function ends with END; END; marking the end of the main block and the function declaration.
-
-
-
-User
-In above function where should I add the prerequisite data  ? Give me exact line
-
-2 / 2
-
-
-ChatGPT
-To add the prerequisite data to the dataList, you should add it within the nested loops where the dynamic SQL queries are executed and the dataList is being constructed. Specifically, you should add the prerequisite data after the SQL queries fetch the required information.
-
-Based on the provided function, you should add the prerequisite data right after the fieldsData is fetched from the dynamic SQL queries. So, you should add it after the lines:
-
-sql
-Copy code
-EXECUTE IMMEDIATE v_query into fieldsData;
-DBMS_OUTPUT.PUT_LINE('IF fieldsData::'|| fieldsData );
-You can add the prerequisite data right after these lines using the dataList variable. For example:
-
-sql
-Copy code
-IF(fieldsData IS NOT NULL) THEN
-   dataList := dataList || fieldsData || ','; -- Adding fetched data to dataList
-   -- Add prerequisite data here
-END IF;
-This ensures that the prerequisite data is added to the dataList along with the fetched data from the database before it is returned.
-
-
-2 / 2
-
-
-
-User
-Milestone is 'REGULATORY' for that milestone Prerequisite data is  : SURVEY, STRUCTURE_FORM,FAA,ASR,AM  Now give me complete updated function  what other info needed for prerequisite 
-
-4 / 4
-
-
-ChatGPT
-To integrate the prerequisite data for the 'REGULATORY' milestone into the provided function, we'll need to add the logic to fetch the required information for the specified fields ('SURVEY', 'STRUCTURE_FORM', 'FAA', 'ASR', 'AM') from the database. Here's the complete updated function:
-
-sql
-Copy code
-CREATE OR REPLACE FUNCTION "FUNC_PROJ_PRE_REQ" (siteProjectsId NUMBER, milestoneName VARCHAR2)
-RETURN CLOB
-AS
-    preReq CLOB;
-    v_dismantlement VARCHAR2(32);
-    v_whereClause VARCHAR2(64);
-    v_query CLOB;
-    dataList CLOB;
-    fieldsData CLOB;
-BEGIN
-    BEGIN
-        SELECT CASE WHEN SP.TYPE = 'Modification' AND (PAI.PROJ_MOD_TYPE IS NULL OR PAI.PROJ_MOD_TYPE IN ('DISMANTLEMENT')) THEN 'false' ELSE 'true' END INTO v_dismantlement
-        FROM SITE_PROJECTS SP
-        INNER JOIN PROJ_ADDITIONAL_INFO PAI ON PAI.SITE_PROJECTS_ID = SP.SITE_PROJECTS_ID
-        AND SP.SITE_PROJECTS_ID = siteProjectsId;
-    EXCEPTION
-        WHEN NO_DATA_FOUND THEN
-            v_dismantlement := 'false';
-    END;
-
-    IF(v_dismantlement = 'true') THEN
-        dataList := NULL;
-        FOR FIELD_LIST IN (
-            SELECT MODULE, TABLE_NAME,
-                dbms_xmlgen.convert(
-                    RTRIM(
-                        XMLAGG(
-                            XMLELEMENT(E, D, '||'',''' || ',')
-                        ).EXTRACT('E/text()').getCLOBVal(), '||'
-                    ),
-                    1
-                ) AS fields
-            FROM (
-                SELECT MODULE, TABLE_NAME,
-                    CASE
-                        WHEN TABLE_NAME = 'VDU_ORCHESTRATION' AND FIELD_NAME != 'VCP_FE_INSTALLATION_AC_DT' THEN '''"' || TITLE || '":"''' || ' || CASE WHEN COUNT(' || FIELD_NAME || ') = COUNT(*) THEN TO_CHAR(MAX(' || FIELD_NAME || '),''MM/DD/RRRR'') ELSE '''' END || ' || '''"'''
-                        WHEN TABLE_NAME = 'VDU_ORCHESTRATION' AND FIELD_NAME = 'VCP_FE_INSTALLATION_AC_DT' THEN '''"' || TITLE || '":"''' || '||CASE WHEN COUNT(' || FIELD_NAME || ') = COUNT(*) THEN TO_CHAR(MAX(TO_DATE(' || FIELD_NAME || ',''MM/DD/RRRR'')),''MM/DD/RRRR'') ELSE '''' END || ' || '''"'''
-                        ELSE '''"' || TITLE || '":"''' || '||' || FIELD_NAME || '||' || '''"'''
-                    END AS D
-                FROM FUZE_TRACKER_FIELD_CONFIG FTFC
-                WHERE FIELD_NAME IN (
-                    SELECT MMM.DEPENDENT_FIELD
-                    FROM PROJ_MAJOR_MILESTONE_MAPPING MMM
-                    INNER JOIN FUZE_TRACKER_FIELD_CONFIG FTFC ON MMM.MAJOR_MILESTONE = FTFC.FIELD_NAME
-                    WHERE MMM.IS_MANDATORY IN ('C', 'MC', 'VDU')
-                    AND FTFC.EDIT_RULE = 'CALCULATED_DATE'
-                    AND FTFC.WORKSTEP_NAME = milestoneName
-                )
-            ) T
-            GROUP BY MODULE, TABLE_NAME
-        ) LOOP
-            IF(FIELD_LIST.TABLE_NAME = 'SPM_PROJECT_TRACKER') THEN
-                v_whereClause := 'FUZE_PROJECT_ID';
-            ELSE
-                v_whereClause := 'SITE_PROJECTS_ID';
-            END IF;
-
-            IF (FIELD_LIST.TABLE_NAME NOT IN ('PROJECT_TRACKER_WORKSTEP_STATUS', 'VDU_ORCHESTRATION')) THEN
-                v_query := 'SELECT ' || TO_CHAR(FIELD_LIST.fields) || '
-                            FROM SITE_PROJECTS SP
-                            LEFT OUTER JOIN ' || FIELD_LIST.TABLE_NAME || ' T ON T.' || v_whereClause || ' = SP.SITE_PROJECTS_ID
-                            WHERE SP.SITE_PROJECTS_ID = ' || siteProjectsId;
-
-                EXECUTE IMMEDIATE v_query INTO fieldsData;
-            ELSIF (FIELD_LIST.TABLE_NAME = 'VDU_ORCHESTRATION') THEN
-                v_query := 'SELECT ' || TO_CHAR(FIELD_LIST.fields) || '
-                            FROM SITE_PROJECTS SP
-                            LEFT OUTER JOIN ' || FIELD_LIST.TABLE_NAME || ' T ON T.' || v_whereClause || ' = SP.SITE_PROJECTS_ID
-                            AND VRAN_ORCHESTRATION_PATH = ''FULL_ORCHESTRATION''
-                            WHERE SP.SITE_PROJECTS_ID = ' || siteProjectsId;
-
-                EXECUTE IMMEDIATE v_query INTO fieldsData;
-            ELSE
-                SELECT dbms_xmlgen.convert(
-                        XMLAGG(XMLELEMENT(E, FLDDATA, ',')).EXTRACT('E/text()').getCLOBVal(),
-                        1
-                    )
-                INTO fieldsData
-                FROM (
-                    SELECT '"' || FTFC.TITLE || '":"' || PTWS1.COMPLETED_DATE || '"' AS FLDDATA
-                    FROM FUZE_TRACKER_FIELD_CONFIG FTFC
-                    INNER JOIN (
-                        SELECT *
-                        FROM (
-                            SELECT
-                                MAJOR_MS_CANDIDATE_SELECTION_COMPLETED_DATE, MAJOR_MS_ACTIVATION_COMPLETED_DATE,
-                                MINOR_MS_ACTIVATION_NON_RF_COMPLETED_DATE, MINOR_MS_AE_COMPLETED_DATE,
-                                MINOR_MS_CANDIDATE_ACCEPTED_COMPLETED_DATE, MINOR_MS_CANDIDATE_SUBMITTED_COMPLETED_DATE,
-                                MINOR_MS_CONSTRUCTION_REVIEW_COMPLETED_DATE, MINOR_MS_RF_ACCEPT_RANKING_COMPLETED_DATE,
-                                MINOR_MS_TRANSPORT_REVIEW_COMPLETED_DATE, MINOR_MS_CLOSEOUT_DOCUMENTS_UPLOAD_COMPLETED_DATE,
-                                MINOR_MS_PHOTO_DOCUMENTS_COMPLETED_DATE, MINOR_MS_CREATE_CQ_COMPLETED_DATE,
-                                MINOR_MS_CQ_EQUIPMENT_COMPLETED_DATE, MINOR_MS_IP_COMPLETE_COMPLETED_DATE,
-                                MINOR_MS_READY_FOR_ASSURANCE_COMPLETED_DATE, MINOR_MS_RF_COMPLETE_DATE,
-                                MINOR_MS_SP_COMPLETE_COMPLETED_DATE, MINOR_MS_TRANSPORT_COMPLETE_COMPLETED_DATE,
-                                MINOR_MS_CONSTRUCTION_READY_COMPLETED_DATE, MINOR_MS_PRE_TCN_COMPLETED_DATE,
-                                MINOR_MS_CREATE_PROJECT_COMPLETED_DATE,
-                                MINOR_MS_CONFIRM_E911_ADDRESS_COMPLETED_DATE, MINOR_MS_CONFIRM_E911_SUBMITTED_COMPLETED_DATE,
-                                MINOR_MS_CONFIRM_TVW_RECEIVED_COMPLETED_DATE, MINOR_MS_EDGE_EQUIPMENT_CLOSEOUT_COMPLETED_DATE,
-                                MINOR_MS_EDGE_EQUIPMENT_INFORMATION_COMPLETED_DATE, MINOR_MS_EDGE_EQUIPMENT_INSTALL_COMPLETED_DATE,
-                                MINOR_MS_EDGE_FUNDING_COMPLETED_DATE, MINOR_MS_EDGE_INTEGRATE_COMPLETED_DATE,
-                                MINOR_MS_EDGE_PROJECT_INFO_COMPLETED_DATE, MINOR_MS_EDGE_PSC_VETTING_COMPLETED_DATE,
-                                MINOR_MS_EDGE_VENDOR_SERVICE_INSTALL_COMPLETED_DATE, MINOR_MS_ENVIRONMENTAL_REVIEW_COMPLETED_DATE,
-                                MINOR_MS_GLOBAL_EHS_REVIEW_COMPLETED_DATE, MINOR_MS_TERRITORY_REVIEW_COMPLETED_DATE,
-                                MINOR_MS_TSDF_REVIEW_COMPLETED_DATE, MIN
-
-14 / 14
-
-
-
-
-
-Message ChatGPT…
-
-ChatGPT can make mistakes. Consider checking important information.
-Function to fetch milestone data
-
-
-
-
-import org.springframework.web.bind.annotation.*;
-import org.springframework.http.*;
-import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.*;
-import java.util.List;
-import org.slf4j.*;
-
-@RestController
-public class ProjectController {
-
-    private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
-
-    @Autowired
-    private ProjectService projectService;
-
-    @RequestMapping(value = "/getProjectDetails", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Returns additional details of a project", description = "Projects Service")
-    @ApiResponse(responseCode = "200", description = "SUCCESS", content = {@Content(mediaType = "application/json", schema = @Schema(implementation = ProjectDetails.class))})
-    @ResponseStatus(HttpStatus.OK)
-    public ProjectDetails getProjectDetails(@RequestHeader("user") String userJSON, @RequestParam("projectId") String projectId) throws Exception {
-        final User user = userInfoService.getUserInfo();
-        logger.info("PROJECTS-SERVICE: Inside {}, Called by {} with Parameter {}", Thread.currentThread().getStackTrace()[1].getMethodName(), user, projectId);
-
-        return projectService.getProjectDetails(projectId);
-    }
-}
-
+<jsp:include page="/app/jsp/project/optional-fields-container.jsp" />
+<div id="Common_INTERNATIONAL_BORDER" class="col-sm-12 padding-zero history-block margin-top-bottom">
+	<jsp:include page="/app/jsp/project/common/comments-change-history.jsp"/>
+	<div class="col-sm-12 padding-left-right-zero margin-bottom">
+		<h5 class="text-brand-red margin-top-zero padding-left padding-sm">Comments</h5>
+		<textarea id="Comments-INTERNATIONAL_BORDER" class="disable full-width comments"
+			data-toggle="tooltip" data-placement="top"
+			data-original-title="Do you have any comments?"></textarea>
+	</div>
+	<!-- <h5 class="col-sm-12 text-brand-red padding-left padding-sm">Comment
+		History</h5>
+	<div class="col-sm-12 padding-left-right-zero margin-bottom">
+		<textarea
+			class="comments-history background-gray-lightest disable full-width"
+			readonly id="comments-history-INTERNATIONAL_BORDER" data-toggle="tooltip"
+			data-placement="top" data-original-title="Comments History"></textarea>
+	</div> -->
+	<button type="submit" class="disable pull-right btn btn-small btn-primary btn-sm finalize-task-button mobile-height" id="INTERNATIONAL_BORDER" role=""><i class="fa fa-spinner fa-spin finalize-spinner hide"></i><b>Finalize Task</b></button>
+	<button type="submit" class="disable pull-right btn btn-small btn-success btn-sm reject-task-button mobile-height hide" id="" role="INTERNATIONAL_BORDER"><i class="fa fa-spinner fa-spin reject-spinner hide"></i>Reject Task</button>
+	<button type="submit" class="disable pull-right btn btn-small btn-default btn-sm save-button mobile-height" id="INTERNATIONAL_BORDER" role="">Save</button>
+	<button type="submit" class="pull-right btn btn-small btn-blue btn-sm edit-task-button mobile-height hide" id="" role="INTERNATIONAL_BORDER">Edit Task</button>
+	<button type="submit" class="hide disable pull-right btn btn-small btn-default btn-sm save-task-comments-button mobile-height" id="INTERNATIONAL_BORDER" role="">Save Comment(s)</button>
+	<div class="overview_icons">
+	<i class="fa fa-envelope fa-2x pull-right padding-right text-gold send-comments" id="INTERNATIONAL_BORDER" role=""></i>
+	<vp:VendorProject user="${sessionScope.SiteManagementSession.user}"  displayFlag="false">
+		<fuze:HasPermissions user="${sessionScope.SiteManagementSession.user}" type="PRIVILEGE" requirePer="${applicationScope.ContextCache.projectServiceSettings['featureAccess']['GEAR_INTERNATIONAL_BORDER']}">
+		<div class="gear_common_parent_container" data-role = "INTERNATIONAL_BORDER">
+			<jsp:include page = "/app/jsp/project/gear-icon.jsp" />
+		</div>
+		</fuze:HasPermissions>
+	</vp:VendorProject>
+	<i class=" fa audit-image fa-bold text-link  pull-right cursor-pointer tracker-history" id="@TASK_NAME" role="@TASK_ID" data-milestone="RFDS"></i>
+	</div>
+	<div class="pull-left last_updated_by_container hide">Last updated by: <label class="last_updated_value"></label></div>
+</div>
+<c:if test = "${not empty applicationScope.ContextCache.projectServiceSettings['taskUserNotes']['INTERNATIONAL_BORDER']}">
+	<div class="col-sm-12 padding-zero note-bulb"><i class="fa fa-lightbulb-o fa-bold text-brand-red" aria-hidden="true"></i><strong>*${applicationScope.ContextCache.projectServiceSettings['taskUserNotes']['INTERNATIONAL_BORDER']}</strong></div>
+</c:if>
