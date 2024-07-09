@@ -1,233 +1,158 @@
-
-<div class="col-xs-12 col-sm-12 col-md-12 margin-top mobile-padding-left-right-0 ipad-padding-left-right-0 ight-0">
-    <label class="col-sm-5 col-xs-12 col-md-5 padding-left-right-zero opt-label">Date Submitted to Environmental Compliance: </label>
-    <div class="col-xs-12 col-sm-7 col-md-7 padding-zero">
-        <div class="date-picker">
-            <input id="env_submit_territory_date" type="text" close-text="Close" data-provide="datepicker" datepicker-popup="dd-MMM-yyyy" class="col-xs-12 datepicker form-control-spm env-submit-territory-date" aria-required="false" aria-invalid="false" data-toggle="tooltip" data-placement="top" data-original-title="Date Submitted to Environmental Compliance">
-            <span class="input-group-btn">
-            </span>
-        </div>
-    </div>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="vp" uri="/WEB-INF/vendor-project.tld"%>
+<%@ taglib prefix="fuze" uri="/WEB-INF/fuze.tld"%>
+<h5 class="text-brand-red margin-top-zero col-sm-12">International Border</h5>
+<div class="international-callsign-tables"></div>
+<div class="documents-result col-xs-12 col-sm-12 padding-zero international-border-documents-list margin-top hide">
+	<div id="international-border-document-table" data-ref-type="SITE_INTL_BORDER_AGREEMENTS" class="spm-grid-styles"></div>
 </div>
+<div class="international-table-header-template hide">
+	<h6 class="text-brand-red margin-top">@BANDWIDTH Callsigns</h6>
+	<div class="col-md-12 padding-zero section-divider-bottom">
+		<div id="@ID-international-colnames" class="spm-grid-styles">
+		</div>
+		<div class="radio vzbs-radio text-bold border-none margin-top-bottom">Does the signal extend into the country at levels above those specified in the Agreement between the FCC and their counterpart? :&nbsp;
+			<input name="@ID" role="radio" data-reg-service="@VZREGSERVICE" value="Yes" id="signalextend-yes" type="radio" class="@ID-yes fcc-radio disable" disabled="disabled">
+			<label>Yes</label>
+			<input name="@ID" role="radio" data-reg-service="@VZREGSERVICE" value="No" id="signalextend-no" type="radio" class="@ID-no fcc-radio disable" disabled="disabled" checked>
+			<label>No</label>
+		</div>
+		<div id="@ID-notificationTimeoutDiv" >
+		        <label for="notificationTimeout">Notification Timeout Date</label>
+		        <input type="date" id="notificationTimeout" name="notificationTimeout">
+		    </div>
+		
+		    <div id="@ID-agreementTimeoutDiv"  >
+		        <label for="agreementTimeout">Agreement Timeout Date</label>
+		        <input type="date" id="agreementTimeout" name="agreementTimeout">
+		    </div>
 
-
-
-
-
-
-
-
-<div class="col-xs-12 col-sm-12 col-md-6 action-items_documents padding-right-zero ipad-padding-left-0 mobile-padding-left-0 margin-top update-mode-only">
-			<h5 class="text-brand-red margin-top-zero padding-left padding-sm">Document Upload</h5>
-			<div class="col-sm-12 padding-zero margin-top-bottom">
-				<div class="custom-file-upload">
-					<label class="lbl-file-upload">
-						<i class="fa fa-upload fa-bold vertical-align-middle padding-right padding-xs" aria-hidden="true"></i> 
-						Drag File Here / Click Here To Upload
-					</label>
-					<form method="post" id="@TASK_action-item-upload-form" enctype="multipart/form-data" action="service/invoke/upload" target="upload-target" class="upload-form deep-fetch">
-						<input class="action-item-docs" name="refNum" id="refNumDocuments" value="" type="hidden">
-						<c:choose>
-							<c:when test="${param.formType == 'SITE'}">
-								<input class="action-item-docs" name="refType" id="refType" value="SITE_ACTION_ITEM_DOCS" type="hidden">
-							</c:when>
-							<c:otherwise>
-								<input class="action-item-docs" name="refType" id="refType" value="PROJ_ACTION_ITEM_DOCS" type="hidden">
-							</c:otherwise>
-						</c:choose>
-						<input class="action-item-docs" name="service" id="service" value="" type="hidden"> <input class="action-item-docs" name="category" id="category" value="actionitems" type="hidden">
-						<input class="action-item-docs" name="subCategory" id="subCategory" value="" type="hidden">
-						<c:choose>
-							<c:when test="${param.formType == 'SITE'}">
-								<input class="action-item-docs" name="description" id="description" value="Site Action Items Documents" type="hidden">
-							</c:when>
-							<c:otherwise>
-								<input class="action-item-docs" name="description" id="description" value="Action Items Documents" type="hidden">
-							</c:otherwise>
-						</c:choose>
-						<input class="action-item-docs" name="siteInfoJSON" id="siteInfoJSONDocuments" value="" type="hidden"> 
-						<input class="action-item-docs" name="uri" id="uri" value="document-gateway/document-service/document/documentUpload" type="hidden">
+		<div class="col-sm-12 padding-left-right-zero margin-top @ID-container hide">
+			<div class="col-sm-6 col-md-4 padding-left-right-zero group_one">
+				<div class="col-xs-12 col-sm-12 select_picklist opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement Type</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section opt-content-single-select">
+						<select class="select_picklist_select form-control border-zero input-sm padding-right-zero mandatory-field empty" data-toggle="tooltip">
+							<option value="">Nothing Selected</option>
+							<option value="SINGLE_SITE">Single-Site</option>
+							<option value="MULTI_SITE">Multi-Site</option>
+						</select>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-12 text_varchar opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement Applicable Site ID</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section">
+						<input class="form-control input-sm padding-right-zero text_varchar_input border-zero mandatory-field empty" disabled readonly data-toggle="tooltip"/>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-12 text_varchar opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement Applicable Band Class</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section">
+						<input class="form-control input-sm padding-right-zero text_varchar_input border-zero mandatory-field empty" data-toggle="tooltip" value="@VZREGSERVICE"/>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-6 col-md-4 padding-left-right-zero group_two">
+				<div class="col-xs-12 col-sm-12 select_picklist opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement Border Proximity Threshold (meters)</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section opt-content-single-select">
+						<input type="number" class="select_picklist_select form-control border-zero input-sm padding-right-zero mandatory-field empty" data-toggle="tooltip" oninput="numberDecimalsValidation(event)"/>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-12 text_varchar opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement Field Strength Border Limit (dBu)</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section">
+						<input type="number" class="form-control input-sm padding-right-zero text_varchar_input border-zero mandatory-field empty" data-toggle="tooltip" oninput="numberDecimalsValidation(event)"/>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-12 text_varchar opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement PFSD Border Limit (dBm/m2/MHz)</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section">
+						<input class="form-control input-sm padding-right-zero text_varchar_input border-zero mandatory-field empty" data-toggle="tooltip" oninput="numberDecimalsValidation(event)"/>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-6 col-md-4 padding-left-right-zero group_three">
+				<div class="col-xs-12 col-sm-12 select_picklist opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement PSD Border Limit (dBm/MHz)</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section opt-content-single-select">
+						<input type="number" class="select_picklist_select form-control border-zero input-sm padding-right-zero mandatory-field empty" data-toggle="tooltip" oninput="numberDecimalsValidation(event)"/>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-12 text_varchar opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement RSRP Border Limit (dBm)</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section">
+						<input class="form-control input-sm padding-right-zero text_varchar_input border-zero mandatory-field empty" data-toggle="tooltip" oninput="numberDecimalsValidation(event)"/>
+					</div>
+				</div>
+				<div class="col-xs-12 col-sm-12 text_varchar opt-field padding-left-right-zero">
+					<div class="col-xs-6 col-sm-6 opt-label-section background-gray-light"><label class="opt-label"  data-toggle="tooltip" data-placement="top" data-original-title="">Agreement RSSI Border Limit (dBm)</label></div>
+					<div class="col-xs-6 col-sm-6 padding-left-right-zero opt-content-section">
+						<input type="number" class="form-control input-sm padding-right-zero text_varchar_input border-zero mandatory-field empty" data-toggle="tooltip" oninput="numberDecimalsValidation(event)"/>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="doc-upload-@ID">
+			<div class="margin-top-bottom">
+				<label>Upload Agreement/Notification :</label>
+				<div class="custom-file-upload vertical-align-middle">
+					<label class="lbl-file-upload"><i class="fa fa-upload fa-bold vertical-align-middle padding-right padding-xs" aria-hidden="true"></i> Drag File Here / Click Here To Upload</label>
+					<form method="post" enctype="multipart/form-data" id="@ID-form" action="service/invoke/upload" target="upload-target" class="inline-block upload-international-form upload-form">
+						<input type="hidden" name="refNum" id="refNumDocuments" value="">
+						<input type="hidden" name="refType" id="refType" value="SITE_INTL_BORDER_AGREEMENTS">
+						<input type="hidden" name="service" id="service" value=""> 
+						<input type="hidden" name="category" id="category" value="projects"> 
+						<input type="hidden" name="subCategory" id="subCategory" value="INTERNATIONAL_BORDER_@DOC_CHECK_@DOC_CATEGORY"> 
+						<input type="hidden" name="description" id="description" value="General Documents">
+						<input type="hidden" name="siteInfoJSON" id="siteInfoJSONDocuments">
+						<input type="hidden" name="uri" id="uri" value="document-gateway/document-service/document/documentUpload">
 						<iframe name="upload-target" id="upload-target" style="display: none;" onload=""></iframe>
 						<!-- SPM GUI Fortify often misused file upload vulnerability fix -->
-						<input class="action-item-docs col-md-8 btn btn-default btn-sm input-field padding-right-zero padding-left auto-upload-doc" data-table="#@TASK_action-item-upload-table" name="file" id="browse-files" type="${applicationScope.ContextCache.projectServiceSettings['guiConstants']['FILE_TYPE']}">
+						<input class="col-md-8 btn btn-default btn-sm input-field padding-zero disable auto-upload-doc" type="${applicationScope.ContextCache.projectServiceSettings['guiConstants']['FILE_TYPE']}" data-table="#international-border-document-table" name="file" id="browse-files">
 						<!-- SPM GUI Fortify often misused file upload vulnerability fix -->
+						<!-- <button type="submit" id="upload-@NAME-button" href="#" data-toggle="" data-target="" role="button" class="btn btn-danger btn-sm input-field upload-international-document disable common_doc_upload_btn"> <i class="fa fa-spinner fa-spin finalize-spinner hide"></i><b>Upload Document</b></button> -->
 					</form>
 				</div>
 			</div>
 		</div>
 	</div>
-
-
-
-............
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
-<form action="uploadDocument" method="post" enctype="multipart/form-data">
-    <div>
-        <label>Does the signal extend into the country at levels specified in the Agreement between The FCC and their counterpart?</label>
-        &nbsp;
-        <input name="signalExtend" role="radio" data-reg-service="VZREGSERVICE" value="yes" id="signalExtendYes" type="radio">
-        <label for="signalExtendYes">Yes</label>
-        <input name="signalExtend" role="radio" data-reg-service="VZREGSERVICE" value="no" id="signalExtendNo" type="radio" checked>
-        <label for="signalExtendNo">No</label>
-    </div>
-
-    <div id="notificationTimeoutDiv" class="hidden">
-        <label for="notificationTimeout">Notification Timeout Date</label>
-        <input type="date" id="notificationTimeout" name="notificationTimeout">
-    </div>
-
-    <div id="agreementTimeoutDiv" class="hidden">
-        <label for="agreementTimeout">Agreement Timeout Date</label>
-        <input type="date" id="agreementTimeout" name="agreementTimeout">
-    </div>
-
-    <div>
-        <label>Upload Agreement/Notification</label>
-        <div class="custom-file-upload vertical-align-middle">
-            <div class="margin-top-bottom">
-                <input type="file" name="fileUpload" class="file-upload" accept=".doc, .docx, .pdf">
-            </div>
-            <input type="hidden" name="category" id="category" value="projects">
-            <input type="hidden" name="subCategory" id="subCategory" value="INTERNATIONAL BORDER DOC">
-            <input type="hidden" name="description" id="description" value="General Documents">
-            <input type="hidden" name="uri" id="uri" value="document-gateway/document">
-        </div>
-        <button type="submit" class="btn btn-danger">Upload Document</button>
-    </div>
-</form>
-
-
-
-...........
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Modal Example</title>
-  <style>
-    /* Style for the modal */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      padding: 20px;
-      background-color: #fff;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      z-index: 1000;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-
-    .modal label {
-      text-align: right;
-      padding-right: 10px;
-    }
-
-    .modal input,
-    .modal select {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 5px;
-    }
-
-    .modal button {
-      grid-column: span 2;
-      margin-top: 10px;
-    }
-
-    /* Style for the grid */
-    .data-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 20px;
-    }
-  </style>
-</head>
-<body>
-
-<!-- Button to open the modal -->
-<button onclick="openModal()">Open Modal</button>
-
-<!-- The Modal -->
-<div id="myModal" class="modal">
-  <label for="age">Age:</label>
-  <input type="number" id="age" name="age" required>
-
-  <label for="date">Date:</label>
-  <input type="date" id="date" name="date" required>
-
-  <label for="organization">Organization:</label>
-  <select id="organization" name="organization">
-    <option value="company1">Company 1</option>
-    <option value="company2">Company 2</option>
-    <option value="company3">Company 3</option>
-    <!-- Add more options as needed -->
-  </select>
-
-  <button onclick="saveData()">Save</button>
 </div>
-
-<!-- Data Grid -->
-<div class="data-grid" id="dataGrid"></div>
-
-<script>
-  // Function to open the modal
-  function openModal() {
-    const modal = document.getElementById('myModal');
-    modal.style.display = 'block';
-  }
-
-  // Function to save data and print request payload
-  function saveData() {
-    const age = document.getElementById('age').value;
-    const date = document.getElementById('date').value;
-    const organization = document.getElementById('organization').value;
-
-    // Dummy endpoint - Replace with your actual endpoint
-    const dummyEndpoint = 'https://example.com/api/saveData';
-
-    // Dummy API call for demonstration
-    fetch(dummyEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ age, date, organization }),
-      mode: 'cors', // Add this line for cross-origin requests
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Response from server:', data);
-        // Display saved data in the grid
-        displayDataGrid(data);
-        // Close the modal after saving data
-        document.getElementById('myModal').style.display = 'none';
-      })
-      .catch(error => console.error('Error:', error));
-  }
-
-  // Function to display saved data in the grid
-  function displayDataGrid(data) {
-    const dataGrid = document.getElementById('dataGrid');
-    
-    // Clear previous data
-    dataGrid.innerHTML = '';
-
-    // Add new data to the grid
-    Object.keys(data).forEach(key => {
-      const cell = document.createElement('div');
-      cell.textContent = `${key}: ${data[key]}`;
-      dataGrid.appendChild(cell);
-    });
-  }
-</script>
-
-</body>
-</html>
+<jsp:include page="/app/jsp/project/optional-fields-container.jsp" />
+<div id="Common_INTERNATIONAL_BORDER" class="col-sm-12 padding-zero history-block margin-top-bottom">
+	<jsp:include page="/app/jsp/project/common/comments-change-history.jsp"/>
+	<div class="col-sm-12 padding-left-right-zero margin-bottom">
+		<h5 class="text-brand-red margin-top-zero padding-left padding-sm">Comments</h5>
+		<textarea id="Comments-INTERNATIONAL_BORDER" class="disable full-width comments"
+			data-toggle="tooltip" data-placement="top"
+			data-original-title="Do you have any comments?"></textarea>
+	</div>
+	<!-- <h5 class="col-sm-12 text-brand-red padding-left padding-sm">Comment
+		History</h5>
+	<div class="col-sm-12 padding-left-right-zero margin-bottom">
+		<textarea
+			class="comments-history background-gray-lightest disable full-width"
+			readonly id="comments-history-INTERNATIONAL_BORDER" data-toggle="tooltip"
+			data-placement="top" data-original-title="Comments History"></textarea>
+	</div> -->
+	<button type="submit" class="disable pull-right btn btn-small btn-primary btn-sm finalize-task-button mobile-height" id="INTERNATIONAL_BORDER" role=""><i class="fa fa-spinner fa-spin finalize-spinner hide"></i><b>Finalize Task</b></button>
+	<button type="submit" class="disable pull-right btn btn-small btn-success btn-sm reject-task-button mobile-height hide" id="" role="INTERNATIONAL_BORDER"><i class="fa fa-spinner fa-spin reject-spinner hide"></i>Reject Task</button>
+	<button type="submit" class="disable pull-right btn btn-small btn-default btn-sm save-button mobile-height" id="INTERNATIONAL_BORDER" role="">Save</button>
+	<button type="submit" class="pull-right btn btn-small btn-blue btn-sm edit-task-button mobile-height hide" id="" role="INTERNATIONAL_BORDER">Edit Task</button>
+	<button type="submit" class="hide disable pull-right btn btn-small btn-default btn-sm save-task-comments-button mobile-height" id="INTERNATIONAL_BORDER" role="">Save Comment(s)</button>
+	<div class="overview_icons">
+	<i class="fa fa-envelope fa-2x pull-right padding-right text-gold send-comments" id="INTERNATIONAL_BORDER" role=""></i>
+	<vp:VendorProject user="${sessionScope.SiteManagementSession.user}"  displayFlag="false">
+		<fuze:HasPermissions user="${sessionScope.SiteManagementSession.user}" type="PRIVILEGE" requirePer="${applicationScope.ContextCache.projectServiceSettings['featureAccess']['GEAR_INTERNATIONAL_BORDER']}">
+		<div class="gear_common_parent_container" data-role = "INTERNATIONAL_BORDER">
+			<jsp:include page = "/app/jsp/project/gear-icon.jsp" />
+		</div>
+		</fuze:HasPermissions>
+	</vp:VendorProject>
+	<i class=" fa audit-image fa-bold text-link  pull-right cursor-pointer tracker-history" id="@TASK_NAME" role="@TASK_ID" data-milestone="RFDS"></i>
+	</div>
+	<div class="pull-left last_updated_by_container hide">Last updated by: <label class="last_updated_value"></label></div>
+</div>
+<c:if test = "${not empty applicationScope.ContextCache.projectServiceSettings['taskUserNotes']['INTERNATIONAL_BORDER']}">
+	<div class="col-sm-12 padding-zero note-bulb"><i class="fa fa-lightbulb-o fa-bold text-brand-red" aria-hidden="true"></i><strong>*${applicationScope.ContextCache.projectServiceSettings['taskUserNotes']['INTERNATIONAL_BORDER']}</strong></div>
+</c:if>
