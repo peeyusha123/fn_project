@@ -1,83 +1,81 @@
-...cond,1.2
-html
-
-<!-- Add this within the body tag, after the login form -->
-<div id="signUpModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeSignUpModal()">&times;</span>
-    <h2>Sign Up</h2>
-    <form id="signUpForm">
-      <label for="signupUsername">Username:</label>
+//.jsp
+<div id="@ID-international-colnames" class="spm-grid-styles"></div>
+    <div class="radio vzbs-radio text-bold border-none margin-top-bottom">
+      Does the signal extend into the country at levels above those specified in
+      the Agreement between the FCC and their counterpart? :&nbsp;
       <input
-        type="text"
-        id="signupUsername"
-        placeholder="Enter the User Name"
-        autocomplete="signupUsername"
+        name="@ID"
+        role="radio"
+        data-reg-service="@VZREGSERVICE"
+        value="Yes"
+        id="signalextend-yes"
+        type="radio"
+        class="@ID-yes fcc-radio disable"
+        disabled="disabled"
       />
-
-      <label for="signupPassword">Password:</label>
+      <label>Yes</label>
       <input
-        type="password"
-        id="signupPassword"
-        placeholder="Enter the Password"
-        autocomplete="signupPassword"
+        name="@ID"
+        role="radio"
+        data-reg-service="@VZREGSERVICE"
+        value="No"
+        id="signalextend-no"
+        type="radio"
+        class="@ID-no fcc-radio disable"
+        disabled="disabled"
+        checked
       />
+      <label>No</label>
+    </div>
+   
+	 <div id="@ID-notificationTimeoutDiv">
+      <label for="notificationTimeout">@BANDWIDTH Notification Sent Date:</label>
+      <input type="date" id="notificationTimeout" name="notificationTimeout" />
+    </div>
 
-      <button type="button" id="signupSubmitBtn" onclick="submitSignUpForm()">Submit</button>
-      <button type="button" id="signupResetBtn" onclick="resetSignUpForm()">Reset</button>
-    </form>
-  </div>
-</div>
+    <div id="@ID-agreementTimeoutDiv">
+      <label for="agreementTimeout"> @BANDWIDTH Agreement Sent Date:</label>
+      <input type="date" id="agreementTimeout" name="agreementTimeout" />
+    </div>
+//.js
+changeFccRadio: function(e){
+			var self  = $(e.currentTarget);
+    		var fccRequiredObject = {};
+    		var radioVal = self.val();
+    		var regService = self.data('reg-service');
+    		var selectedBandName = self.data('reg-service');
+    		fccRequiredObject.siteProjectsId = this.dom.projectId;
+    		var bandNames = ['700Mhz', 'Cellular', 'PCS', 'AWS', 'C-Band'];
+    		for (var key = 0; key < bandNames.length; key++) {
+    			var value = bandNames[key];
+    			if (selectedBandName === value) {
+					selectedBandName = selectedBandName === 'C-Band'? 'CBand':selectedBandName;
+    				fccRequiredObject['intlBorderExtendsFor' + selectedBandName] = radioVal
+    				fccRequiredObject.vzRegService = regService;
+    				this.updateRfdsCallSigns(fccRequiredObject);
+    				break;
+    			}
+    		}
+    		var callSignId = self.attr("name");
+    		
+			if(radioVal === 'Yes'){		
+				$("#"+callSignId +"-notificationTimeoutDiv").addClass("hide").hide();
+				$("#"+callSignId +"-agreementTimeoutDiv").removeClass("hide").show();				
+			}
+			else{
+				$("#"+callSignId +"-agreementTimeoutDiv").addClass("hide").hide();
+				$("#"+callSignId +"-notificationTimeoutDiv").removeClass("hide").show();					
+			}
 
-js..
-// Add these functions after your existing functions in p3.js
 
-function openSignUpModal() {
-  const signUpModal = document.getElementById("signUpModal");
-  signUpModal.style.display = "block";
-}
-
-function closeSignUpModal() {
-  const signUpModal = document.getElementById("signUpModal");
-  signUpModal.style.display = "none";
-}
-
-function submitSignUpForm() {
-  const username = document.getElementById("signupUsername").value;
-  const password = document.getElementById("signupPassword").value;
-
-  if (username === "" || password === "") {
-    alert("Username and password are mandatory");
-    return;
-  }
-
-  const userObject = {
-    userName: username,
-    pwd: password,
-  };
-
-  // Retrieve the existing user list from local storage
-  let userList = JSON.parse(localStorage.getItem("userList")) || [];
-
-  // Check if the username already exists
-  if (userList.some(user => user.userName === username)) {
-    alert("Username already exists. Please choose a different one.");
-    return;
-  }
-
-  // Push the new user object to the user list
-  userList.push(userObject);
-
-  // Store the updated user list back to local storage
-  localStorage.setItem("userList", JSON.stringify(userList));
-
-  console.log("User List after signup:", userList);
-
-  // Close the modal after successful signup
-  closeSignUpModal();
-}
-
-function resetSignUpForm() {
-  document.getElementById("signupUsername").value = "";
-  document.getElementById("signupPassword").value = "";
-}
+this.dom.body.find(".international-callsign-tables").append(tableHeader);
+	    		
+	    		if(doc_check === 'AGREEMENT'){		
+					$("#"+callSignId +"-notificationTimeoutDiv").addClass("hide").hide();
+					$("#"+callSignId +"-agreementTimeoutDiv").removeClass("hide").show();		
+				}
+				else if (doc_check === 'NOTIFICATION'){
+					$("#"+callSignId +"-agreementTimeoutDiv").addClass("hide").hide();
+					$("#"+callSignId +"-notificationTimeoutDiv").removeClass("hide").show();			
+				}
+				
