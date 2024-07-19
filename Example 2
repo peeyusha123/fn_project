@@ -79,3 +79,90 @@ this.dom.body.find(".international-callsign-tables").append(tableHeader);
 					$("#"+callSignId +"-notificationTimeoutDiv").removeClass("hide").show();			
 				}
 				
+
+
+
+
+<div id="@ID-international-colnames" class="spm-grid-styles"></div>
+<div class="radio vzbs-radio text-bold border-none margin-top-bottom">
+  Does the signal extend into the country at levels above those specified in
+  the Agreement between the FCC and their counterpart? :&nbsp;
+  <input
+    name="@ID"
+    role="radio"
+    data-reg-service="@VZREGSERVICE"
+    value="Yes"
+    id="signalextend-yes"
+    type="radio"
+    class="@ID-yes fcc-radio disable"
+    disabled="disabled"
+    <%-- Added conditional logic to set checked attribute for "Yes" radio button --%>
+    <% if (conditionForYes) { %> checked <% } %>
+  />
+  <label for="signalextend-yes">Yes</label>
+  <input
+    name="@ID"
+    role="radio"
+    data-reg-service="@VZREGSERVICE"
+    value="No"
+    id="signalextend-no"
+    type="radio"
+    class="@ID-no fcc-radio disable"
+    disabled="disabled"
+    <%-- Added conditional logic to set checked attribute for "No" radio button --%>
+    <% if (conditionForNo) { %> checked <% } %>
+  />
+  <label for="signalextend-no">No</label>
+</div>
+
+<%-- Added conditional logic to set visibility of Notification Sent Date field --%>
+<div id="@ID-notificationTimeoutDiv" class="<% if (conditionForNo) { %> show <% } else { %> hide <% } %>">
+  <label for="notificationTimeout">@BANDWIDTH Notification Sent Date:</label>
+  <input type="date" id="notificationTimeout" name="notificationTimeout" />
+</div>
+
+<%-- Added conditional logic to set visibility of Agreement Sent Date field --%>
+<div id="@ID-agreementTimeoutDiv" class="<% if (conditionForYes) { %> show <% } else { %> hide <% } %>">
+  <label for="agreementTimeout">@BANDWIDTH Agreement Sent Date:</label>
+  <input type="date" id="agreementTimeout" name="agreementTimeout" />
+</div>
+changeFccRadio: function(e) {
+    var self = $(e.currentTarget);
+    var fccRequiredObject = {};
+    var radioVal = self.val();
+    var regService = self.data('reg-service');
+    var selectedBandName = self.data('reg-service');
+    fccRequiredObject.siteProjectsId = this.dom.projectId;
+    var bandNames = ['700Mhz', 'Cellular', 'PCS', 'AWS', 'C-Band'];
+    for (var key = 0; key < bandNames.length; key++) {
+        var value = bandNames[key];
+        if (selectedBandName === value) {
+            selectedBandName = selectedBandName === 'C-Band' ? 'CBand' : selectedBandName;
+            fccRequiredObject['intlBorderExtendsFor' + selectedBandName] = radioVal;
+            fccRequiredObject.vzRegService = regService;
+            this.updateRfdsCallSigns(fccRequiredObject);
+            break;
+        }
+    }
+    var callSignId = self.attr("name");
+
+    // Updated visibility logic based on radio button value
+    if (radioVal === 'Yes') {
+        $("#" + callSignId + "-notificationTimeoutDiv").addClass("hide").hide();
+        $("#" + callSignId + "-agreementTimeoutDiv").removeClass("hide").show();
+    } else {
+        $("#" + callSignId + "-agreementTimeoutDiv").addClass("hide").hide();
+        $("#" + callSignId + "-notificationTimeoutDiv").removeClass("hide").show();
+    }
+
+    this.dom.body.find(".international-callsign-tables").append(tableHeader);
+
+    // Handle initial state if needed
+    if (doc_check === 'AGREEMENT') {
+        $("#" + callSignId + "-notificationTimeoutDiv").addClass("hide").hide();
+        $("#" + callSignId + "-agreementTimeoutDiv").removeClass("hide").show();
+    } else if (doc_check === 'NOTIFICATION') {
+        $("#" + callSignId + "-agreementTimeoutDiv").addClass("hide").hide();
+        $("#" + callSignId + "-notificationTimeoutDiv").removeClass("hide").show();
+    }
+}
