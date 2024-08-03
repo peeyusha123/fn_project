@@ -1,291 +1,61 @@
+@RequestMapping(value = "/completeWorkStep", method = RequestMethod.POST, produces =  MediaType.APPLICATION_JSON )
+	@ApiOperation(value = "Returns output details", notes = "Projects Service", response = ProjTracker.class)
+	@ApiResponses(value = {
+			@ApiResponse(code = 200, message = "Successful retrieval service", response = ProjTracker.class),
+			@ApiResponse(code = 400, message = "Invalid input provided"),
+			@ApiResponse(code = 404, message = "Data does not exist"), })
+	@ResponseStatus(value = HttpStatus.OK)
 
-	    loadCallSignDetails: function(response, callSignId){
-	    	var title;
+	public Map<String, Map<String, Object>> completeWorkStep(@RequestHeader("user") String userJSON, @RequestBody ProjTracker projTracker) throws Exception {
 
-	    	if (response && response.length !== 0) {
-	    		var templateHeader = this.dom.body.find(".international-table-header-template").html();
-	    		if (callSignId === "band700m") {
-	    			title = "700 Mhz"
-	    		} else if (callSignId === "band850m") {
-	    			title = "850 Mhz"
-	    		} else if (callSignId === "band1900m") {
-	    			title = "1900 Mhz"
-	    		} else if (callSignId === "band2100m") {
-	    			title = "2100 Mhz"
-	    		}else if (callSignId === "cband") {
-	    			title = "C-BAND";
-	    		}
-	    		
-	    		var doc_check;
-				var optionSelectedYes = $(this.dom.body).find("#signalextend-yes");
-				var optionSelectedNo  = $(this.dom.body).find("#signalextend-no");
-					
-				doc_check = optionSelectedYes.prop("checked")?"AGREEMENT":optionSelectedNo.prop("checked")?"NOTIFICATION":false;					
-				
-	    		
-	    		var tableHeader = templateHeader.replace(/@BANDWIDTH/g, title).replace(/@ID/g, callSignId).replace(/@VZREGSERVICE/g, response[0].vzRegService).replace(/@DOC_CHECK/g, (doc_check?doc_check:"")).replace(/@DOC_CATEGORY/g, title.replace(" Mhz", ""));
-	    		// $.each(response, function(i, data) {
-	    		// tableModifiedHeader = tableHeader.replace(/@VZREGSERVICE/g,
-				// data.vzRegService);
-	    		// });
-	    		
-	    		this.dom.body.find(".international-callsign-tables").append(tableHeader);
-	    		let tableId = this.dom.body.find("#" + callSignId + "-international-colnames");
-	    		let columns = this.getCallsignsColumns(false); // don't hide
-																// last 2 cols
-	    		
+		final User user = userInfoService.getUserInfo();
+		
+		logger.info("PROJECTS-SERVICE :  completeWorkStep is called for {} by {} ",projTracker,userInfoService.getUserInfo());
+		
+		Map<String, Map<String, Object>> completedStepMap = new LinkedHashMap<>();
 
-	 addCallSigns: function(reportType, isReportRequired, callsigns, action) {
-	    	var self =rfdsModule;
-	    	var template = self.dom.body.find(".carrier-agreement-template").html();
-	    	self.dom.body.find(".carrier-agreements-select-block").find('#' + reportType).find(".carrier-agreements-selected-block").empty();
+		BackEndValidations.projTrackerFieldsValidation(projTracker);
+		
+		try{
+			final String currentWorkStep = projTracker.getWorkStepName();
+			logger.info("PROJECTS-SERVICE :  Current step is {}",currentWorkStep);
 
-	    	if (isReportRequired === "Yes") {
-	    		if(reportType !== "CONTOUR_EXTENSION_INTO_UNLICENSED_AREA"){
-	    			self.dom.body.find(".carrier-agreements-select-block").find('#' + reportType).find(".carrier-agreements-selected-block").append(template.replace(/@REPORT_TYPE_VAL/g, reportType));
-	    		}else{
-	    			console.log("The Report Type is CONTOUR_EXTENSION_INTO_UNLICENSED_AREA")
-	    		}
-	    	}else {
+			String validationResult=trackerService.BackendValidationCheck(projTracker);
+			if(validationResult.equalsIgnoreCase("FALSE"))
+			{
+				logger.info("PROJECTS-SERVICE :  BACKEND VALIDATION FAILED");
+				throw new Exception("BackEndValidation- Finalize failed !!");
+			}
+			else
+			{
+			completedStepMap = trackerService.completeWorkStep(projTracker, user);
 
-	    		if(reportType === "CONTOUR_EXTENSION_INTO_UNLICENSED_AREA" &&  isReportRequired === "No"){
-
-	    			self.dom.body.find("#CONTOUR_EXTENSION_BEYOND_40").removeClass('hide');
-
-	    			self.dom.body.find(".carrier-agreements-select-block").find('#' + reportType).find(".carrier-agreements-selected-block").append(template.replace(/@REPORT_TYPE_VAL/g, reportType));
-	    		}else{
-	    			console.log("The Report Type is not CONTOUR_EXTENSION_INTO_UNLICENSED_AREA")
-	    		}
-	    		if(reportType === "CONTOUR_EXTENSION_BEYOND_40") {
-	    			self.dom.body.find("#EXTENSION_AGREEMENT_No").prop("checked",false);
-	    			self.dom.body.find("#EXTENSION_AGREEMENT").addClass('hide')
-	    		}
-	    	}
-	    	self.getProjCallSignsCommon(reportType, isReportRequired, callsigns, action);
-
-	    },
-
-	    getProjCallSignsCommon: function(reportType, isReportRequired, callsigns, action){
-	    	var carrierAgreementsContainer = this.dom.body.find(".carrier-agreements-select-block");
-	    	this.dom.body.find("#callsign-list-" + reportType).empty();
-	    	this.getProjCallSigns(reportType, (response)=> {
-	    		if (!jQuery.isEmptyObject(response)) {
-	    			$.each(response, (i, data)=> {
-	    				if (data !== null && data !== undefined) {
-	    					this.dom.body.find("#callsign-list-" + reportType).append($("<option></option>").prop("value", i).text(data));
-	    				}
-	    			});
-	    	    	this.dom.body.find(".carrier-agrmt-callsign-list").off('change').on('change', $.proxy(this.changeCarrierAgrmtCallsignList, this));
-	    			if (callsigns !== undefined && callsigns !== null) {
-	    				this.dom.body.find("#callsign-list-" + reportType).val(callsigns.split(","));
-	    			}
-	    			this.dom.body.find("#callsign-list-" + reportType).selectpicker('refresh');
-	    			if (isReportRequired === "Yes" || isReportRequired === "" || isReportRequired === undefined){
-	    				reportType === "CONTOUR_EXTENSION_INTO_UNLICENSED_AREA" ? this.dom.body.find("#CONTOUR_EXTENSION_BEYOND_40, #EXTENSION_AGREEMENT").addClass('hide') : "";
-	    			}else{
-	    				reportType === "CONTOUR_EXTENSION_INTO_UNLICENSED_AREA" ? this.dom.body.find("#CONTOUR_EXTENSION_BEYOND_40").removeClass('hide') : "";
-	    			}
-	    			if (reportType === "CONTOUR_EXTENSION_INTO_UNLICENSED_AREA" && isReportRequired === "Yes") {
-	    				this.dom.body.find('#CONTOUR_EXTENSION_BEYOND_40_No').prop('checked', true);
-	    				this.dom.body.find('#CONTOUR_EXTENSION_BEYOND_40_Yes').prop('checked', false);
-	    				this.dom.body.find('#EXTENSION_AGREEMENT_No').prop('checked', true);
-	    				this.dom.body.find('#EXTENSION_AGREEMENT_Yes').prop('checked', false);
-	    				this.dom.body.find("#callsign-list-CONTOUR_EXTENSION_BEYOND_40, #callsign-list-EXTENSION_AGREEMENT").empty();
-	    				this.dom.body.find("#callsign-list-CONTOUR_EXTENSION_BEYOND_40, #callsign-list-EXTENSION_AGREEMENT").change();
-
-	    			}else {
-	    				console.log("850 callsigns are going as no");
-	    			}
-	    		} else {
-	    			reportType === "CONTOUR_EXTENSION_INTO_UNLICENSED_AREA" ? this.dom.body.find("#CONTOUR_EXTENSION_BEYOND_40, #EXTENSION_AGREEMENT").addClass('hide') : "";
-	    			reportType === "CONTOUR_EXTENSION_BEYOND_40" ? this.dom.body.find("#EXTENSION_AGREEMENT").removeClass('hide') : "";
-	    			this.dom.body.find(".carrier-agreements-select-block").find('#' + reportType).find(".carrier-agreements-selected-block").empty();
-
-	    			if (reportType === "CONTOUR_EXTENSION_INTO_UNLICENSED_AREA") {
-	    				
-	    				carrierAgreementsContainer.find("#CONTOUR_EXTENSION_INTO_UNLICENSED_AREA").attr("data-850-callsigns", "No");
-	    				$('#CONTOUR_EXTENSION_INTO_UNLICENSED_AREA_No, #CONTOUR_EXTENSION_INTO_UNLICENSED_AREA_Yes, #CONTOUR_EXTENSION_BEYOND_40_No, #CONTOUR_EXTENSION_BEYOND_40_Yes, #EXTENSION_AGREEMENT_No, #EXTENSION_AGREEMENT_Yes').prop('checked', false);
-	    				$("#callsign-list-CONTOUR_EXTENSION_INTO_UNLICENSED_AREA, #callsign-list-CONTOUR_EXTENSION_BEYOND_40, #callsign-list-EXTENSION_AGREEMENT").empty();
-	    				$("#callsign-list-CONTOUR_EXTENSION_INTO_UNLICENSED_AREA, #callsign-list-CONTOUR_EXTENSION_BEYOND_40, #callsign-list-EXTENSION_AGREEMENT").change();
-
-	    				// Delay in setting the dom
-	    				setTimeout(()=> {
-	    					this.dom.body.find('#CONTOUR_EXTENSION_INTO_UNLICENSED_AREA').addClass('hide');
-	    					this.dom.body.find('#CONTOUR_EXTENSION_INTO_UNLICENSED_AREA, #CONTOUR_EXTENSION_BEYOND_40, #EXTENSION_AGREEMENT').removeClass("mandatory_label_before");
-	    					if(action && action === "CHANGE" && isReportRequired === "Yes" ){ //NTSCE-10311
-								this.mergeProjCarrierAgreementDetails(reportType , displayMessage("No CallSigns Available for "+ reportType));
-							}else{
-								this.mergeProjCarrierAgreementDetails(reportType);
-							}
-	    				}, 100);
-
-	    			}else {
-
-	    				this.dom.body.find('#' + reportType + '_No').prop('checked', true);
-
-	    				// Delay in setting the dom
-	    				setTimeout(()=> {
-							if(action && action === "CHANGE" && isReportRequired === "Yes" ){ //NTSCE-10311
-								this.mergeProjCarrierAgreementDetails(reportType , displayMessage("No CallSigns Available for"+ reportType));
-							}else{
-								this.mergeProjCarrierAgreementDetails(reportType);
-							}
-	    				}, 100);
-
-
-	    			}
-	    			this.dom.body.find('#' + reportType + '_Yes').prop('checked', false);
-	    		}
-	    	});
-	    },
-
-	    getProjCallSigns: function(reportType, callback) {
-	    	var projectSearchRequest = {};
-	    	projectSearchRequest.siteProjectsId = this.dom.projectId;
-	    	projectSearchRequest.searchKey = reportType;
-	    	this.constructor.ajax.fireApi(projectSearchRequest, "project", "getProjCallSigns", (response)=> {
-				var isESValid=response.isESValid;
-			    var isCbandSiteOrProject=response.isCbandSiteOrProject;
-				var isContigUnlicensed=response.CONTIG_50_SQMI_UNLICENSED;
-			    delete response["isESValid"];
-			    delete response["isCbandSiteOrProject"];
-				delete response["CONTIG_50_SQMI_UNLICENSED"];	
-
-	    		if (reportType === "") {
-	    			callSignFrequency = response;
-	    		} else if (reportType === "8Cs") {
-	    			cellularCallSigns = [];
-	    			$.each(response, (callsign, frequency)=> {
-	    				cellularCallSigns.push(callsign);
-	    			});
-	    		}
-				var cbandFound = Object.values(response).find(a => a.match("C-Band"));
-				if(reportType === ""){ // ONLY ON LOAD
-					if(cbandFound){
-						if(isCbandSiteOrProject == "true" && isESValid == "true" ){
-							this.constructor.mandateESDocs = true;
-							let payload ={
-			                		 siteProjectsId : this.dom.siteProjectsId,
-									 siteInfoId : this.dom.siteInfoId  
-			                   }
-							this.constructor.ajax.fireApi(payload,"rfds-callsign","getAtollEarthStationData",(res)=>{
-									this.atollTransmitterGrid(res,"rfds-cband-table");
-							})
-							this.dom.body.find('.c-band-body .rfds-cband-template').removeClass('hide');
-
-							$("#c-band-gNB-equipment-type").val(projectDetailsWrapper.projAdditionalInfo.cbEqType);
-							if(projectDetailsWrapper.projAdditionalInfo.earth_station_agreement == 'true'){
-								$("#earth-station-agreement").prop("checked",true);
-							}else{
-								$("#earth-station-agreement").prop("checked",false);
-							}
-							var esdma= projectDetailsWrapper.projAdditionalInfo.esdma.split(',')
-							$("#earth-station-design-mitigation-applied").val(esdma);
-							$("#earth-station-design-mitigation-applied").selectpicker('refresh');
-							this.dom.body.find('.c-band-body .earth-station-fields').removeClass('hide');
-
-						}else{
-							this.constructor.mandateESDocs = false;
-							this.dom.body.find('.c-band-body .rfds-cband-template').addClass('hide');
-							this.dom.body.find('.c-band-body .earth-station-fields').addClass('hide');
-						}
+			if("COMPLETE".equalsIgnoreCase(projTracker.getActionPerformed())){
+				String enableRhpam = "flase"; // cachedResultsDao.getEnableRhpam().get(0);
+					if("CREATE_PROJECT".equalsIgnoreCase(currentWorkStep)) {
+						projTracker.setWorkStepName("CREATE_PROJECT_COMPLETED");
+						projectsService.populateUaceIdAndName(projTracker, user);
 						
-						this.dom.body.find('.c-band-header, .c-band-body').removeClass('hide');
-					}else{
-						this.dom.body.find('.c-band-header, .c-band-body').addClass('hide');
+						if(enableRhpam.equalsIgnoreCase("true")) {
+							unoService.createProjectPAM(projTracker.getSiteProjectsId(),user);
+						}						
+					}
+					else {
+						if(enableRhpam.equalsIgnoreCase("true")) {
+//							final String currWorkStepDispNm = Optional.ofNullable(cachedResultsDao.getMilestones().get(currentWorkStep)).isPresent() && !"".equalsIgnoreCase(cachedResultsDao.getMilestones().get(currentWorkStep).trim()) ?
+//									cachedResultsDao.getMilestones().get(currentWorkStep) : cachedResultsDao.getWorkStepName().get(currentWorkStep);//cachedResultsDao.getMilestones().get(currentWorkStep);
+							unoService.updateWorkstepStatusPAM(currentWorkStep, "COMPLETED", projTracker.getSiteProjectsId(),user);
+						}	
 					}
 				
-				}
-	    		if(["CONTOUR_EXTENSION_INTO_UNLICENSED_AREA","CONTOUR_EXTENSION_BEYOND_40","EXTENSION_AGREEMENT"].includes(reportType) || reportType === ""){
-	    			var callsigns850 = Object.values(response).find(a => a.match('850'));
-					
-	    			if(callsigns850){
-						this.dom.validate850 = true;
-	    				this.dom.body.find('#CONTOUR_EXTENSION_INTO_UNLICENSED_AREA, .850_callsigns_header').removeClass('hide');
-	    				this.dom.body.find("#CONTOUR_EXTENSION_INTO_UNLICENSED_AREA").attr("data-850-callsigns", "Yes");
-	    			}else{
-						this.dom.validate850 = false;
-	    				this.dom.body.find("#CONTOUR_EXTENSION_INTO_UNLICENSED_AREA").attr("data-850-callsigns", "No");
-	    				this.dom.body.find('#CONTOUR_EXTENSION_INTO_UNLICENSED_AREA_No, #CONTOUR_EXTENSION_INTO_UNLICENSED_AREA_Yes, #CONTOUR_EXTENSION_BEYOND_40_No, #CONTOUR_EXTENSION_BEYOND_40_Yes, #EXTENSION_AGREEMENT_No, #EXTENSION_AGREEMENT_Yes').prop('checked', false);
-	    				this.dom.body.find("#callsign-list-CONTOUR_EXTENSION_INTO_UNLICENSED_AREA, #callsign-list-CONTOUR_EXTENSION_BEYOND_40, #callsign-list-EXTENSION_AGREEMENT").empty();
-	    				this.dom.body.find("#callsign-list-CONTOUR_EXTENSION_INTO_UNLICENSED_AREA, #callsign-list-CONTOUR_EXTENSION_BEYOND_40, #callsign-list-EXTENSION_AGREEMENT").change();
-	    			}
-					if(isContigUnlicensed == 'No'){
-						this.dom.body.find('#CONTIG_50_SQMI_UNLICENSED').removeClass('hide');
-						this.dom.body.find('#CONTIG_50_SQMI_UNLICENSED_No').prop('checked', true);
-						this.dom.body.find('#CONTIG_50_SQMI_UNLICENSED_Yes').prop('checked', false);
-					}else if(isContigUnlicensed == 'Yes'){
-						this.dom.body.find('#CONTIG_50_SQMI_UNLICENSED').removeClass('hide');
-						this.dom.body.find('#CONTIG_50_SQMI_UNLICENSED_Yes').prop('checked', true);
-						this.dom.body.find('#CONTIG_50_SQMI_UNLICENSED_No').prop('checked', false);
-						
-					}
-	    		}
-	    		if (callback) {
-	    			callback(response);
-	    		}
-	    	});
-	    },
-
-
-	    changeFccRadio: function(e){
-			var self  = $(e.currentTarget);
-    		var fccRequiredObject = {};
-    		var radioVal = self.val();
-    		var regService = self.data('reg-service');
-    		var selectedBandName = self.data('reg-service');
-    		fccRequiredObject.siteProjectsId = this.dom.projectId;
-    		var bandNames = ['700Mhz', 'Cellular', 'PCS', 'AWS', 'C-Band'];
-    		for (var key = 0; key < bandNames.length; key++) {
-    			var value = bandNames[key];
-    			if (selectedBandName === value) {
-					selectedBandName = selectedBandName === 'C-Band'? 'CBand':selectedBandName;
-    				fccRequiredObject['intlBorderExtendsFor' + selectedBandName] = radioVal
-    				fccRequiredObject.vzRegService = regService;
-    				this.updateRfdsCallSigns(fccRequiredObject);
-    				break;
-    			}
-    		}
-    		var callSignId = self.attr("name");
-			if(radioVal === 'Yes'){
-				
-				$("#"+callSignId +"-notificationTimeoutDiv").addClass("hide");
-				$("#"+callSignId +"-agreementTimeoutDiv").removeClass("hide");
+				parallelProcessor.execute(ParallelProcessor.Operation.EMAIL_QUEUE, userInfoService.getUserInfo(), projTracker, new HashMap<>());
+				projTracker.setWorkStepName(currentWorkStep);
 			}
-			else{
-			$("#"+callSignId +"-agreementTimeoutDiv").addClass("hide");
-			$("#"+callSignId +"-notificationTimeoutDiv").removeClass("hide");	
 			}
-    		var subCategory="";
-    		if (callSignId === "band700m") {
-                    subCategory = "700"
-                } else if (callSignId === "band850m") {
-                    subCategory = "850"
-                } else if (callSignId === "band1900m") {
-                    subCategory = "1900"
-                } else if (callSignId === "band2100m") {
-                    subCategory = "2100"
-                }else if (callSignId === "cband") {
-                    subCategory = "C-BAND";
-                }
-               subCategory = 'INTERNATIONAL_BORDER_'+  (radioVal === 'No' ? 'NOTIFICATION' : 'AGREEMENT' )+'_'+subCategory;
-               $("#"+callSignId+"-form").find("#subCategory").val(subCategory);                
-	    },
-	    changeUploadRfdsInserviceDocuments: function(e){
-    		e.preventDefault();
-    		var form = this.dom.body.find('.rfds-inservice-template .upload-form');
-    		var formId = form.attr("id");
-    		var subCategory = this.dom.parent.find("#inservice-callsign-list").val();
-    		if (subCategory !== null && subCategory !== "" && subCategory !== undefined) {
-//    			this.dom.parent.find("#" + formId).find('#subCategory').val(subCategory);
-//    			this.dom.parent.find("#" + formId).find('#bandwidth').val(callSignFrequency[subCategory].replace(/-/g, "^"));
-//    			uploadDocument(this.dom.siteInfoId, formId, this.getRfdsInserviceDocuments);
-	    		this.dom.parent.find("#" + formId).find('#subCategory').val(subCategory);
-	    		this.dom.parent.find("#" + formId).find('#bandwidth').val(JSON.stringify(callSignFrequency));
-	    		uploadDocumentWithMultipleCategories(this.dom.siteInfoId, formId, this.getRfdsInserviceDocuments, null, "Yes");
-    		} else {
-    			displayError("Error", "Please select the callsigns the document is applicable to");
-    			this.dom.parent.find("#" + formId)[0].reset();
-    		}
-	    },
-	   
+
+		}catch( final Exception e){
+			e.printStackTrace();
+			throw e;
+		}
+		return completedStepMap;
+	}
