@@ -1,61 +1,66 @@
-@RequestMapping(value = "/completeWorkStep", method = RequestMethod.POST, produces =  MediaType.APPLICATION_JSON )
-	@ApiOperation(value = "Returns output details", notes = "Projects Service", response = ProjTracker.class)
+-controller file
+@RequestMapping(value = "/mergeProjLocationInfo", method = RequestMethod.POST, produces =  MediaType.APPLICATION_JSON )
+	@ApiOperation(value = "Returns output details", notes = "Projects Service", response = ProjLocationInfo.class)
 	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Successful retrieval service", response = ProjTracker.class),
+			@ApiResponse(code = 200, message = "Successful retrieval service", response = ProjLocationInfo.class),
 			@ApiResponse(code = 400, message = "Invalid input provided"),
 			@ApiResponse(code = 404, message = "Data does not exist"), })
 	@ResponseStatus(value = HttpStatus.OK)
 
-	public Map<String, Map<String, Object>> completeWorkStep(@RequestHeader("user") String userJSON, @RequestBody ProjTracker projTracker) throws Exception {
+	public boolean mergeProjLocationInfo(@RequestHeader("user") String userJSON, @RequestBody ProjLocationInfo projLocationInfo) throws Exception {
 
 		final User user = userInfoService.getUserInfo();
 		
-		logger.info("PROJECTS-SERVICE :  completeWorkStep is called for {} by {} ",projTracker,userInfoService.getUserInfo());
+		logger.info("PROJECTS-SERVICE : Inside {}, Called by {} with Parameter {}", Thread.currentThread().getStackTrace()[1].getMethodName(), user, projLocationInfo);
 		
-		Map<String, Map<String, Object>> completedStepMap = new LinkedHashMap<>();
-
-		BackEndValidations.projTrackerFieldsValidation(projTracker);
+		final boolean status = projectsService.mergeProjLocationInfo(projLocationInfo, user);
 		
-		try{
-			final String currentWorkStep = projTracker.getWorkStepName();
-			logger.info("PROJECTS-SERVICE :  Current step is {}",currentWorkStep);
+		return status;
+	}
+-service layer
+@Override
+	public boolean mergeProjLocationInfo(ProjLocationInfo projLocationInfo, User user) throws Exception {
 
-			String validationResult=trackerService.BackendValidationCheck(projTracker);
-			if(validationResult.equalsIgnoreCase("FALSE"))
-			{
-				logger.info("PROJECTS-SERVICE :  BACKEND VALIDATION FAILED");
-				throw new Exception("BackEndValidation- Finalize failed !!");
-			}
-			else
-			{
-			completedStepMap = trackerService.completeWorkStep(projTracker, user);
+		projLocationInfo.setLastModifiedBy(user.getUserId());
 
-			if("COMPLETE".equalsIgnoreCase(projTracker.getActionPerformed())){
-				String enableRhpam = "flase"; // cachedResultsDao.getEnableRhpam().get(0);
-					if("CREATE_PROJECT".equalsIgnoreCase(currentWorkStep)) {
-						projTracker.setWorkStepName("CREATE_PROJECT_COMPLETED");
-						projectsService.populateUaceIdAndName(projTracker, user);
-						
-						if(enableRhpam.equalsIgnoreCase("true")) {
-							unoService.createProjectPAM(projTracker.getSiteProjectsId(),user);
-						}						
-					}
-					else {
-						if(enableRhpam.equalsIgnoreCase("true")) {
-//							final String currWorkStepDispNm = Optional.ofNullable(cachedResultsDao.getMilestones().get(currentWorkStep)).isPresent() && !"".equalsIgnoreCase(cachedResultsDao.getMilestones().get(currentWorkStep).trim()) ?
-//									cachedResultsDao.getMilestones().get(currentWorkStep) : cachedResultsDao.getWorkStepName().get(currentWorkStep);//cachedResultsDao.getMilestones().get(currentWorkStep);
-							unoService.updateWorkstepStatusPAM(currentWorkStep, "COMPLETED", projTracker.getSiteProjectsId(),user);
-						}	
-					}
-				
-				parallelProcessor.execute(ParallelProcessor.Operation.EMAIL_QUEUE, userInfoService.getUserInfo(), projTracker, new HashMap<>());
-				projTracker.setWorkStepName(currentWorkStep);
-			}
-			}
+		logger.info("PROJECTS-SERVICE : mergeProjectLocationInfo service Impl");
 
-		}catch( final Exception e){
+		return projectsDao.mergeProjLocationInfo(projLocationInfo, user);
+	}
+-DAO layer 
+public boolean mergeProjLocationInfo(ProjLocationInfo projLocationInfo, User user ) throws Exception {
+
+		logger.info("PROJECTS_SERVICE : Inside {}. Parameter :  {}",
+				Thread.currentThread().getStackTrace()[1].getMethodName(), projLocationInfo);
+		
+		final DataSourceCriteria criteria = dataCloudSerializer.mapMergeProjLocationInfo(projLocationInfo, user);
+		
+		boolean isMerged = false;
+
+		try {
+
+			final DataSourceResultSet wsResult = DataCloud.perform(DataCloudServices.PROJECTS.mergeProjLocationInfo,
+					criteria);
+			isMerged = wsResult.getUpdateCount() > 0;
+			
+			//Code to update the PSLC data from ppl sft is moved to getProjectFields
+			if(isMerged) {
+				DataCloud.perform(DataCloudServices.PROJECTS.mergePslcSite,
+						criteria);
+			}else {
+				throw new Exception("Invalid PSLC Code");
+
+			}
+			
+		} catch (final Exception e) {
+			logger.error("PROJECTS_SERVICE : Error in projLocationInfo Dao {}", e.getMessage());
 			e.printStackTrace();
 			throw e;
 		}
-		return completedStepMap;
+
+		logger.info(RETURN_PARAMS,
+				Thread.currentThread().getStackTrace()[1].getMethodName(), isMerged);
+		return isMerged;
 	}
+- dataCluodService layer
+String mergeProjLocationInfo = "projects.mergeProjLocationInfo";
