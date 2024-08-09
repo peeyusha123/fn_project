@@ -1,464 +1,155 @@
-//p4.js file .. update
-
-// Function to open the password reset modal
-// In openResetPasswordModal function
-function openResetPasswordModal(triggeredFromLogin = false) {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "block";
-
-  // Add event listener to the input field for real-time validation
-  const resetUsernameInput = document.getElementById("resetUsername");
-  resetUsernameInput.addEventListener("input", handleResetUsernameInputChange);
-
-  // Initially disable the Reset Buttons
-  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
-  resetPasswordBtns.forEach((btn) => {
-    btn.disabled = true;
-  });
-
-  if (triggeredFromLogin) {
-    resetUsernameInput.value = "";
-  }
-
-  // Return a promise that resolves after opening the resetpasswordmodal
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, 0);
-  });
-}
-
-// In openResetPasswordModalFromLogin function
-async function openResetPasswordModalFromLogin() {
-  await openResetPasswordModal(true);
-  openPasswordResetModal();
-}
-
-// Function to handle input change in the Reset Username field
-function handleResetUsernameInputChange() {
-  let isUsernameInLocalStorage;
-  const resetUsernameInput = document.getElementById("resetUsername");
-  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
-
-  // Enable the Reset Buttons only if the Reset Username field is not empty
-
-  const isUsernameEmpty = !resetUsernameInput.value.trim();
-  const containsSpecialCharacters = /[!@#$%^&*(),.?":{}|<>]/.test(
-    resetUsernameInput.value.trim()
-  );
-
-  resetPasswordBtns.forEach((btn) => {
-    btn.disabled = isUsernameEmpty || containsSpecialCharacters;
-  });
-
-  if (document.getElementById("passwordResetModal").style.display === "block") {
-    resetUsernameInput.value = "";
-  }
-
-  // Check if the entered username is present in Local Storage
-  const enteredUsername = resetUsernameInput.value.trim();
-  if (!containsSpecialCharacters) {
-    const storedUsernames = JSON.parse(localStorage.getItem("userList")) || [];
-
-    isUsernameInLocalStorage = storedUsernames.some(
-      (user) => user.userName === enteredUsername
-    );
-
-    // Optionally, you can clear the input field or display an error message
-    resetUsernameInput.value = "";
-  } else {
-    const storedUsernames = JSON.parse(localStorage.getItem("userList")) || [];
-    const isUsernameInLocalStorage = storedUsernames.some(
-      (user) => user.userName === enteredUsername
-    );
-    console.log("Username is valid:", enteredUsername);
-
-    if (!isUsernameInLocalStorage) {
-      storedUsernames.push({ userName: enteredUsername });
-      localStorage.setItem("userList", JSON.stringify(storedUsernames));
-    }
-
-    openPasswordResetModal(enteredUsername);
-  }
-
-  const storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
-  isUsernameInLocalStorage = storedUsernames.includes(enteredUsername);
-
-  if (isUsernameInLocalStorage) {
-    console.log("Username found in Local Storage:", enteredUsername);
-    openPasswordResetModal(enteredUsername);
-  } else {
-    console.log("Username not found in Local Storage:", enteredUsername);
-
-    // If the username is not found, you can add it to Local Storage
-    storedUsernames.push(enteredUsername);
-    localStorage.setItem("usernames", JSON.stringify(storedUsernames));
-
-    console.log("Username added to Local Storage:", enteredUsername);
-  }
-}
-
-// Function to open the password reset modal from login
-function openResetPasswordModalFromLogin() {
-  openResetPasswordModal(true);
-}
-
-// Function to close the password reset modal
-function closeResetPasswordModal() {
-  //const resetPasswordModal = document.getElementById("resetPasswordModal");
-  //resetPasswordModal.style.display = "none";
-  resetUsernameInput = document.getElementById("resetUsername");
-  resetUsernameInput.removeEventListener(
-    "input",
-    handleResetUsernameInputChange
-  );
-}
-
-// Function to open the password reset modal
-function openPasswordResetModal(username) {
-  const passwordResetModal = document.getElementById("passwordResetModal");
-
-  if (passwordResetModal) {
-    passwordResetModal.style.display = "block";
-
-    //set the username in the modal
-    const usernameField = document.getElementById("resetUsernameDisplay");
-
-    if (usernameField) {
-      usernameField.value = username;
-      usernameField.setAttribute("readonly", true);
-
-      //add event listener to handle input change in second modal
-      const newPasswordInput = document.getElementById("passwordNew");
-      if (newPasswordInput) {
-        newPasswordInput.addEventListener(
-          "input",
-          handleNewPasswordInputChange
-        );
-      }
-    } else {
-      console.error("Element with id 'resetUsernameModal' not found.");
-    }
-  } else {
-    console.error("Element with id 'passwordResetModal' not found.");
-  }
-}
-// Function to close the password reset modal
-function closePasswordResetModal() {
-  const passwordResetModal = document.getElementById("passwordResetModal");
-  passwordResetModal.style.display = "none";
-}
-
-function handleNewPasswordInputChange() {
-  newPasswordInput = document.getElementById("passwordNew");
-}
-
-// Function to submit the password reset form
-function submitPasswordResetForm() {
-  const newPasswordInput = document.getElementById("passwordNew");
-  const retypeNewPasswordInput = document.getElementById("retypeNewPassword");
-  const resetUsernameDisplay = document.getElementById("resetUsernameDisplay");
-
-  // Validate Password
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^])(?=.*\d)[a-zA-Z\d!@#$%^]{8,}$/;
-  const newPassword = newPasswordInput.value;
-  const retypeNewPassword = retypeNewPasswordInput.value;
-
-  if (!passwordRegex.test(newPassword)) {
-    showErrorMessage("Password must meet the specified criteria.");
-    return;
-  }
-
-  // Validate Special Characters
-  const specialCharactersRegex = /[!@#$%^]/;
-  if (!specialCharactersRegex.test(newPassword)) {
-    showErrorMessage("Password must contain at least one of !@#$%^");
-    return;
-  }
-
-  // Check if New Password and Retype Password Match
-  if (newPassword !== retypeNewPassword) {
-    showErrorMessage("Passwords do not match.");
-    return;
-  }
-
-  // Update the password in local storage
-  const userList = JSON.parse(localStorage.getItem("userList")) || [];
-  const userIndex = userList.findIndex(
-    (user) => user.userName === resetUsernameDisplay.value
-  );
-
-  if (userIndex !== -1) {
-    userList[userIndex].pwd = newPassword;
-    localStorage.setItem("userList", JSON.stringify(userList));
-  }
-
-  // Close the Password Reset Modal
-  closePasswordResetModal();
-
-  // Show Bootstrap Success Alert for Password Reset Success
-  showSuccessMessage("User Password Reset Success");
-}
-
-function showErrorMessage(message) {
-  showAlert(message, "alert-danger");
-}
-
-function showSuccessMessage(message) {
-  showAlert(message, "alert-success");
-}
-
-function showAlert(message, alertType) {
-  const loginForm = document.getElementById("loginForm");
-  loginForm.insertAdjacentHTML(
-    "afterbegin",
-    `
-    <div class="alert ${alertType} alert-dismissible fade show" role="alert">
-      ${message}
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-  `
-  );
-
-  // Set timeout to remove the alert after 5 seconds
-  setTimeout(() => {
-    document.querySelector(`.${alertType}`).remove();
-  }, 5000);
-}
-
-
-//trail,js
-// Function to open the password reset modal
-// In openResetPasswordModal function
-function openResetPasswordModal(triggeredFromLogin = false) {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "block";
-
-  // Add event listener to the input field for real-time validation
-  const resetUsernameInput = document.getElementById("resetUsername");
-  resetUsernameInput.addEventListener("input", handleResetUsernameInputChange);
-
-  // Initially disable the Reset Buttons
-  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
-  resetPasswordBtns.forEach((btn) => {
-    btn.disabled = true;
-  });
-
-  if (triggeredFromLogin) {
-    resetUsernameInput.value = "";
-  }
-
-  // Return a promise that resolves after opening the resetpasswordmodal
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, 0);
-  });
-}
-
-// In openResetPasswordModalFromLogin function
-async function openResetPasswordModalFromLogin() {
-  await openResetPasswordModal(true);
-  openPasswordResetModal();
-}
-
-// Function to handle input change in the Reset Username field
-function handleResetUsernameInputChange() {
-  let isUsernameInLocalStorage;
-  const resetUsernameInput = document.getElementById("resetUsername");
-  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
-
-  // Enable the Reset Buttons only if the Reset Username field is not empty
-
-  const isUsernameEmpty = !resetUsernameInput.value.trim();
-  const containsSpecialCharacters = /[!@#$%^&*(),.?":{}|<>]/.test(
-    resetUsernameInput.value.trim()
-  );
-
-  resetPasswordBtns.forEach((btn) => {
-    btn.disabled = isUsernameEmpty || containsSpecialCharacters;
-  });
-
-  if (
-    document.getElementById("passwordResetModal").style.display === "block" &&
-    document.getElementById("passwordResetModal").offsetHeight > 0
-  ) {
-    resetUsernameInput.value = "";
-  }
-
-  // Check if the entered username is present in Local Storage
-  const enteredUsername = resetUsernameInput.value.trim();
-  if (!containsSpecialCharacters) {
-    const storedUsernames = JSON.parse(localStorage.getItem("userList")) || [];
-
-    isUsernameInLocalStorage = storedUsernames.some(
-      (user) => user.userName === enteredUsername
-    );
-
-    // Optionally, you can clear the input field or display an error message
-    resetUsernameInput.value = "";
-  } else {
-    const storedUsernames = JSON.parse(localStorage.getItem("userList")) || [];
-    const isUsernameInLocalStorage = storedUsernames.some(
-      (user) => user.userName === enteredUsername
-    );
-    console.log("Username is valid:", enteredUsername);
-
-    if (!isUsernameInLocalStorage) {
-      storedUsernames.push({ userName: enteredUsername });
-      localStorage.setItem("userList", JSON.stringify(storedUsernames));
-    }
-
-    openPasswordResetModal(enteredUsername);
-  }
-
-  const storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
-  isUsernameInLocalStorage = storedUsernames.includes(enteredUsername);
-
-  if (isUsernameInLocalStorage) {
-    console.log("Username found in Local Storage:", enteredUsername);
-    openPasswordResetModal(enteredUsername);
-  } else {
-    console.log("Username not found in Local Storage:", enteredUsername);
-
-    // If the username is not found, you can add it to Local Storage
-    storedUsernames.push(enteredUsername);
-    localStorage.setItem("usernames", JSON.stringify(storedUsernames));
-
-    console.log("Username added to Local Storage:", enteredUsername);
-  }
-}
-
-// Function to open the password reset modal from login
-function openResetPasswordModalFromLogin() {
-  openResetPasswordModal(true);
-}
-
-// Function to close the password reset modal
-function closeResetPasswordModal() {
-  //const resetPasswordModal = document.getElementById("resetPasswordModal");
-  //resetPasswordModal.style.display = "none";
-  resetUsernameInput = document.getElementById("resetUsername");
-  resetUsernameInput.removeEventListener(
-    "input",
-    handleResetUsernameInputChange
-  );
-}
-
-// Function to open the password reset modal
-function openPasswordResetModal(username) {
-  const passwordResetModal = document.getElementById("passwordResetModal");
-
-  if (passwordResetModal) {
-    passwordResetModal.style.display = "block";
-
-    //set the username in the modal
-    const usernameField = document.getElementById("resetUsernameDisplay");
-
-    if (usernameField) {
-      usernameField.value = username;
-      usernameField.setAttribute("readonly", true);
-
-      //add event listener to handle input change in second modal
-      const newPasswordInput = document.getElementById("passwordNew");
-      if (newPasswordInput) {
-        newPasswordInput.addEventListener(
-          "input",
-          handleNewPasswordInputChange
-        );
-      }
-    } else {
-      console.error("Element with id 'resetUsernameModal' not found.");
-    }
-  } else {
-    console.error("Element with id 'passwordResetModal' not found.");
-  }
-}
-// Function to close the password reset modal
-function closePasswordResetModal() {
-  const passwordResetModal = document.getElementById("passwordResetModal");
-  passwordResetModal.style.display = "none";
-}
-
-function handleNewPasswordInputChange() {
-  newPasswordInput = document.getElementById("passwordNew");
-}
-
-// Function to submit the password reset form
-function submitPasswordResetForm() {
-  const newPasswordInput = document.getElementById("passwordNew");
-  const retypeNewPasswordInput = document.getElementById("retypeNewPassword");
-  const resetUsernameDisplay = document.getElementById("resetUsernameDisplay");
-
-  // Validate Password
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^])(?=.*\d)[a-zA-Z\d!@#$%^]{8,}$/;
-  const newPassword = newPasswordInput.value;
-  const retypeNewPassword = retypeNewPasswordInput.value;
-
-  if (!passwordRegex.test(newPassword)) {
-    showErrorMessage("Password must meet the specified criteria.");
-    return;
-  }
-
-  // Validate Special Characters
-  const specialCharactersRegex = /[!@#$%^]/;
-  if (!specialCharactersRegex.test(newPassword)) {
-    showErrorMessage("Password must contain at least one of !@#$%^");
-    return;
-  }
-
-  // Check if New Password and Retype Password Match
-  if (newPassword !== retypeNewPassword) {
-    showErrorMessage("Passwords do not match.");
-    return;
-  }
-
-  // Update the password in local storage
-  const userList = JSON.parse(localStorage.getItem("userList")) || [];
-  const userIndex = userList.findIndex(
-    (user) => user.userName === resetUsernameDisplay.value
-  );
-
-  if (userIndex !== -1) {
-    userList[userIndex].pwd = newPassword;
-    localStorage.setItem("userList", JSON.stringify(userList));
-  }
-
-  // Close the Password Reset Modal
-  closePasswordResetModal();
-
-  // Show Bootstrap Success Alert for Password Reset Success
-  showSuccessMessage("User Password Reset Success");
-}
-
-function showErrorMessage(message) {
-  showAlert(message, "alert-danger");
-}
-
-function showSuccessMessage(message) {
-  showAlert(message, "alert-success");
-}
-
-function showAlert(message, alertType) {
-  const loginForm = document.getElementById("loginForm");
-  loginForm.insertAdjacentHTML(
-    "afterbegin",
-    `
-    <div class="alert ${alertType} alert-dismissible fade show" role="alert">
-      ${message}
-      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-  `
-  );
-
-  // Set timeout to remove the alert after 5 seconds
-  setTimeout(() => {
-    document.querySelector(`.${alertType}`).remove();
-  }, 5000);
-}
+create or replace PROCEDURE "PROC_COMPLETE_WORKSTEP" (
+siteProjectsId NUMBER,
+siteInfoId NUMBER,
+workStepName VARCHAR2,
+actionPerformed VARCHAR2,
+taskStatus VARCHAR2,
+lastModifiedBy VARCHAR2,
+userReviewStatus VARCHAR2,
+v_tableName IN VARCHAR2 DEFAULT NULL,
+i_togglable varchar2 default null
+) AS
+v_rowcount number;
+cq_change_control VARCHAR2(32);
+TYPE pptStatus IS RECORD (
+v_milestone VARCHAR2(128 BYTE),
+v_workStepName VARCHAR2(128 BYTE),
+v_oldStatus VARCHAR2(16),
+v_newStatus VARCHAR2(16)
+);
+TYPE pptStatusSet IS TABLE OF pptStatus;
+pptStatusRows pptStatusSet;
+v_mm VARCHAR2(128 BYTE);
+v_mmTableNmae VARCHAR2(256 BYTE);
+v_query VARCHAR2(1024 BYTE);
+v_workstep_group VARCHAR2(8);
+BEGIN
+
+
+    IF(siteProjectsId !=0 AND actionPerformed = 'COMPLETE') THEN
+	DBMS_OUTPUT.PUT_LINE('WorkstepName '|| workStepName || ' Status ' || taskStatus);
+	-- Do not Activate Re Finalize PSLC_FUNDING
+	IF(workStepName = 'PSLC_FUNDING' AND FUNC_GET_WORKSTEP_STATUS(siteProjectsId,'PSLC_FUNDING') = 'COMPLETED' ) THEN
+	    return;
+	END IF;
+
+ 	IF(workStepName = 'SUBMIT_RFDS' AND FUNC_GET_WORKSTEP_STATUS(siteProjectsId,'SUBMIT_RFDS') = 'COMPLETED' ) THEN
+	    PROC_INSERT_DQI_VALIDATION_QUEUE_WRAPPER(siteProjectsId, 'INITIATIVE_VERIFICATION', 'BULK', lastModifiedBy);
+	END IF;
+
+	IF(workStepName in ('RF_COMPLETE','RF_COMPLETE_INSERT','CQ_VCP_FAR_EDGE_CIQ_COMPLETE','CQ_VCP_FAR_EDGE_CIQ_COMPLETE_INSERT') AND FUNC_GET_WORKSTEP_STATUS_TIGGER_ONLY(siteProjectsId,'SUBMIT_RFDS') IN ('COMPLETED')) THEN
+	    BEGIN
+		SELECT
+		CASE WHEN CQ_CHANGE_CONTROL ='Active' THEN 'true'
+		WHEN CQ_CHANGE_CONTROL='Inactive' THEN 'false'
+		END AS CQ_CHANGE_CONTROL INTO cq_change_control
+		from PROJ_ADDITIONAL_INFO
+		WHERE SITE_PROJECTS_ID = siteProjectsId;
+
+		EXCEPTION WHEN NO_DATA_FOUND THEN
+		cq_change_control := NULL;
+	    END;
+	    IF(cq_change_control IS NOT NULL AND cq_change_control IN ('true')) THEN
+		PROC_INSERT_API_QUEUE('FUZE_PLANNING','UPDATE_RFDS_CQ_CHANGE_CONTROL',NULL,siteProjectsId,NULL,NULL,NULL,'QUEUED',lastModifiedBy);
+	    END IF;
+    END IF;
+
+	SELECT * BULK COLLECT INTO pptStatusRows
+	FROM (
+	    SELECT WS.MILESTONE,WS.WORKSTEP_NAME,
+	    CASE WHEN WS.WORKSTEP_GROUP = 'T' AND PTT.TASK_STATUS ='COMPLETED' AND PTT.USER_REVIEW_STATUS ='NA' THEN 'N/A' ELSE PTT.TASK_STATUS END AS OLD_STATUS,
+	    CASE WHEN WS.WORKSTEP_GROUP = 'T' AND taskStatus = 'COMPLETED' AND userReviewStatus ='NA' THEN 'N/A' ELSE taskStatus END AS NEW_STATUS
+	    FROM PROJ_TRACKER_TASKS PTT
+	    INNER JOIN PROJ_TRACKER PT ON PTT.PROJ_TRACKER_ID = PT.PROJ_TRACKER_ID
+	    INNER JOIN WORKSTEPS WS ON PTT.WORKSTEP_ID = WS.WORKSTEP_ID
+	    INNER JOIN WORKFLOW W ON WS.WF_ID = W.WF_ID AND PT.WF_ID = W.WF_ID
+	    INNER JOIN SITE_PROJECTS SP ON SP.SITE_PROJECTS_ID = PT.SITE_PROJECTS_ID
+	    WHERE PT.TRACKER_TYPE IN ('NEW_BUILD_PROJECT','MOD_PROJECT')
+	    AND SP.SITE_PROJECTS_ID = siteProjectsId
+	    AND WS.WORKSTEP_NAME IN (SELECT trim(regexp_substr(workStepName, '[^,]+', 1, LEVEL)) WORKSTEP_NAME
+	    FROM DUAL
+	    CONNECT BY regexp_substr(workStepName , '[^,]+', 1, LEVEL) IS NOT NULL)
+	) WHERE ((OLD_STATUS = 'N/A' AND NEW_STATUS != 'N/A') OR (OLD_STATUS!= 'N/A' AND NEW_STATUS = 'N/A'));
+
+	FOR AX IN( SELECT PT.PROJ_TRACKER_ID,WS.WORKSTEP_ID
+		FROM PROJ_TRACKER PT
+		INNER JOIN SITE_PROJECTS SP ON SP.SITE_PROJECTS_ID = PT.SITE_PROJECTS_ID
+		INNER JOIN WORKFLOW W ON PT.WF_ID = W.WF_ID
+		INNER JOIN WORKSTEPS WS ON WS.WF_ID = W.WF_ID
+		WHERE PT.TRACKER_TYPE IN ('NEW_BUILD_PROJECT','MOD_PROJECT')
+		AND SP.SITE_PROJECTS_ID = siteProjectsId
+		AND WS.WORKSTEP_NAME IN (
+		    SELECT trim(regexp_substr(workStepName, '[^,]+', 1, LEVEL)) WORKSTEP_NAME
+		    FROM DUAL
+		    CONNECT BY regexp_substr(workStepName , '[^,]+', 1, LEVEL) IS NOT NULL
+		)
+	)LOOP
+	    UPDATE PROJ_TRACKER_TASKS PTT
+	    SET PTT.TASK_STATUS = taskStatus,
+	    PTT.LAST_MODIFIED_DATE = SYSDATE,
+	    PTT.CREATED_DATE = CASE WHEN PTT.CREATED_DATE IS NULL THEN SYSDATE ELSE PTT.CREATED_DATE END,
+	    PTT.COMPLETED_DATE = CASE taskStatus WHEN 'COMPLETED' THEN SYSDATE WHEN 'REJECTED' THEN TO_DATE('09/09/1900','MM/DD/YYYY') ELSE NULL END,
+	    PTT.LAST_MODIFIED_BY = lastModifiedBy,
+	    PTT.USER_REVIEW_STATUS = userReviewStatus
+	    WHERE PTT.PROJ_TRACKER_ID = AX.PROJ_TRACKER_ID AND PTT.WORKSTEP_ID=AX.WORKSTEP_ID;
+
+	    DBMS_OUTPUT.PUT_LINE('sql%rowcount' ||sql%rowcount);
+
+	    IF(sql%rowcount =0)THEN
+		INSERT INTO PROJ_TRACKER_TASKS(PROJ_TRACKER_ID,WORKSTEP_ID,TASK_STATUS,LAST_MODIFIED_BY,LAST_MODIFIED_DATE,USER_REVIEW_STATUS,CREATED_DATE)
+		VALUES(AX.PROJ_TRACKER_ID,AX.WORKSTEP_ID,taskStatus,lastModifiedBy,SYSDATE,userReviewStatus,SYSDATE);
+	    END IF;
+
+	END LOOP;
+
+	v_rowcount := sql%Rowcount;
+
+
+    INSERT INTO PROJ_COMPLETE_WORKSTEP_LOG(SITE_PROJECTS_ID,SITE_INFO_ID,WORKSTEP_NAME,"COMMENT",LAST_MODIFIED_BY,LAST_MODIFIED_DATE)
+    select siteProjectsId, siteInfoId, workStepName,'PROC_COMPLETE_WORKSTEP Updated -' || v_rowcount,lastModifiedBy, SYSDATE FROM DUAL;
+
+    IF (i_togglable IS NULL) THEN
+	IF (v_tableName IS NULL) THEN
+	    FOR rownumb IN 1..pptStatusRows.COUNT
+	    LOOP
+		 IF(pptStatusRows(rownumb).v_oldStatus = 'N/A' AND pptStatusRows(rownumb).v_newStatus != 'N/A' AND workStepName NOT IN ('ZONING'))
+		    THEN
+			DBMS_OUTPUT.PUT_LINE('Calling PROC_NA_MILESTONE_DATE_UPDATE - blank date');
+			PROC_NA_MILESTONE_DATE_UPDATE('true', pptStatusRows(rownumb).v_workStepName,'', '', siteProjectsId, lastModifiedBy);
+		    ELSE
+			DBMS_OUTPUT.PUT_LINE('Calling PROC_NA_MILESTONE_DATE_UPDATE - 1/1/1900');
+			PROC_NA_MILESTONE_DATE_UPDATE('true',pptStatusRows(rownumb).v_workStepName,'', '01/01/1900', siteProjectsId, lastModifiedBy);
+		    END IF;
+	    END LOOP;
+	END IF; -- v_tableName IS NULL
+    END IF; -- i_togglable IS NULL
+
+	IF(taskStatus = 'REJECTED') THEN
+
+	BEGIN
+
+	    SELECT FIELD_NAME,TABLE_NAME INTO v_mm,v_mmTableNmae FROM FUZE_TRACKER_FIELD_CONFIG WHERE WORKSTEP_NAME = workStepName AND EDIT_RULE = 'CALCULATED_DATE';
+
+	    EXCEPTION WHEN NO_DATA_FOUND THEN
+		v_mm:= NULL;
+	END;
+
+	v_query := 'UPDATE '||v_mmTableNmae||' SET '|| v_mm|| ' = ''09/09/1900'',LAST_MODIFIED_BY = '''||lastModifiedBy||''', LAST_MODIFIED_DATE = SYSDATE WHERE SITE_PROJECTS_ID = '|| siteProjectsId;
+	EXECUTE IMMEDIATE v_query;
+
+	FOR i in(
+	    SELECT trim(regexp_substr(workStepName, '[^,]+', 1, LEVEL)) WORKSTEP_NAME
+	    FROM DUAL
+			CONNECT BY regexp_substr(workStepName , '[^,]+', 1, LEVEL) IS NOT NULL
+	)
+		LOOP
+		SELECT WORKSTEP_GROUP into v_workstep_group FROM WORKSTEPS WHERE WORKSTEP_NAME = i.WORKSTEP_NAME and rownum = 1;
+	IF (v_workstep_group <> 'M') THEN
+			PROC_INSERT_EMAIL_QUEUE('TEXT',null,siteProjectsId,'PROJECTS',i.WORKSTEP_NAME,0,lastModifiedBy,'REJECTED');
+		END IF;
+	END LOOP;
+
+	END IF; -- taskStatus = 'REJECTED'
+
+	END IF;
+END;
