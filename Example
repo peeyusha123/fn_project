@@ -153,9 +153,76 @@ BEGIN
 
 	END IF;
 END;
-
+//2
 create or replace PROCEDURE PROC_INSERT_DQI_VALIDATION_QUEUE_WRAPPER(REF_NUM_LIST IN VARCHAR2,DQI_GROUP IN VARCHAR2,VALIDATION_TYPE IN VARCHAR2,LAST_MODIFIED_BY IN VARCHAR2) AS
    my_batch_id_cur SYS_REFCURSOR;
 BEGIN
   PROC_INSERT_DQI_VALIDATION_QUEUE(REF_NUM_LIST, DQI_GROUP, VALIDATION_TYPE, LAST_MODIFIED_BY, my_batch_id_cur);
+END;
+//3
+create or replace PROCEDURE PROC_INSERT_DQI_VALIDATION_QUEUE(REF_NUM_LIST IN VARCHAR2,DQI_GROUP IN VARCHAR2,VALIDATION_TYPE IN VARCHAR2,LAST_MODIFIED_BY IN VARCHAR2, BATCH_ID_CUR OUT SYS_REFCURSOR) IS
+  refnum VARCHAR2(32767);
+  batch_id NUMBER;
+BEGIN
+
+BEGIN
+SELECT MAX(BATCH_ID) INTO batch_id FROM DQI_VALIDATION_QUEUE;
+EXCEPTION WHEN NO_DATA_FOUND THEN
+batch_id := NULL;
+END;
+
+IF(batch_id IS NOT NULL) THEN
+DBMS_OUTPUT.PUT_LINE('not null batch_id: ' || batch_id);
+
+  FOR i IN 1..LENGTH(REF_NUM_LIST) - LENGTH(REPLACE(REF_NUM_LIST, ',', '')) + 1 LOOP
+    -- Extract the next refnum
+    refnum := TO_NUMBER(REGEXP_SUBSTR(REF_NUM_LIST, '[^,]+', 1, i));
+
+    INSERT INTO DQI_VALIDATION_QUEUE(
+                BATCH_ID,
+                DQI_GROUP,
+                REF_NUM,
+                STATUS,
+                SOURCE,
+                CREATION_DATE,
+                LAST_MODIFIED_DATE,
+                LAST_MODIFIED_BY,
+                VALIDATION_TYPE)
+    VALUES(batch_id+1, DQI_GROUP, refnum, 'QUEUED', 'DQI', SYSDATE, SYSDATE, LAST_MODIFIED_BY, VALIDATION_TYPE);
+
+    DBMS_OUTPUT.PUT_LINE('Processing refnum: ' || refnum);
+  END LOOP;
+  
+  OPEN BATCH_ID_CUR FOR
+  SELECT batch_id+1 AS BATCH_ID FROM DUAL;
+
+END IF;
+
+IF(batch_id IS NULL) THEN
+DBMS_OUTPUT.PUT_LINE('batch_id: ' || batch_id);
+
+ FOR i IN 1..LENGTH(REF_NUM_LIST) - LENGTH(REPLACE(REF_NUM_LIST, ',', '')) + 1 LOOP
+    -- Extract the next refnum
+    refnum := TO_NUMBER(REGEXP_SUBSTR(REF_NUM_LIST, '[^,]+', 1, i));
+
+    INSERT INTO DQI_VALIDATION_QUEUE(
+                BATCH_ID,
+                DQI_GROUP,
+                REF_NUM,
+                STATUS,
+                SOURCE,
+                CREATION_DATE,
+                LAST_MODIFIED_DATE,
+                LAST_MODIFIED_BY,
+                VALIDATION_TYPE)
+    VALUES(1, DQI_GROUP, refnum, 'QUEUED', 'DQI', SYSDATE, SYSDATE, LAST_MODIFIED_BY, VALIDATION_TYPE);
+
+    DBMS_OUTPUT.PUT_LINE('Processing refnum: ' || refnum);
+  END LOOP;
+
+  OPEN BATCH_ID_CUR FOR
+  SELECT 1 AS BATCH_ID FROM DUAL;
+  
+END IF;  
+
 END;
