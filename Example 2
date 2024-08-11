@@ -53,3 +53,21 @@ public Map<String, Map<String, Object>> completeWorkStep(@RequestHeader("user") 
 	}
 
 explain this code line by line?
+
+
+	
+	public boolean completeWorkStep(ProjTracker projTracker,User user) throws Exception {
+		boolean isWorkStepCompleted = false;
+		final DataSourceCriteria criteria = dataCloudSerializer.mapMergeProjTracker(projTracker,user);
+		try {
+			DataCloud.perform(DataCloudServices.PROJECTS.completeWorkStep, criteria);
+			isWorkStepCompleted = true;
+		} catch (final Exception e) {
+			logger.error("PROJECTS_SERVICE : Error in completeWorkStep Dao {}", e.getMessage());
+			e.printStackTrace();
+			throw new Exception(e.getMessage());
+		}
+		logger.debug(RETURN_PARAMS,
+				Thread.currentThread().getStackTrace()[1].getMethodName(), isWorkStepCompleted);
+		return isWorkStepCompleted;
+	}
