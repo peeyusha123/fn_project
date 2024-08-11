@@ -1,168 +1,55 @@
-//.jsp
-<div id="@ID-international-colnames" class="spm-grid-styles"></div>
-    <div class="radio vzbs-radio text-bold border-none margin-top-bottom">
-      Does the signal extend into the country at levels above those specified in
-      the Agreement between the FCC and their counterpart? :&nbsp;
-      <input
-        name="@ID"
-        role="radio"
-        data-reg-service="@VZREGSERVICE"
-        value="Yes"
-        id="signalextend-yes"
-        type="radio"
-        class="@ID-yes fcc-radio disable"
-        disabled="disabled"
-      />
-      <label>Yes</label>
-      <input
-        name="@ID"
-        role="radio"
-        data-reg-service="@VZREGSERVICE"
-        value="No"
-        id="signalextend-no"
-        type="radio"
-        class="@ID-no fcc-radio disable"
-        disabled="disabled"
-        checked
-      />
-      <label>No</label>
-    </div>
-   
-	 <div id="@ID-notificationTimeoutDiv">
-      <label for="notificationTimeout">@BANDWIDTH Notification Sent Date:</label>
-      <input type="date" id="notificationTimeout" name="notificationTimeout" />
-    </div>
+public Map<String, Map<String, Object>> completeWorkStep(@RequestHeader("user") String userJSON, @RequestBody ProjTracker projTracker) throws Exception {
 
-    <div id="@ID-agreementTimeoutDiv">
-      <label for="agreementTimeout"> @BANDWIDTH Agreement Sent Date:</label>
-      <input type="date" id="agreementTimeout" name="agreementTimeout" />
-    </div>
-//.js
-changeFccRadio: function(e){
-			var self  = $(e.currentTarget);
-    		var fccRequiredObject = {};
-    		var radioVal = self.val();
-    		var regService = self.data('reg-service');
-    		var selectedBandName = self.data('reg-service');
-    		fccRequiredObject.siteProjectsId = this.dom.projectId;
-    		var bandNames = ['700Mhz', 'Cellular', 'PCS', 'AWS', 'C-Band'];
-    		for (var key = 0; key < bandNames.length; key++) {
-    			var value = bandNames[key];
-    			if (selectedBandName === value) {
-					selectedBandName = selectedBandName === 'C-Band'? 'CBand':selectedBandName;
-    				fccRequiredObject['intlBorderExtendsFor' + selectedBandName] = radioVal
-    				fccRequiredObject.vzRegService = regService;
-    				this.updateRfdsCallSigns(fccRequiredObject);
-    				break;
-    			}
-    		}
-    		var callSignId = self.attr("name");
-    		
-			if(radioVal === 'Yes'){		
-				$("#"+callSignId +"-notificationTimeoutDiv").addClass("hide").hide();
-				$("#"+callSignId +"-agreementTimeoutDiv").removeClass("hide").show();				
+		final User user = userInfoService.getUserInfo();
+		
+		logger.info("PROJECTS-SERVICE :  completeWorkStep is called for {} by {} ",projTracker,userInfoService.getUserInfo());
+		
+		Map<String, Map<String, Object>> completedStepMap = new LinkedHashMap<>();
+
+		BackEndValidations.projTrackerFieldsValidation(projTracker);
+		
+		try{
+			final String currentWorkStep = projTracker.getWorkStepName();
+			logger.info("PROJECTS-SERVICE :  Current step is {}",currentWorkStep);
+
+			String validationResult=trackerService.BackendValidationCheck(projTracker);
+			if(validationResult.equalsIgnoreCase("FALSE"))
+			{
+				logger.info("PROJECTS-SERVICE :  BACKEND VALIDATION FAILED");
+				throw new Exception("BackEndValidation- Finalize failed !!");
 			}
-			else{
-				$("#"+callSignId +"-agreementTimeoutDiv").addClass("hide").hide();
-				$("#"+callSignId +"-notificationTimeoutDiv").removeClass("hide").show();					
-			}
+			else
+			{
+			completedStepMap = trackerService.completeWorkStep(projTracker, user);
 
-
-this.dom.body.find(".international-callsign-tables").append(tableHeader);
-	    		
-	    		if(doc_check === 'AGREEMENT'){		
-					$("#"+callSignId +"-notificationTimeoutDiv").addClass("hide").hide();
-					$("#"+callSignId +"-agreementTimeoutDiv").removeClass("hide").show();		
-				}
-				else if (doc_check === 'NOTIFICATION'){
-					$("#"+callSignId +"-agreementTimeoutDiv").addClass("hide").hide();
-					$("#"+callSignId +"-notificationTimeoutDiv").removeClass("hide").show();			
-				}
+			if("COMPLETE".equalsIgnoreCase(projTracker.getActionPerformed())){
+				String enableRhpam = "flase"; // cachedResultsDao.getEnableRhpam().get(0);
+					if("CREATE_PROJECT".equalsIgnoreCase(currentWorkStep)) {
+						projTracker.setWorkStepName("CREATE_PROJECT_COMPLETED");
+						projectsService.populateUaceIdAndName(projTracker, user);
+						
+						if(enableRhpam.equalsIgnoreCase("true")) {
+							unoService.createProjectPAM(projTracker.getSiteProjectsId(),user);
+						}						
+					}
+					else {
+						if(enableRhpam.equalsIgnoreCase("true")) {
+//							final String currWorkStepDispNm = Optional.ofNullable(cachedResultsDao.getMilestones().get(currentWorkStep)).isPresent() && !"".equalsIgnoreCase(cachedResultsDao.getMilestones().get(currentWorkStep).trim()) ?
+//									cachedResultsDao.getMilestones().get(currentWorkStep) : cachedResultsDao.getWorkStepName().get(currentWorkStep);//cachedResultsDao.getMilestones().get(currentWorkStep);
+							unoService.updateWorkstepStatusPAM(currentWorkStep, "COMPLETED", projTracker.getSiteProjectsId(),user);
+						}	
+					}
 				
+				parallelProcessor.execute(ParallelProcessor.Operation.EMAIL_QUEUE, userInfoService.getUserInfo(), projTracker, new HashMap<>());
+				projTracker.setWorkStepName(currentWorkStep);
+			}
+			}
 
+		}catch( final Exception e){
+			e.printStackTrace();
+			throw e;
+		}
+		return completedStepMap;
+	}
 
-
-
-<div id="@ID-international-colnames" class="spm-grid-styles"></div>
-<div class="radio vzbs-radio text-bold border-none margin-top-bottom">
-  Does the signal extend into the country at levels above those specified in
-  the Agreement between the FCC and their counterpart? :&nbsp;
-  <input
-    name="@ID"
-    role="radio"
-    data-reg-service="@VZREGSERVICE"
-    value="Yes"
-    id="signalextend-yes"
-    type="radio"
-    class="@ID-yes fcc-radio disable"
-    disabled="disabled"
-    <%-- Added conditional logic to set checked attribute for "Yes" radio button --%>
-    <% if (conditionForYes) { %> checked <% } %>
-  />
-  <label for="signalextend-yes">Yes</label>
-  <input
-    name="@ID"
-    role="radio"
-    data-reg-service="@VZREGSERVICE"
-    value="No"
-    id="signalextend-no"
-    type="radio"
-    class="@ID-no fcc-radio disable"
-    disabled="disabled"
-    <%-- Added conditional logic to set checked attribute for "No" radio button --%>
-    <% if (conditionForNo) { %> checked <% } %>
-  />
-  <label for="signalextend-no">No</label>
-</div>
-
-<%-- Added conditional logic to set visibility of Notification Sent Date field --%>
-<div id="@ID-notificationTimeoutDiv" class="<% if (conditionForNo) { %> show <% } else { %> hide <% } %>">
-  <label for="notificationTimeout">@BANDWIDTH Notification Sent Date:</label>
-  <input type="date" id="notificationTimeout" name="notificationTimeout" />
-</div>
-
-<%-- Added conditional logic to set visibility of Agreement Sent Date field --%>
-<div id="@ID-agreementTimeoutDiv" class="<% if (conditionForYes) { %> show <% } else { %> hide <% } %>">
-  <label for="agreementTimeout">@BANDWIDTH Agreement Sent Date:</label>
-  <input type="date" id="agreementTimeout" name="agreementTimeout" />
-</div>
-changeFccRadio: function(e) {
-    var self = $(e.currentTarget);
-    var fccRequiredObject = {};
-    var radioVal = self.val();
-    var regService = self.data('reg-service');
-    var selectedBandName = self.data('reg-service');
-    fccRequiredObject.siteProjectsId = this.dom.projectId;
-    var bandNames = ['700Mhz', 'Cellular', 'PCS', 'AWS', 'C-Band'];
-    for (var key = 0; key < bandNames.length; key++) {
-        var value = bandNames[key];
-        if (selectedBandName === value) {
-            selectedBandName = selectedBandName === 'C-Band' ? 'CBand' : selectedBandName;
-            fccRequiredObject['intlBorderExtendsFor' + selectedBandName] = radioVal;
-            fccRequiredObject.vzRegService = regService;
-            this.updateRfdsCallSigns(fccRequiredObject);
-            break;
-        }
-    }
-    var callSignId = self.attr("name");
-
-    // Updated visibility logic based on radio button value
-    if (radioVal === 'Yes') {
-        $("#" + callSignId + "-notificationTimeoutDiv").addClass("hide").hide();
-        $("#" + callSignId + "-agreementTimeoutDiv").removeClass("hide").show();
-    } else {
-        $("#" + callSignId + "-agreementTimeoutDiv").addClass("hide").hide();
-        $("#" + callSignId + "-notificationTimeoutDiv").removeClass("hide").show();
-    }
-
-    this.dom.body.find(".international-callsign-tables").append(tableHeader);
-
-    // Handle initial state if needed
-    if (doc_check === 'AGREEMENT') {
-        $("#" + callSignId + "-notificationTimeoutDiv").addClass("hide").hide();
-        $("#" + callSignId + "-agreementTimeoutDiv").removeClass("hide").show();
-    } else if (doc_check === 'NOTIFICATION') {
-        $("#" + callSignId + "-agreementTimeoutDiv").addClass("hide").hide();
-        $("#" + callSignId + "-notificationTimeoutDiv").removeClass("hide").show();
-    }
-}
+explain this code line by line?
