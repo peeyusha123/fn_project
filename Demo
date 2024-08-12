@@ -1,3 +1,27 @@
+var agreementSentDate = new Date(); // This should be replaced with the actual Agreement Sent Date value
+    var notificationSentDate = new Date(); // This should be replaced with the actual Notification Sent Date value
+    var calculatedDate;
+
+    if (radioVal === 'Yes') {
+        if (subCategory.includes("700") || subCategory.includes("850") || subCategory.includes("1900") || subCategory.includes("C-BAND")) {
+            calculatedDate = new Date(agreementSentDate);
+            calculatedDate.setDate(calculatedDate.getDate() + 30); // Agreement Sent Date + 30 days
+        } else if (subCategory.includes("2100")) {
+            calculatedDate = new Date(agreementSentDate);
+            calculatedDate.setDate(calculatedDate.getDate() + 60); // Agreement Sent Date + 60 days
+        }
+    } else if (radioVal === 'No') {
+        calculatedDate = new Date(notificationSentDate);
+        calculatedDate.setDate(calculatedDate.getDate() + 30); // Notification Sent Date + 30 days
+    }
+
+    $("#" + callSignId + "-form").find("#calculatedDateField").val(calculatedDate.toISOString().split('T')[0]); // Assuming the field ID is `calculatedDateField`
+},
+
+
+
+
+
 -controller file
 @RequestMapping(value = "/mergeProjLocationInfo", method = RequestMethod.POST, produces =  MediaType.APPLICATION_JSON )
 	@ApiOperation(value = "Returns output details", notes = "Projects Service", response = ProjLocationInfo.class)
