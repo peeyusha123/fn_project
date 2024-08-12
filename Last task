@@ -1,358 +1,99 @@
-Add Notification Timeout Date and Agreement Timeout Date fields
-1. If 'does the signal strength extend into a country at levels above' is NO, add a new field 'Notification Timeout Date'.
+ changeFccRadio: function(e){
+			var self  = $(e.currentTarget);
+    		var fccRequiredObject = {};
+    		var radioVal = self.val();
+    		var regService = self.data('reg-service');
+    		var selectedBandName = self.data('reg-service');
+			var country = self.data('country');
+    		fccRequiredObject.siteProjectsId = this.dom.projectId;
+    		var bandNames = ['700Mhz', 'Cellular', 'PCS', 'AWS', 'C-Band']
+			var callSignId = self.attr("name");
+			// if(radioVal === 'Yes'){
+			// 	$("."+callSignId).removeClass("hide");
+			// }
+			$.each(this.dom.intBorderInfo, (i, data)=> {
+				if(data && data.length){
+					this.showLicenseGrid(callSignId, data)
+				}
+			});
+		
+    		for (var key = 0; key < bandNames.length; key++) {
+    			var value = bandNames[key];
+    			if (selectedBandName === value) {
+					selectedBandName = selectedBandName === 'C-Band'? 'CBand':selectedBandName;
+    				fccRequiredObject['intlBorderExtendsFor' + selectedBandName] = radioVal
+    				fccRequiredObject.vzRegService = regService;
+    				this.updateRfdsCallSigns(fccRequiredObject);
+    				break;
+    			}
+    		}
+    		var callSignId = self.attr("name");
+			if(radioVal === 'Yes'){
+				//this.showLicenseGrid(callSignId);
+			}
+			// if(value1){//yes
+				
+			// }else if(value2){//no
+			// 	//adding co-channel license grid for NOTIFICATION
+	    	// 	let tableId = this.dom.body.find("#" + callSignId + "-co-channel-license");
+	    	// 	//let columns = this.getNotificationCoLicensColumns();
+			// 	let response = [];
+			// 	//createKendoGrid(tableId, columns, response);
 
-     This field should have a prefix with the service label (e.g., 700MHz Notification Sent    Date).
-
-   There should be a DB field for each possible service - C-Band, 750, 850, 1900, 2100.
-
-   This field should be editable in SPM tracker in the Regulatory callsign tracker        object/module when Int’l Border Task status = active.
-
-  This field will be auto-populated with a calculated date (Notification Sent Date + 30 days).
-
-2. If 'does the signal strength extend into a country at levels above' is YES, add a new field 'Agreement Timeout Date'.
-
-   This field should have a prefix with the service label (e.g., 700MHz Agreement Sent Date).
+			// }
 
 
-var mapping = {};
-	    	mapping["band700m"] = "700 Mhz";
-	    	mapping["band850m"] = "850 Mhz";
-	    	mapping["band1900m"] = "1900 Mhz";
-	    	mapping["band2100m"] = "2100 Mhz";
-			mapping["cband"] = "CBAND";
 
-	    	var map = {};
-	    	var renderTable = false;
-	    	var filteredReponse = {};
-	    	this.constructor.ajax.fireApi(callSignsReq, "regulatory-licenses", "getCallSignsApproval", (response)=> {
-	    		filteredReponse["band700m"] = response.band700m;
-	    		filteredReponse["band850m"] = response.band850m;
-	    		filteredReponse["band1900m"] = response.band1900m;
-	    		filteredReponse["band2100m"] = response.band2100m;
-				filteredReponse["cband"] = response.cband;				
-
-	    		$.each(filteredReponse, (i, data)=> { i="band700m",data=[{_}]
-	    			if (data && data.length) {
-	    				// map[i] = mapping[i];
-
-	    				renderTable = false;
-	    				if (data[0].intlBorder700 === "TRUE" && data[0].intlBorderNon700 === "TRUE") {
-	    					renderTable = true;
-	    				} else if (i === "band700m" && data[0].intlBorder700 === "TRUE" && data[0].intlBorderNon700 === "FALSE") {
-	    					renderTable = true;
-	    				} else if (i !== "band700m" && data[0].intlBorder700 === "FALSE" && data[0].intlBorderNon700 === "TRUE") {
-	    					renderTable = true;
-					    }else if (i == "cband" && data[0].intlBorderCBand === "TRUE") {
-	    				 	renderTable = true;
-	    				}
-	    				if (callSignsReq.refType === "AWS") { // for BAS
-																// review
-
-							this.loadAWSCallsigns(data, i);
-	    				}
-	    				if (renderTable) {
-							map[i] = mapping[i];
-	    					this.loadCallSignDetails(data, i);
-	    				}
-	    			}
-	    		});
-	    		setCallSigns(map);
-	    	});
+    		var subCategory="";
+    		if (callSignId === "band700m") {
+                    subCategory = "700"
+                } else if (callSignId === "band850m") {
+                    subCategory = "850"
+                } else if (callSignId === "band1900m") {
+                    subCategory = "1900"
+                } else if (callSignId === "band2100m") {
+                    subCategory = "2100"
+                }else if (callSignId === "cband") {
+                    subCategory = "C-BAND";
+                }
+               subCategory = 'INTERNATIONAL_BORDER_'+  (radioVal === 'No' ? 'NOTIFICATION' : 'AGREEMENT' )+'_'+subCategory;
+               $("#"+callSignId+"-form").find("#subCategory").val(subCategory);                
 	    },
+		showLicenseGrid:function(callSignId, externalContactDetails){
+			var parentContainer = $("."+callSignId+"-container");
+			var container = $("#"+callSignId+"-block").find(".company-content");
+			var fccVal = parentContainer.find(".fcc-radio").prop("checked");
+			container.empty();
+			$("#"+callSignId+"-block").removeClass("hide");
+			externalContactDetails.forEach(contact=>{
+				var template = this.dom.body.find(".company-details-template").html();
+				container.attr("data-vz-reg-service",contact.vzRegService);
+				container.attr("data-external-company-id",contact.externalCompanyNameId);
+				
+				container.append(template.replace(/@COMPANY/g, contact.companyName).replace(/@EXTERNAL_ID/g, contact.externalCompanyNameId));
+				var feildsTemplate = fccVal  ? $(".agreement-feilds").html() : $(".notification-feilds").html();
+				var companyContainer = container.find("#"+contact.externalCompanyNameId);
+				companyContainer.append(feildsTemplate);
+				$.each(contact, (i, data)=>{
+					companyContainer.find("#"+i).val(data);
+				});
+				
+			})
+			//adding co-channel license grid for AGREEMENT
+			let tableId = this.dom.body.find("#" + callSignId + "-co-channel-license");
+		
+		},
+		mergeInternationalBorderInfo: function(){
+			var internationalBorderInfo = [];
+			$.each(this.dom.body.find(".company-content"), (i, data)=>{
+				var companyContainer = $(data);
+				this.appendNotificationAgreementFeilds(internationalBorderInfo,companyContainer);
+			});
+			console.log("mergeInternationalBorderInfo", internationalBorderInfo);
+			this.constructor.ajax.fireApi(internationalBorderInfo, "project", "mergeInternationalBorderInfo", (response)=> {
+				console.log("mergeRes", response);
+			})
+		},
 
-	    loadCallSignDetails: function(response, callSignId){
-	    	var title;
-
-	    	if (response && response.length !== 0) {
-	    		var templateHeader = this.dom.body.find(".international-table-header-template").html();
-	    		if (callSignId === "band700m") {
-	    			title = "700 Mhz"
-	    		} else if (callSignId === "band850m") {
-	    			title = "850 Mhz"
-	    		} else if (callSignId === "band1900m") {
-	    			title = "1900 Mhz"
-	    		} else if (callSignId === "band2100m") {
-	    			title = "2100 Mhz"
-	    		}else if (callSignId === "cband") {
-	    			title = "C-BAND";
-	    		}
-	    		var tableHeader = templateHeader.replace(/@BANDWIDTH/g, title).replace(/@ID/g, callSignId).replace(/@VZREGSERVICE/g, response[0].vzRegService).replace(/@DOC_CATEGORY/g, title.replace(" Mhz", ""));
-	    		// $.each(response, function(i, data) {
-	    		// tableModifiedHeader = tableHeader.replace(/@VZREGSERVICE/g,
-				// data.vzRegService);
-	    		// });
-	    		this.dom.body.find(".international-callsign-tables").append(tableHeader);
-	    		let tableId = this.dom.body.find("#" + callSignId + "-international-colnames");
-	    		let columns = this.getCallsignsColumns(false); // don't hide
-																// last 2 cols
-	    		
-
-	    		createKendoGrid(tableId, columns, response);
-
-	    		if (callSignId === "band700m") {
-	    			if (response[0].intlBorderExtendsFor700Mhz === 'Yes') {
-	    				this.appendFccRadioValues(".band700m", true, false);
-	    			} else {
-	    				this.appendFccRadioValues(".band700m", false, true);
-	    			}
-	    		} else if (callSignId === "band850m") {
-	    			if (response[0].intlBorderExtendsForCellular === 'Yes') {
-	    				this.appendFccRadioValues(".band850m", true, false);
-	    			} else {
-	    				this.appendFccRadioValues(".band850m", false, true);
-	    			}
-	    		} else if (callSignId === "band1900m") {
-	    			if (response[0].intlBorderExtendsForPCS === 'Yes') {
-	    				this.appendFccRadioValues(".band1900m", true, false);
-	    			} else {
-	    				this.appendFccRadioValues(".band1900m", false, true);
-	    			}
-	    		} else if (callSignId === "band2100m") {
-	    			if (response[0].intlBorderExtendsForAWS === 'Yes') {
-	    				this.appendFccRadioValues(".band2100m", true, false);
-	    			} else {
-	    				this.appendFccRadioValues(".band2100m", false, true);
-	    			}
-	    		}
-				else if (callSignId === "cband") {
-	    			if (response[0].intlBorderExtendsForCBand === 'Yes') {
-	    				this.appendFccRadioValues(".cband", true, false);
-	    			} else {
-	    				this.appendFccRadioValues(".cband", false, true);
-	    			}
-	    		}
-	    	} else {
-	    		console.info("No Callsigns");
-	    	}
-	    },
-
-above is my task and related script code you need to provide me jsp code related to js code ..i tried so much  implemented small jsp code but it is not correct 
-
-below i provided the jsp code which i tried , this for your referance:-
-<h6 class="teat-brand-red margin-top">@BAMWIDTH Callsigns</h6>
-
-<div class="col-md-12 padding-zero section-divider-bottom">
-    <div class="radio vzhs-radio test-bold border-none margin-top-bottom">
-        <label>Does the signal extend into the country at levels specified in the Agreement between The FCC and their counterpart?</label>
-        &nbsp;
-        <input name="signalExtend" role="radio" data-reg-service="VZREGSERVICE" value="yes" id="signalExtendYes" type="radio">
-        <label for="signalExtendYes">Yes</label>
-        <input name="signalExtend" role="radio" data-reg-service="VZREGSERVICE" value="no" id="signalExtendNo" type="radio" checked>
-        <label for="signalExtendNo">No</label>
-    </div>
-
-    <div id="notificationTimeoutDiv" class="hidden">
-        <label for="notificationTimeout">Notification Timeout Date</label>
-        <input type="date" id="notificationTimeout" name="notificationTimeout">
-    </div>
-
-    <div id="agreementTimeoutDiv" class="hidden">
-        <label for="agreementTimeout">Agreement Timeout Date</label>
-        <input type="date" id="agreementTimeout" name="agreementTimeout">
-    </div>
-
-    <label>Upload Agreement/Notification</label>
-    <div class="custom-file-upload vertical-align-middle">
-        <div class="margin-top-bottom">
-            <input type="file" name="fileUpload" class="file-upload" accept=".doc, .docx, .pdf">
-        </div>
-        <input type="hidden" name="category" id="category" value="projects">
-        <input type="hidden" name="subCategory" id="subCategory" value="INTERNATIONAL BORDER DOC">
-        <input type="hidden" name="description" id="description" value="General Documents">
-        <input type="hidden" name="uri" id="uri" value="document-gateway/document">
-    </div>
-
-    <button type="submit" class="btn btn-danger">Upload Document</button>
-</div>
-
-
-
-
-
-
---------------------------------------------------------
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="p2.css" />
-    <title>Login Page</title>
-  </head>
-  <body>
-    <form id="loginForm">
-      <label for="username">Username:</label>
-      <input
-        type="text"
-        id="newUsername"
-        placeholder="Enter the User Name"
-        autocomplete="newUsername"
-      />
-
-      <label for="password">Password:</label>
-      <input
-        type="password"
-        id="newPassword"
-        placeholder="Enter the Password"
-        autocomplete="newPassword"
-      />
-
-      <button type="button" id="submitBtn" disabled>Submit</button>
-      <button type="button" id="resetBtn" style="display: none">Reset</button>
-      <button type="button" id="signupBtn" onclick="openSignUpModal()">
-        Sign Up
-      </button>
-
-      <button
-        type="button"
-        class="resetPasswordBtn"
-        onclick="openResetPasswordModal()"
-      >
-        Password Reset
-      </button>
-    </form>
-
-    <div id="signUpModalContainer"></div>
-    <div id="signUpModal" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closeSignUpModal()">&times;</span>
-        <h2>Sign Up</h2>
-        <form id="signUpForm">
-          <label for="signupUsername">Username:</label>
-          <input
-            type="text"
-            id="signupUsername"
-            placeholder="Enter the User Name"
-            autocomplete="signupUsername"
-          />
-
-          <label for="signupPassword">Password:</label>
-          <input
-            type="password"
-            id="signupPassword"
-            placeholder="Enter the Password"
-            autocomplete="signupPassword"
-          />
-
-          <button
-            type="button"
-            id="signupSubmitBtn"
-            onclick="submitSignUpForm()"
-          >
-            Submit
-          </button>
-          <button type="button" id="signupResetBtn" onclick="resetSignUpForm()">
-            Reset
-          </button>
-          <button type="button" id="resetStorageBtn">Reset Storage</button>
-        </form>
-      </div>
-    </div>
-    <div id="resetPasswordModal" class="modal">
-      <div class="modal-content">
-        <span class="close" onclick="closePasswordResetModal()">&times;</span>
-        <h2>Password Reset Modal</h2>
-        <form id="passwordResetForm">
-          <!-- Non-editable username -->
-          <p>Username: <span id="modalUsername"></span></p>
-
-          <!-- New Password Input -->
-          <label for="resetNewPassword">New Password:</label>
-          <input
-            type="password"
-            id="resetNewPassword"
-            placeholder="Enter new password"
-            autocomplete="new-password"
-          />
-
-          <!-- Retype New Password Input -->
-          <label for="retypePassword">Retype New Password:</label>
-          <input
-            type="password"
-            id="retypePassword"
-            placeholder="Retype new password"
-            autocomplete="new-password"
-          />
-
-          <!-- Submit Button -->
-          <button type="button" id="submitBtn" onclick="submitPasswordReset()">
-            Submit
-          </button>
-        </form>
-      </div>
-    </div>
-    <script defer src="p3.js"></script>
-    <script defer src="p4.js"></script>
-  </body>
-</html>
-
-
-//p4.js
-// Function to open the password reset modal
-function openResetPasswordModal() {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "block";
-
-  // Add event listener to the input field for real-time validation
-  const resetUsernameInput = document.getElementById("newUsername");
-  resetUsernameInput.addEventListener("input", handleResetUsernameInputChange);
-
-  // Initially disable the Reset Buttons
-  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
-  resetPasswordBtns.forEach((btn) => {
-    btn.disabled = true;
-  });
-}
-
-// Function to handle input change in the Reset Username field
-function handleResetUsernameInputChange() {
-  const resetUsernameInput = document.getElementById("newUsername");
-  const resetPasswordBtns = document.querySelectorAll(".resetPasswordBtn");
-
-  // Enable the Reset Buttons only if the Reset Username field is not empty
-  const isUsernameEmpty = !resetUsernameInput.value.trim();
-  resetPasswordBtns.forEach((btn) => {
-    btn.disabled = isUsernameEmpty;
-  });
-}
-
-// Function to handle the submission of the new password in the password reset modal
-function submitPasswordReset() {
-  const resetUsernameInput = document.getElementById("newUsername");
-  const newPasswordInput = document.getElementById("resetNewPassword");
-  const retypePasswordInput = document.getElementById("retypePassword");
-
-  const enteredUsername = resetUsernameInput.value.trim();
-  const newPassword = newPasswordInput.value.trim();
-  const retypedPassword = retypePasswordInput.value.trim();
-
-  // Validate that the passwords match
-  if (newPassword !== retypedPassword) {
-    console.log("Passwords do not match. Please re-enter.");
-    return;
-  }
-
-  // Find the username in Local Storage
-  const storedUsernames = JSON.parse(localStorage.getItem("usernames")) || [];
-  const usernameIndex = storedUsernames.indexOf(enteredUsername);
-
-  if (usernameIndex !== -1) {
-    // Username found, set the new password in Local Storage
-    const storedPasswords = JSON.parse(localStorage.getItem("passwords")) || [];
-    storedPasswords[usernameIndex] = newPassword;
-    localStorage.setItem("passwords", JSON.stringify(storedPasswords));
-
-    console.log("Password reset successful for", enteredUsername);
-  } else {
-    console.log("Username not found in Local Storage:", enteredUsername);
-  }
-
-  // Optionally, you can close the password reset modal here
-  closeResetPasswordModal();
-}
-
-// Function to close the password reset modal
-function closeResetPasswordModal() {
-  const resetPasswordModal = document.getElementById("resetPasswordModal");
-  resetPasswordModal.style.display = "none";
-}
+above i provided the .js code pls add the code or modify code according to below validation: This field will be auto-populated with a calculated date (Notification Sent Date + 30 days).
+  This field will be auto-populated with a calculated date (For 700, 850, 1900 & C-Band: Agreement Sent Date + 30 days, For 2100: Agreement Sent Date + 60 days).
