@@ -1,4 +1,76 @@
- changeFccRadio: function(e){
+
+
+changeFccRadio: function(e) {
+    var self = $(e.currentTarget);
+    var fccRequiredObject = {};
+    var radioVal = self.val();
+    var regService = self.data('reg-service');
+    var selectedBandName = self.data('reg-service');
+    var country = self.data('country');
+    fccRequiredObject.siteProjectsId = this.dom.projectId;
+    var bandNames = ['700Mhz', 'Cellular', 'PCS', 'AWS', 'C-Band'];
+    var callSignId = self.attr("name");
+
+    // Retrieve sent dates from data attributes
+    var notificationSentDate = new Date(self.data('notification-sent-date'));
+    var agreementSentDate = new Date(self.data('agreement-sent-date'));
+    
+    if (notificationSentDate) {
+        $("#" + callSignId + "-form").find("#notificationSentDate").val(notificationSentDate.toISOString().split('T')[0]);
+        var notificationTimeoutDate = new Date(notificationSentDate);
+        notificationTimeoutDate.setDate(notificationTimeoutDate.getDate() + 30);
+        $("#" + callSignId + "-form").find("#notificationTimeoutDate").val(notificationTimeoutDate.toISOString().split('T')[0]);
+    }
+
+    if (agreementSentDate) {
+        $("#" + callSignId + "-form").find("#agreementSentDate").val(agreementSentDate.toISOString().split('T')[0]);
+
+        var agreementTimeoutDate = new Date(agreementSentDate);
+        var bandTimeoutDays = (selectedBandName === '2100') ? 60 : 30;
+        agreementTimeoutDate.setDate(agreementTimeoutDate.getDate() + bandTimeoutDays);
+        $("#" + callSignId + "-form").find("#agreementTimeoutDate").val(agreementTimeoutDate.toISOString().split('T')[0]);
+    }
+
+    $.each(this.dom.intBorderInfo, (i, data) => {
+        if (data && data.length) {
+            this.showLicenseGrid(callSignId, data);
+        }
+    });
+
+    for (var key = 0; key < bandNames.length; key++) {
+        var value = bandNames[key];
+        if (selectedBandName === value) {
+            selectedBandName = selectedBandName === 'C-Band' ? 'CBand' : selectedBandName;
+            fccRequiredObject['intlBorderExtendsFor' + selectedBandName] = radioVal;
+            fccRequiredObject.vzRegService = regService;
+            this.updateRfdsCallSigns(fccRequiredObject);
+            break;
+        }
+    }
+
+    var subCategory = "";
+    if (callSignId === "band700m") {
+        subCategory = "700";
+    } else if (callSignId === "band850m") {
+        subCategory = "850";
+    } else if (callSignId === "band1900m") {
+        subCategory = "1900";
+    } else if (callSignId === "band2100m") {
+        subCategory = "2100";
+    } else if (callSignId === "cband") {
+        subCategory = "C-BAND";
+    }
+    subCategory = 'INTERNATIONAL_BORDER_' + (radioVal === 'No' ? 'NOTIFICATION' : 'AGREEMENT') + '_' + subCategory;
+    $("#" + callSignId + "-form").find("#subCategory").val(subCategory);
+}
+
+
+
+
+
+
+
+changeFccRadio: function(e){
 			var self  = $(e.currentTarget);
     		var fccRequiredObject = {};
     		var radioVal = self.val();
