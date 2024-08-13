@@ -1,81 +1,112 @@
+getFreqBandTitle: function(callSignId) {
+    var title;
+    var freqBand;
+    if (callSignId === "band700m") {
+        title = "700 Mhz";
+        freqBand = "700Mhz";
+    } else if (callSignId === "band850m") {
+        title = "850 Mhz";
+        freqBand = "850Mhz";
+    } else if (callSignId === "band1900m") {
+        title = "1900 Mhz";
+        freqBand = "1900Mhz";
+    } else if (callSignId === "band2100m") {
+        title = "2100 Mhz";
+        freqBand = "2100Mhz";
+    } else if (callSignId === "cband") {
+        title = "C-BAND";
+        freqBand = "cband";
+    }
+    return {
+        title: title,
+        freqBand: freqBand
+    }
+},
 
-select * from data_source where source_name like '%getEnumMap%';
-select * from data_source where source_name = '%enum.getEnumMap%';
+loadCallSignDetails: function(response, callSignId) {
+    var details = this.getFreqBandTitle(callSignId);
+    var title = details.title;
+    var freqBand = details.freqBand;
 
---GROUP_NAME = PROJECTS_SETTINGS, SUB_TYPE=CLOSEOUT_DOCUMENTS
+    if (response && response.length !== 0) {
+        var templateHeader = this.dom.body.find(".international-table-header-template").html();
 
-select * from Data_source where source_name = 'enum.getEnumMap';
-SELECT NAME,VALUE,DESCRIPTION, NAME as KEY FROM ENUM_REFERENCE WHERE GROUP_NAME = 'PROJECTS_SETTINGS'
-AND SUB_TYPE = 'CLOSEOUT_DOCUMENTS' and SEQ !=-70  ORDER BY SEQ, VALUE ASC
+        var doc_check;
+        var optionSelectedYes = $(this.dom.body).find("#signalextend-yes");
+        var optionSelectedNo = $(this.dom.body).find("#signalextend-no");
 
- SELECT * FROM ENUM_REFERENCE where name='TAX_BOND_CERTIFICATE';
+        doc_check = optionSelectedYes.prop("checked") ? "AGREEMENT" : optionSelectedNo.prop("checked") ? "NOTIFICATION" : false;
 
-INSERT INTO ENUM_REFERENCE (NAME,VALUE,DESCRIPTION,GROUP_NAME,SUB_TYPE,SEQ,LAST_MODIFIED_BY)
-VALUES ('TAX_BOND_CERTIFICATE','Tax Bond Certificate','RF Documents','PROJECTS_SETTINGS','CLOSEOUT_DOCUMENTS',24,'shelape');
+        var tableHeader = templateHeader.replace(/@BANDWIDTH/g, title)
+            .replace(/@ID/g, callSignId)
+            .replace(/@VZREGSERVICE/g, response[0].vzRegService)
+            .replace(/@DOC_CHECK/g, doc_check ? doc_check : "")
+            .replace(/@DOC_CATEGORY/g, title.replace(" Mhz", ""))
+            .replace(/@COUNTRY/g, response[0].country);
 
+        this.dom.body.find(".international-callsign-tables").append(tableHeader);
 
-new..
+        let tableId = this.dom.body.find("#" + callSignId + "-international-colnames");
+        let columns = this.getCallsignsColumns(false);
 
--- Retrieve data sources containing 'getEnumMap' in their name
-SELECT * 
-FROM data_source 
-WHERE source_name LIKE '%getEnumMap%';
+        createKendoGrid(tableId, columns, response);
 
--- Retrieve data sources with the exact name 'enum.getEnumMap'
-SELECT * 
-FROM data_source 
-WHERE source_name = 'enum.getEnumMap';
+        this.appendFccRadioValuesByCallSignId(callSignId, response[0]);
 
--- Retrieve ENUM_REFERENCE data based on specified criteria
-SELECT NAME, VALUE, DESCRIPTION, NAME AS KEY 
-FROM ENUM_REFERENCE 
-WHERE GROUP_NAME = 'PROJECTS_SETTINGS' 
-AND SUB_TYPE = 'CLOSEOUT_DOCUMENTS' 
-AND SEQ != -70  
-ORDER BY SEQ, VALUE ASC;
+        // Calculate and set timeout dates
+        this.calculateAndSetTimeoutDates(response[0], callSignId);
+    } else {
+        console.info("No Callsigns");
+    }
+},
 
--- Retrieve information about a specific ENUM_REFERENCE entry
-SELECT * 
-FROM ENUM_REFERENCE 
-WHERE name = 'TAX_BOND_CERTIFICATE';
+appendFccRadioValuesByCallSignId: function(callSignId, responseData) {
+    if (callSignId === "band700m") {
+        this.appendFccRadioValues(".band700m", responseData.intlBorderExtendsFor700Mhz === 'Yes', responseData.intlBorderExtendsFor700Mhz !== 'Yes');
+    } else if (callSignId === "band850m") {
+        this.appendFccRadioValues(".band850m", responseData.intlBorderExtendsForCellular === 'Yes', responseData.intlBorderExtendsForCellular !== 'Yes');
+    } else if (callSignId === "band1900m") {
+        this.appendFccRadioValues(".band1900m", responseData.intlBorderExtendsForPCS === 'Yes', responseData.intlBorderExtendsForPCS !== 'Yes');
+    } else if (callSignId === "band2100m") {
+        this.appendFccRadioValues(".band2100m", responseData.intlBorderExtendsForAWS === 'Yes', responseData.intlBorderExtendsForAWS !== 'Yes');
+    } else if (callSignId === "cband") {
+        this.appendFccRadioValues(".cband", responseData.intlBorderExtendsForCBand === 'Yes', responseData.intlBorderExtendsForCBand !== 'Yes');
+    }
+},
 
--- Insert a new entry into ENUM_REFERENCE table
-INSERT INTO ENUM_REFERENCE (NAME, VALUE, DESCRIPTION, GROUP_NAME, SUB_TYPE, SEQ, LAST_MODIFIED_BY)
-VALUES ('TAX_BOND_CERTIFICATE', 'Tax Bond Certificate', 'RF Documents', 'PROJECTS_SETTINGS', 'CLOSEOUT_DOCUMENTS', 24, 'shelape');
+calculateAndSetTimeoutDates: function(responseData, callSignId) {
+    var notificationSentDate = new Date(responseData.notificationSentDate);
+    var agreementSentDate = new Date(responseData.agreementSentDate);
 
+    // Function to calculate date by adding days
+    function addDays(date, days) {
+        var result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
+    }
 
+    // Set notification timeout date
+    if (notificationSentDate) {
+        var notificationTimeoutDate = addDays(notificationSentDate, 30);
+        $("#" + callSignId + "-form").find("#notificationTimeoutDate").val(notificationTimeoutDate.toISOString().split('T')[0]);
+    }
 
-// Function to check if the Actual Date field is required for finalizing the Documents Uploaded Task
-function validateDocumentUpload() {
-    // Check if Construction Completed Milestone Status is not N/A
-    var constructionStatus = getConstructionStatus(); // Function to retrieve construction status
-    if (constructionStatus !== "N/A") {
-        // Check if Project Level Physical Site Address State is MA, CT, or RI
-        var projectState = getProjectState(); // Function to retrieve project state
-        if (projectState === "MA" || projectState === "CT" || projectState === "RI") {
-            // Check if In State GC Picklist is set to "No"
-            var inStateGC = getInStateGC(); // Function to retrieve In State GC value
-            if (inStateGC === "No") {
-                // Additional condition for the Actual Date field
-                var actualDate = document.getElementById("taxBondCertUploadedAcDt").value;
-                if (!actualDate) {
-                    alert("The Actual Date field is required to finalize the Documents Uploaded Task.");
-                    return false; // Prevent form submission
-                }
-            }
+    // Set agreement timeout date
+    if (agreementSentDate) {
+        var agreementTimeoutDate;
+        switch (callSignId) {
+            case "band700m":
+            case "band850m":
+            case "band1900m":
+            case "cband":
+                agreementTimeoutDate = addDays(agreementSentDate, 30);
+                break;
+            case "band2100m":
+                agreementTimeoutDate = addDays(agreementSentDate, 60);
+                break;
+            default:
+                agreementTimeoutDate = agreementSentDate; // Default if no match
         }
+        $("#" + callSignId + "-form").find("#agreementTimeoutDate").val(agreementTimeoutDate.toISOString().split('T')[0]);
     }
-    return true; // Proceed with form submission
 }
-
-// Event listener for form submission
-document.getElementById("close-documents-upload-form").addEventListener("submit", function(event) {
-    if (!validateDocumentUpload()) {
-        event.preventDefault(); // Prevent form submission if validation fails
-    }
-});
-
-
-https://verizon.webex.com/verizon/url.php?gourl=https%3A%2F%2Fsites.google.com%2Fverizon.com%2Fwow-connect%2Fthe-2024-experience
-
-https://verizon.webex.com/verizon/url.php?gourl=https%3A%2F%2Fgems.vzw.com%2Fcheckin.php%3Fid%3DNlhabw%253D%253D
