@@ -1,4 +1,113 @@
+getFreqBandTitle: function(callSignId){
+			var title;
+			var freqBand;
+			if (callSignId === "band700m") {
+				title = "700 Mhz";
+				freqBand = "700Mhz";
+			} else if (callSignId === "band850m") {
+				title = "850 Mhz";
+				freqBand = "850Mhz";
+			} else if (callSignId === "band1900m") {
+				title = "1900 Mhz";
+				freqBand = "1900Mhz";
+			} else if (callSignId === "band2100m") {
+				title = "2100 Mhz";
+				freqBand = "2100Mhz";
+			}else if (callSignId === "cband") {
+				title = "C-BAND";
+				freqBand = "cband";
+			}
+			return {
+				title:title,
+				freqBand:freqBand
+			}
+		},
 
+	    loadCallSignDetails: function(response, callSignId){
+			var details = this.getFreqBandTitle(callSignId);
+			var title = details.title;
+			var freqBand =  details.freqBand;
+
+	    	if (response && response.length !== 0) {
+	    		var templateHeader = this.dom.body.find(".international-table-header-template").html();
+
+	    		var doc_check;
+				var optionSelectedYes = $(this.dom.body).find("#signalextend-yes");
+				var optionSelectedNo  = $(this.dom.body).find("#signalextend-no");
+					
+				doc_check = optionSelectedYes.prop("checked")?"AGREEMENT":optionSelectedNo.prop("checked")?"NOTIFICATION":false;					
+				
+	    		
+	    		var tableHeader = templateHeader.replace(/@BANDWIDTH/g, title).replace(/@ID/g, callSignId).replace(/@VZREGSERVICE/g, response[0].vzRegService).replace(/@DOC_CHECK/g, (doc_check?doc_check:"")).replace(/@DOC_CATEGORY/g, title.replace(" Mhz", "")).replace(/@COUNTRY/g, response[0].country);
+	    		// $.each(response, function(i, data) {
+	    		// tableModifiedHeader = tableHeader.replace(/@VZREGSERVICE/g,
+				// data.vzRegService);
+	    		// });
+	    		this.dom.body.find(".international-callsign-tables").append(tableHeader);
+	    		let tableId = this.dom.body.find("#" + callSignId + "-international-colnames");
+	    		let columns = this.getCallsignsColumns(false); // don't hide
+																// last 2 cols
+	    		
+	    		createKendoGrid(tableId, columns, response);
+
+	    		if (callSignId === "band700m") {
+	    			if (response[0].intlBorderExtendsFor700Mhz === 'Yes') {
+	    				this.appendFccRadioValues(".band700m", true, false);
+	    			} else {
+	    				this.appendFccRadioValues(".band700m", false, true);
+	    			}
+	    		} else if (callSignId === "band850m") {
+	    			if (response[0].intlBorderExtendsForCellular === 'Yes') {
+	    				this.appendFccRadioValues(".band850m", true, false);
+	    			} else {
+	    				this.appendFccRadioValues(".band850m", false, true);
+	    			}
+	    		} else if (callSignId === "band1900m") {
+	    			if (response[0].intlBorderExtendsForPCS === 'Yes') {
+	    				this.appendFccRadioValues(".band1900m", true, false);
+	    			} else {
+	    				this.appendFccRadioValues(".band1900m", false, true);
+	    			}
+	    		} else if (callSignId === "band2100m") {
+	    			if (response[0].intlBorderExtendsForAWS === 'Yes') {
+	    				this.appendFccRadioValues(".band2100m", true, false);
+	    			} else {
+	    				this.appendFccRadioValues(".band2100m", false, true);
+	    			}
+	    		}
+				else if (callSignId === "cband") {
+	    			if (response[0].intlBorderExtendsForCBand === 'Yes') {
+	    				this.appendFccRadioValues(".cband", true, false);
+	    			} else {
+	    				this.appendFccRadioValues(".cband", false, true);
+	    			}
+	    		}
+	    	} else {
+	    		console.info("No Callsigns");
+	    	}
+	    },
+
+	    appendFccRadioValues: function(className, value1, value2) {
+	    	this.dom.body.find(className + "-yes").prop("checked", value1);
+	    	this.dom.body.find(className + "-no").prop("checked", value2);
+			this.dom.body.find(".fcc-radio").off('change').on('change', $.proxy(this.changeFccRadio, this));
+			//this.dom.body.find(".fcc-radio").trigger("change");
+		},
+	    getBasData: function() {
+	    	var callSignsReq = {};
+	    	callSignsReq.refType = "AWS";
+	    	callSignsReq.searchKey = this.dom.projectId;
+			rfdsModule.getExternalContactDetails(()=>{
+				this.getCallSignsWrap(callSignsReq);// load callsigns
+			});
+	    },
+		getExternalContactDetails:function(cb){
+			var payload = {};
+			payload.country = "CANADA";
+			// this.constructor.ajax.fireApi(payload, "regulatory-doc-mngmnt", "getExternalContactDetails", (externalContactDetails)=> {
+			// 	this.dom.externalContactDetails = externalContactDetails;
+			// 	cb();
+			// });
 
 changeFccRadio: function(e) {
     var self = $(e.currentTarget);
