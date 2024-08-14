@@ -1,3 +1,33 @@
+
+calculateAndSetTimeoutDates: function (responseData, callsignId) {
+    $.each(responseData, (i, data) => {
+        if (data && data.notificationSentDate) {
+            // Calculate Notification Timeout Date (+30 days from Notification Sent Date)
+            data.notificationTimeoutDate = addDays(new Date(data.notificationSentDate), 30);
+        }
+
+        if (data && data.agreementSentDate) {
+            // Check the callsign for determining the correct timeout days
+            var agreementTimeoutDays = (callsignId === "band2100m") ? 60 : 30;
+
+            // Calculate Agreement Timeout Date (+30 or +60 days based on band type)
+            data.agreementTimeoutDate = addDays(new Date(data.agreementSentDate), agreementTimeoutDays);
+        }
+    });
+
+    // Function to calculate date by adding days
+    function addDays(date, days) {
+        var result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
+    }
+}
+
+
+
+
+
+
 getFreqBandTitle: function(callSignId) {
     var title;
     var freqBand;
