@@ -1,3 +1,12 @@
+var day = String(result.getDate()).padStart(2, '0');
+  var month = String(result.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  var year = result.getFullYear();
+
+  return day + '/' + month + '/' + year;
+}
+
+
+
 
 calculateAndSetTimeoutDates: function (responseData, callsignId) {
     $.each(responseData, (i, data) => {
