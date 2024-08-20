@@ -1,3 +1,61 @@
+ calculateAndSetTimeoutDates: function(responseData, callSignId ,flag) {
+			var doc_check;
+				var optionSelectedYes = $(this.dom.body).find("#signalextend-yes");
+				var optionSelectedNo  = $(this.dom.body).find("#signalextend-no");
+					
+				doc_check = optionSelectedYes.prop("checked")?"AGREEMENT":optionSelectedNo.prop("checked")?"NOTIFICATION":false;					
+				
+			$.each(responseData, (i, data)=> {
+				if (doc_check=="AGREEMENT"){
+					if(data.vzRegService == "AWS"){
+						if(data && data.agrementSentDate){
+							
+							 data.agreementTimeout= addDays(data.agrementSentDate, 60);
+						}
+					}else{
+						if(data && data.agrementSentDate){
+							
+							 data.agreementTimeout= addDays(data.agrementSentDate, 30);
+						}
+					}
+			}else{
+					
+						if(data && data.notificationSentDate){
+							
+							 data.notificationTimeoutDate = addDays(data.notificationSentDate, 30);
+						}
+				}
+						 
+						  
+    function addDays(date, days) {
+        var result = new Date(date);
+        result.setDate(result.getDate() + days);
+        var day = String(result.getDate()).padStart(2, '0');
+        var month = String(result.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+            var year = result.getFullYear();
+
+  return month + '/' + day + '/' + year;
+
+
+      
+    }
+
+   
+
+ 
+		},
+
+
+
+
+
+
+
+
+
+
+
+
 getFreqBandTitle: function(callSignId){
 			var title;
 			var freqBand;
