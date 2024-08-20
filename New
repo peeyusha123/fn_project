@@ -1,3 +1,77 @@
+mergeInternationalBorderInfo: function(){
+
+			console.log("mergeInternationalBorderInfo", this.dom.internationalBorderInfoPayload);
+			//this.calculateAndSetTimeoutDates();
+			this.constructor.ajax.fireApi(this.dom.internationalBorderInfoPayload, "project", "mergeInternationalBorderInfo", (response)=> {
+				console.log("mergeRes", response);
+			})
+		},
+		internationaFeildsPayload:function(companyContainer){
+				const addDays= (date, days) => {
+        var result = new Date(date);
+        result.setDate(result.getDate() + days);
+        var day = String(result.getDate()).padStart(2, '0');
+        var month = String(result.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+            var year = result.getFullYear();
+
+  return month + '/' + day + '/' + year;
+}
+			var id = $(companyContainer).attr('id');
+			var vzRegService = companyContainer.attr("data-vz-reg-service");
+			this.dom.internationalBorderInfoPayload =  this.dom.internationalBorderInfoPayload.filter(ob => ob.externalCompanyNameId != id);
+
+			var payload = {};
+			payload.vzRegService = vzRegService;
+			payload.externalCompanyNameId = id;
+			payload.siteProjectsId = rfdsModule.dom.projectId;
+			var internationalFeilds = companyContainer.find(".international-feilds");
+			$.each(internationalFeilds, (i,intfeild)=>{
+				var id = $(intfeild).attr('id');
+				var value = $(intfeild).val();
+				payload[id] = value;
+				if (payload.hasOwnProperty('agrementSentDate')){
+					if(payload.vzRegService == "AWS"){
+						if(payload && payload.agrementSentDate){
+							
+							payload.agreementTimeout= payload.agrementSentDate!=""?addDays(payload.agrementSentDate, 60):"";
+						}
+					}else{
+						if(payload && payload.agrementSentDate){
+							payload.agreementTimeout= payload.agrementSentDate!=""?addDays(payload.agrementSentDate, 30):"";
+							
+						}
+					}
+				}else{
+					
+						if(payload && payload.hasOwnProperty('notificationSentDate')){
+							payload.notificationTimeoutDate= payload.notificationTimeoutDate!=""?addDays(payload.notificationTimeoutDate, 30):"";
+							 
+						}
+				}
+			});
+			this.dom.internationalBorderInfoPayload.push(payload);
+		},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var day = String(result.getDate()).padStart(2, '0');
   var month = String(result.getMonth() + 1).padStart(2, '0'); // Months are zero-based
   var year = result.getFullYear();
