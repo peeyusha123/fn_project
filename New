@@ -1,3 +1,42 @@
+function pizzaPricing(size) {
+    // Define the base prices for each pizza size
+    const basePrices = {
+        small: 8.00,
+        medium: 10.00,
+        large: 12.00
+    };
+
+    // Define the cost of each topping
+    const toppingCost = 1.50;
+
+    // Return a function that takes an array of toppings
+    return function(toppings) {
+        // Calculate the total toppings cost
+        const totalToppingCost = toppings.length * toppingCost;
+
+        // Return a function that takes the quantity of pizzas
+        return function(quantity) {
+            // Calculate the base price of the pizza based on its size
+            const basePrice = basePrices[size.toLowerCase()];
+
+            // Calculate the total price
+            const totalPrice = quantity * (basePrice + totalToppingCost);
+
+            // Return the total price
+            return totalPrice;
+        };
+    };
+}
+
+// Example usage:
+const pizzaOrder = pizzaPricing("large")(["bacon", "cheese"])(2);
+console.log(pizzaOrder); // Output: 29.00
+
+
+
+
+
+
 mergeInternationalBorderInfo: function(){
 
 			console.log("mergeInternationalBorderInfo", this.dom.internationalBorderInfoPayload);
