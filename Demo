@@ -1,3 +1,37 @@
+
+ChatGPT
+
+You said:
+I want to send mail to manager regarding update on last 15 days..my updates is 1)I am working on ntsce-13725  ticket ..also 2)I gone through SQL procedure trying to understand this also 3)understanding the different layers controller service dao layer
+
+Write mail on above mentioned things these three work not related to each other
+
+3/3
+
+ChatGPT said:
+ChatGPT
+Here's a draft email you can use to update your manager on your recent progress:
+
+Subject: Update on My Work Progress Over the Last 15 Days
+
+Hi [Manager's Name],
+
+I wanted to provide you with a quick update on the work I’ve been doing over the last 15 days.
+
+NTCSE-13725 Ticket: I am currently working on the NTCSE-13725 ticket. This involves [briefly describe what the ticket entails, if necessary]. I am progressing steadily and am focused on addressing all the requirements for this task.
+
+SQL Procedure Review: I have also spent some time going through the SQL procedures. My aim here is to deepen my understanding of how these procedures function and contribute to the overall system. I am working through the logic and flow to ensure I can utilize these effectively in my tasks.
+
+Understanding System Layers: Additionally, I have been learning about the different layers of our system architecture, specifically the controller, service, and DAO layers. This effort is to better grasp how each layer interacts and supports our applications, which I believe will enhance my contributions to the project.
+
+Please let me know if there are any specific areas you would like me to focus on or if there's anything else you'd like me to update you on.
+
+Thank you, [Your Name]
+
+Feel free to customize this as needed.
+
+
+
 var agreementSentDate = new Date(); // This should be replaced with the actual Agreement Sent Date value
     var notificationSentDate = new Date(); // This should be replaced with the actual Notification Sent Date value
     var calculatedDate;
