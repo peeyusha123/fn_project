@@ -1,3 +1,45 @@
+
+getProjEnvRestrictionCompliance: function(version, callback) {
+    var payload = {};
+    payload.siteInfoId = $("#site-project-id").val();
+
+    this.constructor.ajax.fireApi(payload, "inventory", "getSiteRestrictions", $.proxy(function(response) {
+        // Process the response data here
+        this.displaySiteRestrictions(response);
+        
+        // Additional logic based on the response, similar to `getProjEnvReviewFormDetails`
+        if (response.noticeToContractor === "Yes") {
+            // Assuming there might be some additional processing if 'Yes'
+            this.getAdditionalComplianceData(payload);
+        } else {
+            let userPrivilege = $("#userPrivilege").val();
+            let maxVersion = $(".environmental_restrictions_container").find(".last-version-value").text();
+            let activeVersion = $(".environmental_restrictions_container").find(".current-version-value").text();
+            let taskStatus = $(".environmental_restrictions_container").attr("data-status");
+
+            /** Determine if components should be enabled or disabled */
+            if (((taskStatus === "COMPLETED") || 
+                 ((taskStatus === "TERRITORY_REVIEW" || taskStatus === "GLOBAL_EHS_REVIEW") && 
+                  !userPrivilege.includes("SPM_HQ_ENV") && !userPrivilege.includes("FUZE_GUI_SUPPORT") && 
+                  !userPrivilege.includes("SPM_GUI_SUPPORT")) || 
+                 (activeVersion && activeVersion !== maxVersion))) {
+                disableComponents(taskStatus);
+                $('.version-list').parent().find('button').removeClass('disable');
+            } else {
+                enableComponents(taskStatus);
+            }
+        }
+
+    }, this), true, false);
+},
+
+
+
+
+
+
+
+
 getProjEnvReviewFormDetails: function(version, callback) {
         var projectSearchRequest = {};
         projectSearchRequest.siteProjectsId = $("#site-project-id").val();
