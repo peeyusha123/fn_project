@@ -42,6 +42,31 @@ Look into how site level restrictions are being handled
 The restrictions currently show in Site Level fields
 
 
+uri:
+ compliance-service/inventory/getSiteRestrictions
+payload :
+{
+"siteInfoId":616311816
+}
+Response :
+{
+"siteInfoId": 616311816,
+"restrictionsConstruction": "No",
+"restrictionsEnvcovs": "No",
+"restrictionsDieselGasoline": "No",
+"restrictionsDieselSensitive": "Yes",
+"restrictionsDsNstd399": null,
+"restrictionsDsFuelPlan": "No",
+"restrictionsDsSpill": null,
+"restrictionsDPortableGen": null,
+"lastModifiedBy": null,
+"lastModifiedDate": null,
+"restrictionsAsbestos": null,
+"restrictionsLBP": null,
+"noticeToContractor": "No"
+}
+
+
 
 
 ChatGPT
