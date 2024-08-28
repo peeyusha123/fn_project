@@ -36,7 +36,10 @@ getProjEnvReviewFormDetails: function(version, callback) {
     },
     
 
-
+Site:
+When the Environmental Tab is clicked in the site page, invoke an API that pulls the current site level restrictions for the site from the Compliance Module
+Look into how site level restrictions are being handled
+The restrictions currently show in Site Level fields
 
 
 
