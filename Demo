@@ -2,6 +2,72 @@
 getProjEnvRestrictionCompliance: function(version, callback) {
     var payload = {};
     payload.siteInfoId = $("#site-project-id").val();
+    
+    this.constructor.ajax.fireApi(payload, "inventory", "getSiteRestrictions", $.proxy(function(response) {
+        // Logging the response to check the API call output
+        console.log(response);
+
+        // Call a function to display the restrictions on the UI
+        this.displaySiteRestrictions(response);
+
+        // Check specific restrictions to enable or disable UI components
+        if (response.restrictionsConstruction === "Yes") {
+            this.handleConstructionRestriction(response);
+        }
+
+        // Perform additional checks and operations as necessary
+        // Example: Enable or disable components based on response values
+        if (response.noticeToContractor === "Yes") {
+            this.enableContractorNotice();
+        } else {
+            this.disableContractorNotice();
+        }
+
+        // Call a callback function if provided
+        if (typeof callback === "function") {
+            callback(response);
+        }
+
+    }, this), true, false);
+},
+
+displaySiteRestrictions: function(response) {
+    // Implement this function to update the UI with the response data
+    // Example:
+    $('#restrictions-construction').text(response.restrictionsConstruction);
+    $('#restrictions-envcovs').text(response.restrictionsEnvcovs);
+    $('#restrictions-diesel-gasoline').text(response.restrictionsDieselGasoline);
+    $('#restrictions-diesel-sensitive').text(response.restrictionsDieselSensitive);
+    // Add similar lines for other fields as necessary
+},
+
+handleConstructionRestriction: function(response) {
+    // Implement handling of construction restriction based on the response
+    if (response.restrictionsConstruction === "Yes") {
+        // Code to handle 'Yes' restriction, such as disabling specific components
+        disableComponents("construction");
+    } else {
+        // Code to handle 'No' restriction, such as enabling specific components
+        enableComponents("construction");
+    }
+},
+
+enableContractorNotice: function() {
+    // Code to enable contractor notice related UI components
+    $('#contractor-notice').removeClass('disabled').addClass('enabled');
+},
+
+disableContractorNotice: function() {
+    // Code to disable contractor notice related UI components
+    $('#contractor-notice').removeClass('enabled').addClass('disabled');
+}
+
+
+
+
+getProjEnvRestrictionCompliance: function(version, callback) {
+    var payload = {};
+    payload.siteInfoId = $("#site-project-id").val();
 
     this.constructor.ajax.fireApi(payload, "inventory", "getSiteRestrictions", $.proxy(function(response) {
         // Process the response data here
