@@ -1,3 +1,45 @@
+getProjEnvReviewFormDetails: function(version, callback) {
+        var projectSearchRequest = {};
+        projectSearchRequest.siteProjectsId = $("#site-project-id").val();
+        if (version) {
+            projectSearchRequest.version = version;
+        }
+        var taskName = this.dom.reviewContainer.closest('.tab-pane').attr('data-task');
+        var taskStatus = $("." + taskName).attr("data-status");
+        this.constructor.ajax.fireApi(projectSearchRequest, "env", "getProjEnvFormDetails", $.proxy(function(response) {
+            fetchDocumentsCallback("SITE_ENV_REPORT_DOCUMENTS", "#" + this.dom.tableId);
+            this.displayProjEnvFormDetails(response);
+            if (response.prelimEddReviewRequired === "Yes") {
+                this.getProjEnvAdditionalData(projectSearchRequest, taskName, taskStatus);
+            }else{
+                enableComponents(taskName);
+                let userPrivilege = $("#userPrivilege").val();
+                let maxVersion = $(".environmental_review_container").find(".last-version-value").text();
+                let activeVersion = $(".environmental_review_container").find(".current-version-value").text();
+
+                /** keeping it readonly as document n adding report is template based - used by environmental review task too**/            
+                if (((taskName === "TERRITORY_REVIEW" || taskName === "GLOBAL_EHS_REVIEW") && !userPrivilege.includes("SPM_HQ_ENV") && !userPrivilege.includes("FUZE_GUI_SUPPORT") && !userPrivilege.includes("SPM_GUI_SUPPORT")) || (activeVersion && activeVersion !== maxVersion) || taskStatus === "COMPLETED") {
+                    disableComponents(taskName);
+                    $('.version-list').parent().find('button').removeClass('disable');
+                }
+            }
+
+        }, this), false, false);
+    },
+
+ getProjEnvRestrictionCompliance: function(version, callback) {
+        var payload = {};
+        payload.siteInfoId = $("#site-project-id").val();
+        this.constructor.ajax.fireApi(payload, "inventory", "getSiteRestrictions", $.proxy(function(response) {
+            console.log(response);
+        }, this), true, false);
+    },
+    
+
+
+
+
+
 
 ChatGPT
 
