@@ -1,302 +1,159 @@
+--1
+create or replace PROCEDURE "PROC_COMPLETE_WORKSTEP" (
+siteProjectsId NUMBER,
+siteInfoId NUMBER,
+workStepName VARCHAR2,
+actionPerformed VARCHAR2,
+taskStatus VARCHAR2,
+lastModifiedBy VARCHAR2,
+userReviewStatus VARCHAR2,
+v_tableName IN VARCHAR2 DEFAULT NULL,
+i_togglable varchar2 default null
+) AS
+v_rowcount number;
+cq_change_control VARCHAR2(32);
+TYPE pptStatus IS RECORD (
+v_milestone VARCHAR2(128 BYTE),
+v_workStepName VARCHAR2(128 BYTE),
+v_oldStatus VARCHAR2(16),
+v_newStatus VARCHAR2(16)
+);
+TYPE pptStatusSet IS TABLE OF pptStatus;
+pptStatusRows pptStatusSet;
+v_mm VARCHAR2(128 BYTE);
+v_mmTableNmae VARCHAR2(256 BYTE);
+v_query VARCHAR2(1024 BYTE);
+v_workstep_group VARCHAR2(8);
+BEGIN
+
+
+    IF(siteProjectsId !=0 AND actionPerformed = 'COMPLETE') THEN
+	DBMS_OUTPUT.PUT_LINE('WorkstepName '|| workStepName || ' Status ' || taskStatus);
+	-- Do not Activate Re Finalize PSLC_FUNDING
+	IF(workStepName = 'PSLC_FUNDING' AND FUNC_GET_WORKSTEP_STATUS(siteProjectsId,'PSLC_FUNDING') = 'COMPLETED' ) THEN
+	    return;
+	END IF;
+
+ 	IF(workStepName = 'SUBMIT_RFDS' AND FUNC_GET_WORKSTEP_STATUS(siteProjectsId,'SUBMIT_RFDS') = 'COMPLETED' ) THEN
+	    PROC_INSERT_DQI_VALIDATION_QUEUE_WRAPPER(siteProjectsId, 'INITIATIVE_VERIFICATION', 'BULK', lastModifiedBy);
+	END IF;
+
+	IF(workStepName in ('RF_COMPLETE','RF_COMPLETE_INSERT','CQ_VCP_FAR_EDGE_CIQ_COMPLETE','CQ_VCP_FAR_EDGE_CIQ_COMPLETE_INSERT') AND FUNC_GET_WORKSTEP_STATUS_TIGGER_ONLY(siteProjectsId,'SUBMIT_RFDS') IN ('COMPLETED')) THEN
+	    BEGIN
+		SELECT
+		CASE WHEN CQ_CHANGE_CONTROL ='Active' THEN 'true'
+		WHEN CQ_CHANGE_CONTROL='Inactive' THEN 'false'
+		END AS CQ_CHANGE_CONTROL INTO cq_change_control
+		from PROJ_ADDITIONAL_INFO
+		WHERE SITE_PROJECTS_ID = siteProjectsId;
+
+		EXCEPTION WHEN NO_DATA_FOUND THEN
+		cq_change_control := NULL;
+	    END;
+	    IF(cq_change_control IS NOT NULL AND cq_change_control IN ('true')) THEN
+		PROC_INSERT_API_QUEUE('FUZE_PLANNING','UPDATE_RFDS_CQ_CHANGE_CONTROL',NULL,siteProjectsId,NULL,NULL,NULL,'QUEUED',lastModifiedBy);
+	    END IF;
+    END IF;
+
+	SELECT * BULK COLLECT INTO pptStatusRows
+	FROM (
+	    SELECT WS.MILESTONE,WS.WORKSTEP_NAME,
+	    CASE WHEN WS.WORKSTEP_GROUP = 'T' AND PTT.TASK_STATUS ='COMPLETED' AND PTT.USER_REVIEW_STATUS ='NA' THEN 'N/A' ELSE PTT.TASK_STATUS END AS OLD_STATUS,
+	    CASE WHEN WS.WORKSTEP_GROUP = 'T' AND taskStatus = 'COMPLETED' AND userReviewStatus ='NA' THEN 'N/A' ELSE taskStatus END AS NEW_STATUS
+	    FROM PROJ_TRACKER_TASKS PTT
+	    INNER JOIN PROJ_TRACKER PT ON PTT.PROJ_TRACKER_ID = PT.PROJ_TRACKER_ID
+	    INNER JOIN WORKSTEPS WS ON PTT.WORKSTEP_ID = WS.WORKSTEP_ID
+	    INNER JOIN WORKFLOW W ON WS.WF_ID = W.WF_ID AND PT.WF_ID = W.WF_ID
+	    INNER JOIN SITE_PROJECTS SP ON SP.SITE_PROJECTS_ID = PT.SITE_PROJECTS_ID
+	    WHERE PT.TRACKER_TYPE IN ('NEW_BUILD_PROJECT','MOD_PROJECT')
+	    AND SP.SITE_PROJECTS_ID = siteProjectsId
+	    AND WS.WORKSTEP_NAME IN (SELECT trim(regexp_substr(workStepName, '[^,]+', 1, LEVEL)) WORKSTEP_NAME
+	    FROM DUAL
+	    CONNECT BY regexp_substr(workStepName , '[^,]+', 1, LEVEL) IS NOT NULL)
+	) WHERE ((OLD_STATUS = 'N/A' AND NEW_STATUS != 'N/A') OR (OLD_STATUS!= 'N/A' AND NEW_STATUS = 'N/A'));
+
+	FOR AX IN( SELECT PT.PROJ_TRACKER_ID,WS.WORKSTEP_ID
+		FROM PROJ_TRACKER PT
+		INNER JOIN SITE_PROJECTS SP ON SP.SITE_PROJECTS_ID = PT.SITE_PROJECTS_ID
+		INNER JOIN WORKFLOW W ON PT.WF_ID = W.WF_ID
+		INNER JOIN WORKSTEPS WS ON WS.WF_ID = W.WF_ID
+		WHERE PT.TRACKER_TYPE IN ('NEW_BUILD_PROJECT','MOD_PROJECT')
+		AND SP.SITE_PROJECTS_ID = siteProjectsId
+		AND WS.WORKSTEP_NAME IN (
+		    SELECT trim(regexp_substr(workStepName, '[^,]+', 1, LEVEL)) WORKSTEP_NAME
+		    FROM DUAL
+		    CONNECT BY regexp_substr(workStepName , '[^,]+', 1, LEVEL) IS NOT NULL
+		)
+	)LOOP
+	    UPDATE PROJ_TRACKER_TASKS PTT
+	    SET PTT.TASK_STATUS = taskStatus,
+	    PTT.LAST_MODIFIED_DATE = SYSDATE,
+	    PTT.CREATED_DATE = CASE WHEN PTT.CREATED_DATE IS NULL THEN SYSDATE ELSE PTT.CREATED_DATE END,
+	    PTT.COMPLETED_DATE = CASE taskStatus WHEN 'COMPLETED' THEN SYSDATE WHEN 'REJECTED' THEN TO_DATE('09/09/1900','MM/DD/YYYY') ELSE NULL END,
+	    PTT.LAST_MODIFIED_BY = lastModifiedBy,
+	    PTT.USER_REVIEW_STATUS = userReviewStatus
+	    WHERE PTT.PROJ_TRACKER_ID = AX.PROJ_TRACKER_ID AND PTT.WORKSTEP_ID=AX.WORKSTEP_ID;
+
+	    DBMS_OUTPUT.PUT_LINE('sql%rowcount' ||sql%rowcount);
+
+	    IF(sql%rowcount =0)THEN
+		INSERT INTO PROJ_TRACKER_TASKS(PROJ_TRACKER_ID,WORKSTEP_ID,TASK_STATUS,LAST_MODIFIED_BY,LAST_MODIFIED_DATE,USER_REVIEW_STATUS,CREATED_DATE)
+		VALUES(AX.PROJ_TRACKER_ID,AX.WORKSTEP_ID,taskStatus,lastModifiedBy,SYSDATE,userReviewStatus,SYSDATE);
+	    END IF;
 
-getProjEnvRestrictionCompliance: function(version, callback) {
-    var payload = {};
-    payload.siteInfoId = $("#site-project-id").val();
-    
-    this.constructor.ajax.fireApi(payload, "inventory", "getSiteRestrictions", $.proxy(function(response) {
-        // Logging the response to check the API call output
-        console.log(response);
-
-        // Call a function to display the restrictions on the UI
-        this.displaySiteRestrictions(response);
-
-        // Check specific restrictions to enable or disable UI components
-        if (response.restrictionsConstruction === "Yes") {
-            this.handleConstructionRestriction(response);
-        }
-
-        // Perform additional checks and operations as necessary
-        // Example: Enable or disable components based on response values
-        if (response.noticeToContractor === "Yes") {
-            this.enableContractorNotice();
-        } else {
-            this.disableContractorNotice();
-        }
-
-        // Call a callback function if provided
-        if (typeof callback === "function") {
-            callback(response);
-        }
-
-    }, this), true, false);
-},
-
-displaySiteRestrictions: function(response) {
-    // Implement this function to update the UI with the response data
-    // Example:
-    $('#restrictions-construction').text(response.restrictionsConstruction);
-    $('#restrictions-envcovs').text(response.restrictionsEnvcovs);
-    $('#restrictions-diesel-gasoline').text(response.restrictionsDieselGasoline);
-    $('#restrictions-diesel-sensitive').text(response.restrictionsDieselSensitive);
-    // Add similar lines for other fields as necessary
-},
-
-handleConstructionRestriction: function(response) {
-    // Implement handling of construction restriction based on the response
-    if (response.restrictionsConstruction === "Yes") {
-        // Code to handle 'Yes' restriction, such as disabling specific components
-        disableComponents("construction");
-    } else {
-        // Code to handle 'No' restriction, such as enabling specific components
-        enableComponents("construction");
-    }
-},
-
-enableContractorNotice: function() {
-    // Code to enable contractor notice related UI components
-    $('#contractor-notice').removeClass('disabled').addClass('enabled');
-},
-
-disableContractorNotice: function() {
-    // Code to disable contractor notice related UI components
-    $('#contractor-notice').removeClass('enabled').addClass('disabled');
-}
-
-
-
-
-getProjEnvRestrictionCompliance: function(version, callback) {
-    var payload = {};
-    payload.siteInfoId = $("#site-project-id").val();
-
-    this.constructor.ajax.fireApi(payload, "inventory", "getSiteRestrictions", $.proxy(function(response) {
-        // Process the response data here
-        this.displaySiteRestrictions(response);
-        
-        // Additional logic based on the response, similar to `getProjEnvReviewFormDetails`
-        if (response.noticeToContractor === "Yes") {
-            // Assuming there might be some additional processing if 'Yes'
-            this.getAdditionalComplianceData(payload);
-        } else {
-            let userPrivilege = $("#userPrivilege").val();
-            let maxVersion = $(".environmental_restrictions_container").find(".last-version-value").text();
-            let activeVersion = $(".environmental_restrictions_container").find(".current-version-value").text();
-            let taskStatus = $(".environmental_restrictions_container").attr("data-status");
-
-            /** Determine if components should be enabled or disabled */
-            if (((taskStatus === "COMPLETED") || 
-                 ((taskStatus === "TERRITORY_REVIEW" || taskStatus === "GLOBAL_EHS_REVIEW") && 
-                  !userPrivilege.includes("SPM_HQ_ENV") && !userPrivilege.includes("FUZE_GUI_SUPPORT") && 
-                  !userPrivilege.includes("SPM_GUI_SUPPORT")) || 
-                 (activeVersion && activeVersion !== maxVersion))) {
-                disableComponents(taskStatus);
-                $('.version-list').parent().find('button').removeClass('disable');
-            } else {
-                enableComponents(taskStatus);
-            }
-        }
-
-    }, this), true, false);
-},
-
+	END LOOP;
 
+	v_rowcount := sql%Rowcount;
 
 
+    INSERT INTO PROJ_COMPLETE_WORKSTEP_LOG(SITE_PROJECTS_ID,SITE_INFO_ID,WORKSTEP_NAME,"COMMENT",LAST_MODIFIED_BY,LAST_MODIFIED_DATE)
+    select siteProjectsId, siteInfoId, workStepName,'PROC_COMPLETE_WORKSTEP Updated -' || v_rowcount,lastModifiedBy, SYSDATE FROM DUAL;
 
+    IF (i_togglable IS NULL) THEN
+	IF (v_tableName IS NULL) THEN
+	    FOR rownumb IN 1..pptStatusRows.COUNT
+	    LOOP
+		 IF(pptStatusRows(rownumb).v_oldStatus = 'N/A' AND pptStatusRows(rownumb).v_newStatus != 'N/A' AND workStepName NOT IN ('ZONING'))
+		    THEN
+			DBMS_OUTPUT.PUT_LINE('Calling PROC_NA_MILESTONE_DATE_UPDATE - blank date');
+			PROC_NA_MILESTONE_DATE_UPDATE('true', pptStatusRows(rownumb).v_workStepName,'', '', siteProjectsId, lastModifiedBy);
+		    ELSE
+			DBMS_OUTPUT.PUT_LINE('Calling PROC_NA_MILESTONE_DATE_UPDATE - 1/1/1900');
+			PROC_NA_MILESTONE_DATE_UPDATE('true',pptStatusRows(rownumb).v_workStepName,'', '01/01/1900', siteProjectsId, lastModifiedBy);
+		    END IF;
+	    END LOOP;
+	END IF; -- v_tableName IS NULL
+    END IF; -- i_togglable IS NULL
 
+	IF(taskStatus = 'REJECTED') THEN
 
+	BEGIN
 
-getProjEnvReviewFormDetails: function(version, callback) {
-        var projectSearchRequest = {};
-        projectSearchRequest.siteProjectsId = $("#site-project-id").val();
-        if (version) {
-            projectSearchRequest.version = version;
-        }
-        var taskName = this.dom.reviewContainer.closest('.tab-pane').attr('data-task');
-        var taskStatus = $("." + taskName).attr("data-status");
-        this.constructor.ajax.fireApi(projectSearchRequest, "env", "getProjEnvFormDetails", $.proxy(function(response) {
-            fetchDocumentsCallback("SITE_ENV_REPORT_DOCUMENTS", "#" + this.dom.tableId);
-            this.displayProjEnvFormDetails(response);
-            if (response.prelimEddReviewRequired === "Yes") {
-                this.getProjEnvAdditionalData(projectSearchRequest, taskName, taskStatus);
-            }else{
-                enableComponents(taskName);
-                let userPrivilege = $("#userPrivilege").val();
-                let maxVersion = $(".environmental_review_container").find(".last-version-value").text();
-                let activeVersion = $(".environmental_review_container").find(".current-version-value").text();
+	    SELECT FIELD_NAME,TABLE_NAME INTO v_mm,v_mmTableNmae FROM FUZE_TRACKER_FIELD_CONFIG WHERE WORKSTEP_NAME = workStepName AND EDIT_RULE = 'CALCULATED_DATE';
 
-                /** keeping it readonly as document n adding report is template based - used by environmental review task too**/            
-                if (((taskName === "TERRITORY_REVIEW" || taskName === "GLOBAL_EHS_REVIEW") && !userPrivilege.includes("SPM_HQ_ENV") && !userPrivilege.includes("FUZE_GUI_SUPPORT") && !userPrivilege.includes("SPM_GUI_SUPPORT")) || (activeVersion && activeVersion !== maxVersion) || taskStatus === "COMPLETED") {
-                    disableComponents(taskName);
-                    $('.version-list').parent().find('button').removeClass('disable');
-                }
-            }
+	    EXCEPTION WHEN NO_DATA_FOUND THEN
+		v_mm:= NULL;
+	END;
 
-        }, this), false, false);
-    },
+	v_query := 'UPDATE '||v_mmTableNmae||' SET '|| v_mm|| ' = ''09/09/1900'',LAST_MODIFIED_BY = '''||lastModifiedBy||''', LAST_MODIFIED_DATE = SYSDATE WHERE SITE_PROJECTS_ID = '|| siteProjectsId;
+	EXECUTE IMMEDIATE v_query;
 
- getProjEnvRestrictionCompliance: function(version, callback) {
-        var payload = {};
-        payload.siteInfoId = $("#site-project-id").val();
-        this.constructor.ajax.fireApi(payload, "inventory", "getSiteRestrictions", $.proxy(function(response) {
-            console.log(response);
-        }, this), true, false);
-    },
-    
+	FOR i in(
+	    SELECT trim(regexp_substr(workStepName, '[^,]+', 1, LEVEL)) WORKSTEP_NAME
+	    FROM DUAL
+			CONNECT BY regexp_substr(workStepName , '[^,]+', 1, LEVEL) IS NOT NULL
+	)
+		LOOP
+		SELECT WORKSTEP_GROUP into v_workstep_group FROM WORKSTEPS WHERE WORKSTEP_NAME = i.WORKSTEP_NAME and rownum = 1;
+	IF (v_workstep_group <> 'M') THEN
+			PROC_INSERT_EMAIL_QUEUE('TEXT',null,siteProjectsId,'PROJECTS',i.WORKSTEP_NAME,0,lastModifiedBy,'REJECTED');
+		END IF;
+	END LOOP;
 
-Site:
-When the Environmental Tab is clicked in the site page, invoke an API that pulls the current site level restrictions for the site from the Compliance Module
-Look into how site level restrictions are being handled
-The restrictions currently show in Site Level fields
+	END IF; -- taskStatus = 'REJECTED'
 
+	END IF;
+END;
 
-uri:
- compliance-service/inventory/getSiteRestrictions
-payload :
-{
-"siteInfoId":616311816
-}
-Response :
-{
-"siteInfoId": 616311816,
-"restrictionsConstruction": "No",
-"restrictionsEnvcovs": "No",
-"restrictionsDieselGasoline": "No",
-"restrictionsDieselSensitive": "Yes",
-"restrictionsDsNstd399": null,
-"restrictionsDsFuelPlan": "No",
-"restrictionsDsSpill": null,
-"restrictionsDPortableGen": null,
-"lastModifiedBy": null,
-"lastModifiedDate": null,
-"restrictionsAsbestos": null,
-"restrictionsLBP": null,
-"noticeToContractor": "No"
-}
 
-
-
-
-ChatGPT
-
-You said:
-I want to send mail to manager regarding update on last 15 days..my updates is 1)I am working on ntsce-13725  ticket ..also 2)I gone through SQL procedure trying to understand this also 3)understanding the different layers controller service dao layer
-
-Write mail on above mentioned things these three work not related to each other
-
-3/3
-
-ChatGPT said:
-ChatGPT
-Here's a draft email you can use to update your manager on your recent progress:
-
-Subject: Update on My Work Progress Over the Last 15 Days
-
-Hi [Manager's Name],
-
-I wanted to provide you with a quick update on the work I’ve been doing over the last 15 days.
-
-NTCSE-13725 Ticket: I am currently working on the NTCSE-13725 ticket. This involves [briefly describe what the ticket entails, if necessary]. I am progressing steadily and am focused on addressing all the requirements for this task.
-
-SQL Procedure Review: I have also spent some time going through the SQL procedures. My aim here is to deepen my understanding of how these procedures function and contribute to the overall system. I am working through the logic and flow to ensure I can utilize these effectively in my tasks.
-
-Understanding System Layers: Additionally, I have been learning about the different layers of our system architecture, specifically the controller, service, and DAO layers. This effort is to better grasp how each layer interacts and supports our applications, which I believe will enhance my contributions to the project.
-
-Please let me know if there are any specific areas you would like me to focus on or if there's anything else you'd like me to update you on.
-
-Thank you, [Your Name]
-
-Feel free to customize this as needed.
-
-
-
-var agreementSentDate = new Date(); // This should be replaced with the actual Agreement Sent Date value
-    var notificationSentDate = new Date(); // This should be replaced with the actual Notification Sent Date value
-    var calculatedDate;
-
-    if (radioVal === 'Yes') {
-        if (subCategory.includes("700") || subCategory.includes("850") || subCategory.includes("1900") || subCategory.includes("C-BAND")) {
-            calculatedDate = new Date(agreementSentDate);
-            calculatedDate.setDate(calculatedDate.getDate() + 30); // Agreement Sent Date + 30 days
-        } else if (subCategory.includes("2100")) {
-            calculatedDate = new Date(agreementSentDate);
-            calculatedDate.setDate(calculatedDate.getDate() + 60); // Agreement Sent Date + 60 days
-        }
-    } else if (radioVal === 'No') {
-        calculatedDate = new Date(notificationSentDate);
-        calculatedDate.setDate(calculatedDate.getDate() + 30); // Notification Sent Date + 30 days
-    }
-
-    $("#" + callSignId + "-form").find("#calculatedDateField").val(calculatedDate.toISOString().split('T')[0]); // Assuming the field ID is `calculatedDateField`
-},
-
-
-
-
-
--controller file
-@RequestMapping(value = "/mergeProjLocationInfo", method = RequestMethod.POST, produces =  MediaType.APPLICATION_JSON )
-	@ApiOperation(value = "Returns output details", notes = "Projects Service", response = ProjLocationInfo.class)
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Successful retrieval service", response = ProjLocationInfo.class),
-			@ApiResponse(code = 400, message = "Invalid input provided"),
-			@ApiResponse(code = 404, message = "Data does not exist"), })
-	@ResponseStatus(value = HttpStatus.OK)
-
-	public boolean mergeProjLocationInfo(@RequestHeader("user") String userJSON, @RequestBody ProjLocationInfo projLocationInfo) throws Exception {
-
-		final User user = userInfoService.getUserInfo();
-		
-		logger.info("PROJECTS-SERVICE : Inside {}, Called by {} with Parameter {}", Thread.currentThread().getStackTrace()[1].getMethodName(), user, projLocationInfo);
-		
-		final boolean status = projectsService.mergeProjLocationInfo(projLocationInfo, user);
-		
-		return status;
-	}
--service layer
-@Override
-	public boolean mergeProjLocationInfo(ProjLocationInfo projLocationInfo, User user) throws Exception {
-
-		projLocationInfo.setLastModifiedBy(user.getUserId());
-
-		logger.info("PROJECTS-SERVICE : mergeProjectLocationInfo service Impl");
-
-		return projectsDao.mergeProjLocationInfo(projLocationInfo, user);
-	}
--DAO layer 
-public boolean mergeProjLocationInfo(ProjLocationInfo projLocationInfo, User user ) throws Exception {
-
-		logger.info("PROJECTS_SERVICE : Inside {}. Parameter :  {}",
-				Thread.currentThread().getStackTrace()[1].getMethodName(), projLocationInfo);
-		
-		final DataSourceCriteria criteria = dataCloudSerializer.mapMergeProjLocationInfo(projLocationInfo, user);
-		
-		boolean isMerged = false;
-
-		try {
-
-			final DataSourceResultSet wsResult = DataCloud.perform(DataCloudServices.PROJECTS.mergeProjLocationInfo,
-					criteria);
-			isMerged = wsResult.getUpdateCount() > 0;
-			
-			//Code to update the PSLC data from ppl sft is moved to getProjectFields
-			if(isMerged) {
-				DataCloud.perform(DataCloudServices.PROJECTS.mergePslcSite,
-						criteria);
-			}else {
-				throw new Exception("Invalid PSLC Code");
-
-			}
-			
-		} catch (final Exception e) {
-			logger.error("PROJECTS_SERVICE : Error in projLocationInfo Dao {}", e.getMessage());
-			e.printStackTrace();
-			throw e;
-		}
-
-		logger.info(RETURN_PARAMS,
-				Thread.currentThread().getStackTrace()[1].getMethodName(), isMerged);
-		return isMerged;
-	}
-- dataCluodService layer
-String mergeProjLocationInfo = "projects.mergeProjLocationInfo";
+--2
