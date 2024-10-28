@@ -122,3 +122,64 @@ public class FieldDefinitionControllerTest {
     // Additional test cases can be added for negative scenarios like exceptions, null responses etc.
 }
 
+
+
+new ..
+
+package com.vzw.fuze.projects.controller;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+import com.vzw.fuze.projects.model.ProjectFields;
+import com.vzw.fuze.projects.service.FieldDefinitionService;
+
+@ExtendWith(MockitoExtension.class)
+public class FieldDefinitionControllerTest {
+
+    private static final Logger logger = LoggerFactory.getLogger(FieldDefinitionControllerTest.class.getName());
+
+    @Mock
+    private FieldDefinitionService service;
+
+    @InjectMocks
+    private FieldDefinitionController controller;
+
+    private ProjectFields projectFields;
+
+    @BeforeEach
+    public void setUp() {
+        projectFields = new ProjectFields();
+        // Populate projectFields with relevant data if needed
+    }
+
+    @Test
+    public void testGetTooltips() throws Exception {
+        // Create a mock response entity
+        ResponseEntity<Object> mockResponse = new ResponseEntity<>(new Object(), HttpStatus.OK);
+
+        // Mocking the service response to return the mockResponse
+        when(service.getToolTips(projectFields)).thenReturn(mockResponse);
+
+        // Call the method with mocked dependencies
+        ResponseEntity<Object> response = controller.getTooltips("userJson", projectFields);
+
+        // Validate the response status
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        
+        // Additional assertions can be added to verify the response body, if necessary
+    }
+
+    // Additional test cases can be added for negative scenarios like exceptions, null responses etc.
+}
