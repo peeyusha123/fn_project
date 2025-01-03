@@ -247,3 +247,25 @@ public static Node<Integer> reverse_I(Node<Integer> head) {
     // Return the new head (prev)
     return prev;
 }
+
+...
+
+public static Node<Integer> midPoint(Node<Integer> head) {
+    // If the list is empty or has only one node
+    if (head == null || head.next == null) {
+        return head;
+    }
+
+    // Initialize slow and fast pointers
+    Node<Integer> slow = head;
+    Node<Integer> fast = head;
+
+    // Move pointers until fast or fast.next reaches the end
+    while (fast.next != null && fast.next.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+
+    // Slow is now pointing to the midpoint
+    return slow;
+}
