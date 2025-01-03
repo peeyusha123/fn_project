@@ -115,3 +115,73 @@ public class Solution {
         System.out.print(root.data);
     }
 }
+
+
+4.
+
+class Node<T> {
+    T data;
+    Node<T> next;
+
+    public Node(T data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+public class Solution {
+
+    // Function to find the middle of the linked list
+    private static Node<Integer> findMiddle(Node<Integer> head) {
+        Node<Integer> slow = head;
+        Node<Integer> fast = head;
+
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return slow;
+    }
+
+    // Function to reverse a linked list
+    private static Node<Integer> reverseList(Node<Integer> head) {
+        Node<Integer> prev = null;
+        Node<Integer> curr = head;
+
+        while (curr != null) {
+            Node<Integer> nextNode = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = nextNode;
+        }
+        return prev;
+    }
+
+    // Function to check if the linked list is a palindrome
+    public static boolean isPalindrome(Node<Integer> head) {
+        // Edge case: if the list is empty or has only one element, it's a palindrome
+        if (head == null || head.next == null) {
+            return true;
+        }
+
+        // Step 1: Find the middle of the list
+        Node<Integer> middle = findMiddle(head);
+
+        // Step 2: Reverse the second half of the list
+        Node<Integer> secondHalf = reverseList(middle);
+
+        // Step 3: Compare the first and second halves
+        Node<Integer> firstHalf = head;
+        Node<Integer> secondHalfCopy = secondHalf;
+
+        while (secondHalfCopy != null) {
+            if (!firstHalf.data.equals(secondHalfCopy.data)) {
+                return false; // If mismatch found, it's not a palindrome
+            }
+            firstHalf = firstHalf.next;
+            secondHalfCopy = secondHalfCopy.next;
+        }
+
+        return true; // If no mismatch, the list is a palindrome
+    }
+}
