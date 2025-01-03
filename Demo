@@ -223,3 +223,27 @@ public static Node<Integer> reverseRec(Node<Integer> head) {
     // Return the new head of the reversed list
     return reversedHead;
 }
+....
+
+public static Node<Integer> reverse_I(Node<Integer> head) {
+    // Initialize three pointers
+    Node<Integer> prev = null;
+    Node<Integer> curr = head;
+    Node<Integer> next = null;
+
+    // Iterate through the list
+    while (curr != null) {
+        // Save the next node
+        next = curr.next;
+
+        // Reverse the current node's pointer
+        curr.next = prev;
+
+        // Move pointers one step forward
+        prev = curr;
+        curr = next;
+    }
+
+    // Return the new head (prev)
+    return prev;
+}
