@@ -318,3 +318,62 @@ public static Node<Integer> mergeTwoSorted(Node<Integer> head1, Node<Integer> he
 
     return mergedHead;
 }
+
+
+...
+public static Node<Integer> mergeSort(Node<Integer> head) {
+    // Base case: if the list has 0 or 1 node
+    if (head == null || head.next == null) {
+        return head;
+    }
+
+    // Find the middle of the list
+    Node<Integer> mid = getMiddle(head);
+    Node<Integer> half = mid.next;
+    mid.next = null; // Split the list into two halves
+
+    // Recursively sort both halves
+    Node<Integer> left = mergeSort(head);
+    Node<Integer> right = mergeSort(half);
+
+    // Merge the two sorted halves
+    return mergeTwoSorted(left, right);
+}
+
+private static Node<Integer> getMiddle(Node<Integer> head) {
+    if (head == null) {
+        return head;
+    }
+
+    Node<Integer> slow = head;
+    Node<Integer> fast = head;
+
+    // Move fast by 2 steps and slow by 1 step to find the middle
+    while (fast.next != null && fast.next.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+    }
+
+    return slow;
+}
+
+private static Node<Integer> mergeTwoSorted(Node<Integer> head1, Node<Integer> head2) {
+    if (head1 == null) {
+        return head2;
+    }
+    if (head2 == null) {
+        return head1;
+    }
+
+    Node<Integer> mergedHead;
+    if (head1.data <= head2.data) {
+        mergedHead = head1;
+        mergedHead.next = mergeTwoSorted(head1.next, head2);
+    } else {
+        mergedHead = head2;
+        mergedHead.next = mergeTwoSorted(head1, head2.next);
+    }
+
+    return mergedHead;
+}
+
