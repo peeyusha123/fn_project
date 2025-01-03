@@ -488,3 +488,55 @@ public class Solution {
         return head;
     }
 }
+......
+
+public class Solution {
+    public static Node<Integer> swapNodes(Node<Integer> head, int i, int j) {
+        // If i and j are the same, no swap is needed
+        if (i == j) {
+            return head;
+        }
+
+        // Initialize pointers for traversal
+        Node<Integer> prevI = null, currI = head;
+        Node<Integer> prevJ = null, currJ = head;
+
+        // Find the i-th and j-th nodes along with their previous nodes
+        for (int idx = 0; currI != null && idx < i; idx++) {
+            prevI = currI;
+            currI = currI.next;
+        }
+        for (int idx = 0; currJ != null && idx < j; idx++) {
+            prevJ = currJ;
+            currJ = currJ.next;
+        }
+
+        // If either of the nodes is not found (i or j is out of bounds), return the original list
+        if (currI == null || currJ == null) {
+            return head;
+        }
+
+        // If i-th node is not the head, update the previous node to point to the j-th node
+        if (prevI != null) {
+            prevI.next = currJ;
+        } else {
+            // If i-th node is the head, update the head to point to the j-th node
+            head = currJ;
+        }
+
+        // If j-th node is not the head, update the previous node to point to the i-th node
+        if (prevJ != null) {
+            prevJ.next = currI;
+        } else {
+            // If j-th node is the head, update the head to point to the i-th node
+            head = currI;
+        }
+
+        // Swap the next pointers of the i-th and j-th nodes
+        Node<Integer> temp = currI.next;
+        currI.next = currJ.next;
+        currJ.next = temp;
+
+        return head;
+    }
+}
