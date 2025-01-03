@@ -403,3 +403,45 @@ public class Solution {
         return -1;
     }
 }
+
+.....
+
+
+public class Solution {
+    public static Node<Integer> evenAfterOdd(Node<Integer> head) {
+        // Edge case: If the list is empty or has only one node, return it directly.
+        if (head == null || head.next == null) {
+            return head;
+        }
+
+        // Initialize two dummy nodes for odd and even lists.
+        Node<Integer> oddHead = new Node<>(0);  // Dummy head for odd list
+        Node<Integer> evenHead = new Node<>(0); // Dummy head for even list
+
+        Node<Integer> odd = oddHead;  // Pointer for odd list
+        Node<Integer> even = evenHead;  // Pointer for even list
+
+        Node<Integer> current = head;
+
+        // Traverse the list and divide nodes into odd and even lists.
+        while (current != null) {
+            if (current.data % 2 != 0) {
+                odd.next = current;  // Add to odd list
+                odd = odd.next;
+            } else {
+                even.next = current;  // Add to even list
+                even = even.next;
+            }
+            current = current.next;
+        }
+
+        // To avoid circular references, mark the end of the even list.
+        even.next = null;
+
+        // Connect odd list to even list.
+        odd.next = evenHead.next;
+
+        // Return the head of the new list, which is oddHead.next (skipping dummy node).
+        return oddHead.next;
+    }
+}
