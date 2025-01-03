@@ -185,3 +185,22 @@ public class Solution {
         return true; // If no mismatch, the list is a palindrome
     }
 }
+new...
+
+
+public static Node<Integer> deleteNodeRec(Node<Integer> head, int pos) {
+    // Base case: If the list is empty or position is invalid
+    if (head == null) {
+        return null;
+    }
+
+    // Base case: If the current node is to be deleted
+    if (pos == 0) {
+        return head.next; // Skip the current node
+    }
+
+    // Recursive call for the next node
+    head.next = deleteNodeRec(head.next, pos - 1);
+
+    return head; // Return the current head
+}
