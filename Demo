@@ -772,3 +772,46 @@ public class Solution {
         }
     }
 }
+
+
+......
+import java.util.Stack;
+
+public class Solution {
+    public static boolean checkRedundantBrackets(String expression) {
+        Stack<Character> stack = new Stack<>();
+        
+        for (char ch : expression.toCharArray()) {
+            if (ch == ')') {
+                char top = stack.peek();
+                stack.pop();
+                int elementsInside = 0;
+                
+                // Check if there is an operator inside the brackets
+                while (top != '(') {
+                    elementsInside++;
+                    top = stack.peek();
+                    stack.pop();
+                }
+                
+                // If there are no elements between brackets, it is redundant
+                if (elementsInside == 0) {
+                    return true;
+                }
+            } else {
+                stack.push(ch);
+            }
+        }
+        
+        return false;
+    }
+
+    public static void main(String[] args) {
+        String expression1 = "a+(b)+c";
+        String expression2 = "(a+b)";
+        
+        System.out.println(checkRedundantBrackets(expression1));  // Output: true
+        System.out.println(checkRedundantBrackets(expression2));  // Output: false
+    }
+}
+
