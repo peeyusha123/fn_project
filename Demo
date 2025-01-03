@@ -86,3 +86,32 @@ public class Solution {
         return head;
     }
 }
+
+
+3)
+
+class Node<T> {
+    T data;
+    Node<T> next;
+
+    public Node(T data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+public class Solution {
+
+    public static void printReverse(Node<Integer> root) {
+        // Base case: If the node is null, return
+        if (root == null) {
+            return;
+        }
+
+        // Recursive call on the next node
+        printReverse(root.next);
+
+        // Print the current node's data after the recursion has reached the end
+        System.out.print(root.data);
+    }
+}
