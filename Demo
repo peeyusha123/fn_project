@@ -540,3 +540,68 @@ public class Solution {
         return head;
     }
 }
+....
+
+public class Solution {
+    
+    // Helper function to reverse a sublist of k nodes
+    private static Node<Integer> reverseKNodes(Node<Integer> head, int k) {
+        Node<Integer> prev = null;
+        Node<Integer> curr = head;
+        Node<Integer> next = null;
+        int count = 0;
+        
+        // Reverse the first k nodes
+        while (curr != null && count < k) {
+            next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
+            count++;
+        }
+        
+        // Return the new head of the reversed sublist
+        return prev;
+    }
+
+    public static Node<Integer> reverseKGroup(Node<Integer> head, int k) {
+        // Check for the edge case where the list is empty or k is 1
+        if (head == null || k == 1) {
+            return head;
+        }
+
+        Node<Integer> dummy = new Node<>(0); // Dummy node to simplify edge cases
+        dummy.next = head;
+        Node<Integer> groupPrev = dummy; // This will point to the node before each group
+        Node<Integer> groupEnd = head; // This will point to the last node in each group
+        
+        while (groupEnd != null) {
+            // Move the groupEnd pointer k steps forward
+            int count = 0;
+            while (count < k && groupEnd != null) {
+                groupEnd = groupEnd.next;
+                count++;
+            }
+            
+            // If we have k nodes to reverse
+            if (count == k) {
+                Node<Integer> groupStart = groupPrev.next;
+                Node<Integer> groupNext = groupEnd;
+                
+                // Reverse the k nodes
+                Node<Integer> reversedGroupHead = reverseKNodes(groupStart, k);
+                
+                // Connect the previous part to the reversed part
+                groupPrev.next = reversedGroupHead;
+                
+                // Connect the end of the reversed group to the rest of the list
+                groupStart.next = groupNext;
+                
+                // Move the groupPrev pointer k nodes forward
+                groupPrev = groupStart;
+            }
+        }
+        
+        return dummy.next;
+    }
+}
