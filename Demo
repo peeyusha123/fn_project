@@ -445,3 +445,46 @@ public class Solution {
         return oddHead.next;
     }
 }
+
+
+...
+
+public class Solution {
+    public static Node<Integer> skipMdeleteN(Node<Integer> head, int M, int N) {
+        // Base case: If the head is null or M is 0 (delete all nodes), return null
+        if (head == null || M == 0) {
+            return null;
+        }
+
+        Node<Integer> current = head;
+        Node<Integer> temp = null;
+        
+        while (current != null) {
+            // Retain M nodes
+            for (int i = 1; i < M && current != null; i++) {
+                current = current.next;
+            }
+
+            // If current is null, exit the loop
+            if (current == null) {
+                break;
+            }
+
+            // Now, current points to the M-th node, disconnect it from the next part of the list
+            temp = current.next;
+            
+            // Delete the next N nodes
+            for (int i = 1; i <= N && temp != null; i++) {
+                temp = temp.next;
+            }
+
+            // Connect the M-th node to the (M+N)-th node
+            current.next = temp;
+            
+            // Move the current pointer to the next retained node
+            current = temp;
+        }
+
+        return head;
+    }
+}
