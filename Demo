@@ -656,3 +656,81 @@ public class Solution {
         return head;
     }
 }
+......
+
+class Node {
+    int data;
+    Node next;
+
+    public Node(int data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+public class Stack {
+    private Node top;  // Points to the top of the stack
+    private int size;  // To keep track of the size of the stack
+
+    // Constructor to initialize the stack
+    public Stack() {
+        this.top = null;
+        this.size = 0;
+    }
+
+    // Push function: adds an element to the top of the stack
+    public void push(int data) {
+        Node newNode = new Node(data);
+        newNode.next = top;  // New node points to the previous top
+        top = newNode;       // Now, the new node becomes the top
+        size++;              // Increment the size
+    }
+
+    // Pop function: removes the top element from the stack
+    public int pop() {
+        if (top == null) {  // Stack is empty
+            return -1;
+        }
+        int poppedData = top.data;  // Save the data to return
+        top = top.next;  // Remove the top node
+        size--;  // Decrease the size
+        return poppedData;
+    }
+
+    // Top function: returns the top element without removing it
+    public int top() {
+        if (top == null) {  // Stack is empty
+            return -1;
+        }
+        return top.data;
+    }
+
+    // Size function: returns the size of the stack
+    public int size() {
+        return size;
+    }
+
+    // isEmpty function: checks if the stack is empty
+    public boolean isEmpty() {
+        return top == null;
+    }
+
+    public static void main(String[] args) {
+        Stack stack = new Stack();
+        
+        // Sample Input 1
+        stack.push(13);
+        stack.push(47);
+        System.out.println(stack.size());  // Output: 2
+        System.out.println(stack.isEmpty());  // Output: false
+        System.out.println(stack.pop());  // Output: 47
+        System.out.println(stack.top());  // Output: 13
+
+        // Sample Input 2
+        stack = new Stack();
+        System.out.println(stack.isEmpty());  // Output: true
+        System.out.println(stack.pop());  // Output: -1
+        stack.push(10);
+        System.out.println(stack.isEmpty());  // Output: false
+    }
+}
