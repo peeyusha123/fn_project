@@ -605,3 +605,54 @@ public class Solution {
         return dummy.next;
     }
 }
+..
+.....
+
+class Node<T> {
+    T data;
+    Node<T> next;
+
+    public Node(T data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+public class Solution {
+
+    // Function to perform bubble sort on a singly linked list
+    public static Node<Integer> bubbleSort(Node<Integer> head) {
+        if (head == null || head.next == null) {
+            return head; // If list is empty or has one node, no sorting needed
+        }
+
+        boolean swapped;
+        Node<Integer> current;
+        Node<Integer> lastSorted = null;
+
+        // Keep making passes through the list until no swaps are done
+        do {
+            swapped = false;
+            current = head;
+
+            // Traverse the list, compare adjacent nodes, and swap if needed
+            while (current != null && current.next != lastSorted) {
+                if (current.data > current.next.data) {
+                    // Swap the data of the nodes
+                    int temp = current.data;
+                    current.data = current.next.data;
+                    current.next.data = temp;
+
+                    swapped = true;
+                }
+                current = current.next;
+            }
+
+            // After each pass, the last element is sorted
+            lastSorted = current;
+
+        } while (swapped);  // Continue until no swaps are done
+
+        return head;
+    }
+}
