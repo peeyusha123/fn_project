@@ -734,3 +734,41 @@ public class Stack {
         System.out.println(stack.isEmpty());  // Output: false
     }
 }
+
+import java.util.Stack;
+
+public class Solution {
+    public static void reverseStack(Stack<Integer> input, Stack<Integer> extra) {
+        // Step 1: Move all elements from input to extra to reverse the stack
+        while (!input.isEmpty()) {
+            extra.push(input.pop());
+        }
+
+        // Step 2: Transfer the reversed elements back to input
+        while (!extra.isEmpty()) {
+            input.push(extra.pop());
+        }
+    }
+
+    public static void main(String[] args) {
+        // Sample Test Case 1
+        Stack<Integer> input = new Stack<>();
+        Stack<Integer> extra = new Stack<>();
+        
+        // Simulating the input stack
+        input.push(10);
+        input.push(5);
+        input.push(4);
+        input.push(3);
+        input.push(2);
+        input.push(1);
+
+        // Reversing the stack
+        reverseStack(input, extra);
+
+        // Printing the reversed stack
+        while (!input.isEmpty()) {
+            System.out.print(input.pop() + " ");
+        }
+    }
+}
