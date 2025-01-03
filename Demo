@@ -377,3 +377,29 @@ private static Node<Integer> mergeTwoSorted(Node<Integer> head1, Node<Integer> h
     return mergedHead;
 }
 
+...
+
+public class Solution {
+    public static int findNodeRec(Node<Integer> head, int n) {
+        // Base case: if head is null, return -1 (indicating not found)
+        if (head == null) {
+            return -1;
+        }
+        
+        // If current node's data is equal to n, return the current index (which is 0 at this point)
+        if (head.data == n) {
+            return 0;
+        }
+        
+        // Recurse into the next node, and add 1 to the result (index in the next node)
+        int indexInNextNode = findNodeRec(head.next, n);
+        
+        // If the result is not -1, it means the element was found in the subsequent nodes
+        if (indexInNextNode != -1) {
+            return indexInNextNode + 1;
+        }
+        
+        // If the element wasn't found in the list, return -1
+        return -1;
+    }
+}
