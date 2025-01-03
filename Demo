@@ -269,3 +269,52 @@ public static Node<Integer> midPoint(Node<Integer> head) {
     // Slow is now pointing to the midpoint
     return slow;
 }
+
+
+....
+
+public static Node<Integer> mergeTwoSorted(Node<Integer> head1, Node<Integer> head2) {
+    // If one of the lists is empty, return the other list
+    if (head1 == null) {
+        return head2;
+    }
+    if (head2 == null) {
+        return head1;
+    }
+
+    // Initialize the merged list's head
+    Node<Integer> mergedHead = null, mergedTail = null;
+
+    // Set the initial mergedHead and mergedTail
+    if (head1.data <= head2.data) {
+        mergedHead = head1;
+        mergedTail = head1;
+        head1 = head1.next;
+    } else {
+        mergedHead = head2;
+        mergedTail = head2;
+        head2 = head2.next;
+    }
+
+    // Traverse both lists and merge
+    while (head1 != null && head2 != null) {
+        if (head1.data <= head2.data) {
+            mergedTail.next = head1;
+            mergedTail = head1;
+            head1 = head1.next;
+        } else {
+            mergedTail.next = head2;
+            mergedTail = head2;
+            head2 = head2.next;
+        }
+    }
+
+    // Attach the remaining nodes (if any)
+    if (head1 != null) {
+        mergedTail.next = head1;
+    } else {
+        mergedTail.next = head2;
+    }
+
+    return mergedHead;
+}
