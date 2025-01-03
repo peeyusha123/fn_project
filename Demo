@@ -1,185 +1,52 @@
-..class
-package com.vzw.fuze.projects.controller;
+class Node<T> {
+    T data;
+    Node<T> next;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-import javax.ws.rs.core.MediaType;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
-
-
-import com.vzw.fuze.projects.model.ProjectFields;
-import com.vzw.fuze.projects.model.Task;
-import com.vzw.fuze.projects.service.FieldDefinitionService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
-
-@RestController
-@RequestMapping("/projects-service/project")
-@Tag(name = "fielddeftn-controller",description = "Metadata Controller")
-@Validated
-public class FieldDefinitionController {
-
-	private static Logger logger = LoggerFactory.getLogger(FieldDefinitionController.class.getName());
-	private static final String NOT_FOUND = "not found";
-
-	@Autowired
-	FieldDefinitionService service;
-	
-	@RequestMapping(value = "/getTooltips", method = RequestMethod.POST, produces =  MediaType.APPLICATION_JSON )
-	@Operation(summary = "Returns output details", description = "Tracker Task Service")
-	@ApiResponse(responseCode = "200", description = "SUCCESS", content = {
-			@Content(mediaType = "application/json", schema = @Schema(implementation = Object.class)) })
-	@ResponseStatus(value = HttpStatus.OK)
-
-	public ResponseEntity<Object> getTooltips(
-			@RequestHeader("user") @Size(max = Integer.MAX_VALUE) @Pattern(regexp = "(?s).*") String userJSON,
-			@RequestBody @Valid ProjectFields projectFields) throws Exception {
-		try {
-			logger.info("Get Tooltips method: FieldDefinitionController started");
-			return service.getToolTips(projectFields);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			throw e;
-		}
-		
-	}
-	
-	
+    public Node(T data) {
+        this.data = data;
+        this.next = null;
+    }
 }
 
+public class Solution {
 
-test
-package com.vzw.fuze.projects.controller;
+    public static Node<Integer> appendLastNToFirst(Node<Integer> head, int n) {
+        // Handle empty list or no rearrangement needed
+        if (head == null || n == 0) {
+            return head;
+        }
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+        // Step 1: Find the length of the linked list
+        int length = 0;
+        Node<Integer> current = head;
+        while (current != null) {
+            length++;
+            current = current.next;
+        }
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import com.vzw.fuze.projects.model.ProjectFields;
-import com.vzw.fuze.projects.service.FieldDefinitionService;
+        // Step 2: If N equals length, no change needed
+        if (n == length) {
+            return head;
+        }
 
-@ExtendWith(MockitoExtension.class)
-public class FieldDefinitionControllerTest {
+        // Step 3: Find the (length - N)th node (the new tail)
+        current = head;
+        int count = 1;
+        while (count < length - n) {
+            current = current.next;
+            count++;
+        }
 
-    private static final Logger logger = LoggerFactory.getLogger(FieldDefinitionControllerTest.class.getName());
-
-    @Mock
-    private FieldDefinitionService service;
-
-    @InjectMocks
-    private FieldDefinitionController controller;
-
-    private ProjectFields projectFields;
-
-    @BeforeEach
-    public void setUp() {
-        projectFields = new ProjectFields();
-        // Populate projectFields with relevant data
-    }
-
-    @Test
-    public void testGetTooltips() throws Exception {
-        // Mocking the service response
-        when(service.getToolTips(projectFields)).thenReturn(new Object()); 
-
-        ResponseEntity<Object> response = controller.getTooltips("userJson", projectFields);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        // Add assertions to verify the response body based on your service logic
-    }
-
-    // Additional test cases can be added for negative scenarios like exceptions, null responses etc.
-}
-
-
-
-new ..
-
-package com.vzw.fuze.projects.controller;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-
-import com.vzw.fuze.projects.model.ProjectFields;
-import com.vzw.fuze.projects.service.FieldDefinitionService;
-
-@ExtendWith(MockitoExtension.class)
-public class FieldDefinitionControllerTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(FieldDefinitionControllerTest.class.getName());
-
-    @Mock
-    private FieldDefinitionService service;
-
-    @InjectMocks
-    private FieldDefinitionController controller;
-
-    private ProjectFields projectFields;
-
-    @BeforeEach
-    public void setUp() {
-        projectFields = new ProjectFields();
-        // Populate projectFields with relevant data if needed
-    }
-
-    @Test
-    public void testGetTooltips() throws Exception {
-        // Create a mock response entity
-        ResponseEntity<Object> mockResponse = new ResponseEntity<>(new Object(), HttpStatus.OK);
-
-        // Mocking the service response to return the mockResponse
-        when(service.getToolTips(projectFields)).thenReturn(mockResponse);
-
-        // Call the method with mocked dependencies
-        ResponseEntity<Object> response = controller.getTooltips("userJson", projectFields);
-
-        // Validate the response status
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        // Step 4: Rearrange pointers
+        Node<Integer> newHead = current.next;
+        current.next = null;  // Make current node the new tail
+        Node<Integer> temp = newHead;
+        while (temp.next != null) {
+            temp = temp.next;
+        }
+        temp.next = head;  // Make the old head the next of the last node
         
-        // Additional assertions can be added to verify the response body, if necessary
+        // Return the new head
+        return newHead;
     }
-
-    // Additional test cases can be added for negative scenarios like exceptions, null responses etc.
 }
