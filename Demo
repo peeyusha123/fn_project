@@ -1,3 +1,21 @@
+
+Dear [Insurance Company Name/Claims Department],
+
+I hope this email finds you well. I am writing to inquire about the rejection of my recent medical claim [Claim ID/Policy Number, if available].
+
+I noticed that a similar claim submitted previously was approved without any issues. However, this time, despite the circumstances and details being identical, the claim was rejected. I am unable to understand the reason behind this decision and would appreciate clarification on the matter.
+
+Kindly provide the specific reasons for the rejection and let me know if any additional information or documentation is required from my end to resolve this issue.
+
+I look forward to your prompt response to address this concern.
+
+Thank you for your time and assistance.
+
+
+
+
+
+
 class Node<T> {
     T data;
     Node<T> next;
