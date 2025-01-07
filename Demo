@@ -1115,3 +1115,61 @@ endIndex -= 1;
 
 return true;
 }
+
+
+
+n.,...
+
+public class Solution {
+
+    public static boolean isPalindrome(Node<Integer> head) {
+        if (head == null || head.next == null) {
+            return true; // An empty list or a single-element list is always a palindrome
+        }
+
+        // Step 1: Find the middle of the linked list
+        Node<Integer> slow = head;
+        Node<Integer> fast = head;
+
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+
+        // Step 2: Reverse the second half of the linked list
+        Node<Integer> secondHalfHead = reverse(slow);
+
+        // Step 3: Compare the first half with the reversed second half
+        Node<Integer> firstHalfPointer = head;
+        Node<Integer> secondHalfPointer = secondHalfHead;
+
+        boolean isPalindrome = true;
+        while (secondHalfPointer != null) {
+            if (!firstHalfPointer.data.equals(secondHalfPointer.data)) {
+                isPalindrome = false;
+                break;
+            }
+            firstHalfPointer = firstHalfPointer.next;
+            secondHalfPointer = secondHalfPointer.next;
+        }
+
+        // Optional Step 4: Restore the original structure of the list
+        reverse(secondHalfHead);
+
+        return isPalindrome;
+    }
+
+    private static Node<Integer> reverse(Node<Integer> head) {
+        Node<Integer> prev = null;
+        Node<Integer> current = head;
+
+        while (current != null) {
+            Node<Integer> nextNode = current.next;
+            current.next = prev;
+            prev = current;
+            current = nextNode;
+        }
+
+        return prev;
+    }
+}
