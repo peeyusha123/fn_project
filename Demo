@@ -1,3 +1,8 @@
+subsets.add(new ArrayList<>(currentSubset));
+
+for (int i index; i < input.length; i++) {
+
+
 
 ArrayList<ArrayList<Integer>> subsets = new ArrayList<>();
 
