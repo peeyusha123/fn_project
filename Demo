@@ -1,3 +1,21 @@
+/ Skip duplicates
+
+if (i > index && input[i] == input[i - 1])
+
+continue;
+
+// Add the current element to the subset currentSubset.add(input[i]);
+
+// Recursively generate subsets starting from the next index generateSubsets (input, i + 1, currentSubset, subsets);
+
+// Remove the current element from the subset to backtrack currentSubset.remove(currentSubset.size() - 1);
+
+public static void printSubsets(int[] input) {
+
+ArrayList<ArrayList<Integer>> subsets = getSubsets (input);
+
+
+
 subsets.add(new ArrayList<>(currentSubset));
 
 for (int i index; i < input.length; i++) {
