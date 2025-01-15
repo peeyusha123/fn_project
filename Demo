@@ -1,3 +1,16 @@
+for (ArrayList<Integer> subset: subsets) {
+
+for (int num: subset) {
+
+System.out.print(num + " ");
+
+System.out.println(); I
+
+
+
+
+
+
 / Skip duplicates
 
 if (i > index && input[i] == input[i - 1])
