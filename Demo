@@ -1,3 +1,21 @@
+"Modify the waiver name from 'New 5G Home Ready Site - Disturbance to Building/Structure (1995 or Newer)' to 'New 5G Home Ready Site - Disturbance to Building/Structure (1980 or Newer).'
+
+Changes to be implemented:
+
+1. Update the waiver form name under Environmental Due Diligence and verify the 'Yes' or 'No' selection for Environmental Due Diligence Required.
+
+
+2. Update the PROC_PROJ_ENV_BULK_UPLOAD procedure accordingly.
+
+
+3. In the Bulk Upload tab, upload the Environmental Bulk Upload Excel sheet with the appropriate 'Environmental Due Diligence Required' ('Yes' or 'No') condition and the corrected waiver name."
+
+
+
+
+
+
+
 Subject: Request for Work From Home Due to Medical Emergency
 
 Dear [Manager's Name],
