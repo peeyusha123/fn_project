@@ -1,3 +1,54 @@
+import java.util.Scanner;
+
+public class Main {
+
+    static Scanner s = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        int n = s.nextInt(); // Read the input for number of rows
+        Solution.printPattern(n); // Call the method to print the pattern
+    }
+}
+
+class Solution {
+
+    public static void printPattern(int n) {
+        int totalNumbers = n * n; // Total numbers to generate
+        int[] numbers = new int[totalNumbers]; // Array to store all numbers
+        int num = 1;
+
+        // Fill the array with numbers from 1 to n*n
+        for (int i = 0; i < totalNumbers; i++) {
+            numbers[i] = num++;
+        }
+
+        int start = 0; // Starting index of a row
+        int end = n;   // Ending index of a row
+
+        // Print rows in the required order
+        for (int i = 0; i < n; i++) {
+            if (i % 2 == 0) {
+                // For even rows, print from the start
+                for (int j = start; j < end; j++) {
+                    System.out.print(numbers[j] + " ");
+                }
+                start = end; // Move to the next block
+            } else {
+                // For odd rows, print from the end block backward
+                for (int j = end - 1; j >= start; j--) {
+                    System.out.print(numbers[j] + " ");
+                }
+                start = end; // Move to the next block
+            }
+            end += n; // Update the end for the next row
+            System.out.println(); // Move to the next line
+        }
+    }
+}
+
+
+
+
 public class Solution {
 
     public static void printPattern(int n) {
