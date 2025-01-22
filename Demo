@@ -1,3 +1,11 @@
+1) modified wavier name for site type is multi_customer_unit when due diligence required is set to No
+2)waiver name remain unchanged for NON multi_custm_unit when due diligence required set to No
+3) sucessful bulk upload with the updated waiver name for MCU sites
+4)bulk upload handles invalid data and doesn't update the waiver name incorrectly
+
+
+
+
 import java.util.Scanner;
 
 public class Main {
