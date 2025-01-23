@@ -1,3 +1,11 @@
+Fields available in the Project Started milestone under the Release to Build task, the Transport milestone in the Transport Contract Details, as well as in the Project Details page, allow users to select a Project Operating Rhythm (POR) Status (such as POR, Buffer POR, Next POR, Pipeline, Pending, Inactive, Cancelled, or Completed). Upon selection, related fields like POR Year, Build Plan Year, and Project Status are automatically updated based on predefined rules.
+
+
+
+
+
+
+
 
 This new field will be a single select picklist with these values:
 POR
