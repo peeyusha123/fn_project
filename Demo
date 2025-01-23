@@ -1,3 +1,190 @@
+
+This new field will be a single select picklist with these values:
+POR
+Definition: Projects to be delivered in Current Year.  Projects in this category are fully funded. This is the absolute list that the market is planning on delivering to meet their POR commits.
+Buffer POR
+Definition: Projects beyond POR, but targeted to allow for POR project "fallout" to ensure POR commitment is met. These are the additional projects the markets keep working that may replace POR projects that fall out.  This is also a potential list for Planning and Budget to see what additional current year funding could deliver.
+Next POR
+Definition: Projects that are tracking to meet next year’s POR. As more details come in on a project that would delay either POR or Buffer POR to the following year, this is selected.  These are sites that are intended to be delivered, but will not make it in the current year. This also allows the market to start building the following year's POR commits and allows Planning to see what is required for seed funds, or budget submissions.
+Pipeline
+Definition: Projects that are not in any POR category. A non-POR site that has an estimated delivery in the year indicated.
+Pending
+Definition: Not yet processed from NPP. Auto Populated with this category as released from NPP.
+Inactive
+Definition: Not currently needed or pursued.
+Cancelled
+Definition: Project is no longer being pursued and is not expected to be pursued in the future.
+Completed
+Definition: All initiatives pursued in the project are completed. No additional work is required for the project.
+
+The definitions of these picklist values must be stored as we will be displaying this to the user as part of the selection process.
+
+This field will be on the Project Started Milestone in the Released to Build task as well as the Project Details page.
+
+
+Requirement 5: POR Status component and validations when modifying
+Create a component for selecting the picklist values for POR Status. This component will display the definitions for each option and also require the subsequent selection of all related fields when a status is selected.
+POR Status rules
+POR
+POR Year must be the current year
+POR Site must be Yes
+Build Plan Year must be the current year
+Build Plan Year Status must be POR
+Project Status must be Active
+Buffer POR
+POR Year must be 0
+POR Site must be Yes
+Build Plan Year must be the current year
+Build Plan Year Status must be Watch
+Project Status must be Active
+Next POR
+POR Year must be 2025
+POR Site must be No
+Build Plan Year must be the next year
+Build Plan Year Status must be blank
+Project Status must be Active
+Pipeline
+POR Year must be 0
+POR Site must be No
+Build Plan Year must be >= the next year
+Build Plan Year Status must be blank
+Project Status must be Active
+Pending
+POR Year must be blank
+POR Site must be blank
+Build Plan Year must be blank
+Build Plan Year Status must be blank
+Project Status must be Pending
+Inactive
+POR Year must be blank
+POR Site must be blank
+Build Plan Year must be blank
+Build Plan Year Status must be blank
+Project Status must be Inactive
+Cancelled
+POR Year must be blank
+POR Site must be blank
+Build Plan Year must be blank
+Build Plan Year Status must be blank
+Project Status must be Cancelled or FUZE_Reject
+Completed
+POR Year must be the current year
+POR Site must be Yes
+Build Plan Year must be the current year
+Build Plan Year Status must be POR
+Project Status must be Completed
+POR Status component
+
+User selects: POR
+If the user selects POR, all the changes that will be made if they select POR will be displayed. Do not display the field changes if no changes will be made on them.
+Specific to Site Type = In-Building, In-Building VBG or Venue
+Normal users cannot change the value to POR. Only users with the existing In-Building privilege can change the POR Year. If the user selects values in the above picklist that would change the POR Year in any way, we cannot allow the user to continue.
+
+Logic that will be applied if POR is set:
+POR Year = current year
+POR Site = Yes
+Build Plan Year = current year
+Build Plan Year Status = POR
+Project Status = Active
+
+User selects: Buffer POR
+If the user selects Buffer POR, all the changes that will be made if they select Buffer POR will be displayed.  Do not display the field changes if no changes will be made on them.
+Logic that will be applied if Buffer POR is set:
+POR Year = 0
+POR Site = Yes
+Build Plan Year = current year
+Build Plan Year Status = Watch
+Project Status = Active
+
+User selects: Next POR
+If the user selects Next POR, all the changes that will be made if they select Next POR will be displayed. Do not display the field changes if no changes will be made on them.
+Logic that will be applied if Next POR is set:
+POR Year = next year
+POR Site = No
+Build Plan Year = next year
+Build Plan Year Status = blank
+Project Status = Active
+
+User selects: Pipeline
+If the user selects Pipeline, they will be prompted to enter a Build Plan Year in. Below that,  all the changes that will be made if they select Pipeline will be displayed. Do not display the field changes if no changes will be made on them.
+User must enter a Build Plan Year > next year
+Logic that will be applied if Pipeline is set:
+POR Year = 0
+POR Site = Whatever the automation logic states this will be based on the Build Plan Year and POR Year selection
+Build Plan Year = What the user has selected
+Build Plan Year Status = Whatever the automation logic states this will be based on the Build Plan Year and POR Year selection
+Project Status = Active
+
+User selects: Pending
+If the user selects Pending and any of the rules are violated, the user will be presented with a popup that displays all the changes that will be made if they select Pending. Do not display the field changes if no changes will be made on them.
+Logic that will be applied if Pending is set:
+POR Year = blank
+POR Site = blank
+Build Plan Year = blank
+Build Plan Year Status = blank
+Project Status = Pending
+
+User selects: Inactive
+If the user selects Inactive and any of the rules are violated, the user will be presented with a popup that displays all the changes that will be made if they select Inactive. Do not display the field changes if no changes will be made on them.
+Logic that will be applied if Inactive is set:
+POR Year = blank
+POR Site = blank
+Build Plan Year = blank
+Build Plan Year Status = blank
+Project Status = Inactive
+
+Specific to Transport Disconnect or Transport ETL / Disconnect template projects
+Logic that will be applied if Inactive is set:
+POR Year = blank
+POR Site = blank
+Build Plan Year Status = blank
+Project Status = Inactive
+The user will also select a Build Plan Year in this scenario
+User selects: Cancelled
+If the user selects Cancelled and any of the rules are violated, the user will be presented with a popup that displays all the changes that will be made if they select Cancelled. Do not display the field changes if no changes will be made on them.
+Logic that will be applied if Cancelled is set:
+POR Year = blank
+POR Site = blank
+Build Plan Year = blank
+Build Plan Year Status = blank
+Project Status = Cancelled
+User selects: Completed
+If the user selects Completed and any of the rules are violated, the user will be presented with a popup that displays all the changes that will be made if they select Completed. Do not display the field changes if no changes will be made on them.
+Logic that will be applied if Completed is set:
+If the current date is between 1/1 and 2/15 of the current year
+Build Plan Year = User selectable. Must be either current year or current year - 1
+POR Year = User selectable. Must be >= Build Plan Year
+POR Site = Yes
+Build Plan Year Status = POR
+Project Status = Completed
+
+Else
+POR Year = <existing value>
+POR Site = <existing value>
+Build Plan Year = <existing value>
+Build Plan Year Status = <existing value>
+Project Status = Completed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 1) modified wavier name for site type is multi_customer_unit when due diligence required is set to No
 2)waiver name remain unchanged for NON multi_custm_unit when due diligence required set to No
 3) sucessful bulk upload with the updated waiver name for MCU sites
