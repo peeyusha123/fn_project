@@ -1,3 +1,15 @@
+
+I have been working on testing the POR Status component for the past five days as part of the RE PI-25-Q1.3 feature. The process took longer due to some mistakes made by the developer while resolving the ticket, as well as the time required to fully understand the requirements. My testing focuses on validating that when a user selects different POR statuses (POR, Buffer POR, Next POR, Pipeline, Pending, Inactive, Cancelled, or Completed), the expected field changes and validations are correctly applied. I am ensuring that the correct rules are enforced, privilege-based restrictions are in place, and appropriate pop-ups are displayed when needed. Additionally, I am verifying data consistency, automation logic for status changes, and handling rule violations effectively. This will be completed by the end of today."
+
+
+
+
+
+
+
+
+
+
 Fields available in the Project Started milestone under the Release to Build task, the Transport milestone in the Transport Contract Details, as well as in the Project Details page, allow users to select a Project Operating Rhythm (POR) Status (such as POR, Buffer POR, Next POR, Pipeline, Pending, Inactive, Cancelled, or Completed). Upon selection, related fields like POR Year, Build Plan Year, and Project Status are automatically updated based on predefined rules.
 
 
