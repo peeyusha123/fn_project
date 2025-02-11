@@ -1,3 +1,98 @@
+
+1. Project Status
+
+Users can select from: Active, On-Hold, Pending, Inactive, Cancelled, Completed.
+
+Existing picklist options will be displayed.
+
+
+2. Build Plan Year Rules
+
+If Project Status = Inactive, Pending, or Cancelled:
+
+Build Plan Year = blank (user cannot change).
+
+Exception: Users can set Build Plan Year for Transport Disconnect or Transport ETL/Disconnect projects.
+
+
+If Project Status = Active or On-Hold:
+
+Users can select a Build Plan Year > current year.
+
+
+If Project Status = Completed:
+
+Between Jan 1 - Feb 15: Can select current year or current year +1.
+
+After Feb 15: Can only select current year.
+
+
+
+3. POR Year Rules
+
+If Project Status = Inactive, Pending, or Cancelled:
+
+POR Year = blank (user cannot change).
+
+
+If Project Status = Active or On-Hold:
+
+POR Year must be greater than Build Plan Year or 0.
+
+
+If Project Status = Completed:
+
+POR Year must be greater than Build Plan Year.
+
+
+For Site Types "In-Building", "In-Building VBG", or "Venue":
+
+Normal users cannot change POR Year into or out of the current year.
+
+Only users with In-Building privilege can modify POR Year into or out of the current year.
+
+Exception: Allowed if Budget Code is IBSNP, 5GTT, FIBER, FTCCA, LENST, MCRWV, MCRCS, FTC3, FTCB, FTCT, 5GTR6.
+
+
+
+4. Change Summary Section
+
+Displays modifications to POR Site, Build Plan Year Status, and POR Status.
+
+Example messages:
+
+"Set POR Site to No from Yes."
+
+"Set Build Plan Year Status to POR from <blank>."
+
+
+
+5. Button Logic
+
+Continue Button:
+
+Disabled until all required fields are populated.
+
+Once clicked:
+
+Runs POR Site/Build Plan Year Status logic.
+
+Runs POR Status logic.
+
+
+
+Cancel Button:
+
+Always enabled.
+
+
+
+
+
+
+
+
+
 US-1-Send SPM details to NEPA Module
  Edit
  Add comment
