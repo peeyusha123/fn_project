@@ -1,3 +1,231 @@
+Test Case 1: Verify Project Status Picklist Options
+
+Test Summary: Ensure that the correct project status options are available for selection.
+
+Test Description: The modal should display the predefined project status options to the user.
+
+Test Steps:
+
+1. Open the "Project Plan Change" modal.
+
+
+2. Click on the "Project Status" dropdown.
+
+
+3. Verify the available options.
+
+
+
+Expected Result: The dropdown should display the following options:
+
+Active
+
+On-Hold
+
+Pending
+
+Inactive
+
+Cancelled
+
+Completed
+
+
+
+---
+
+Test Case 2: Verify Build Plan Year Restriction for Inactive, Pending, and Cancelled Status
+
+Test Summary: Ensure that Build Plan Year is automatically set to blank and cannot be changed when Project Status is Inactive, Pending, or Cancelled.
+
+Test Description: Users should not be able to select a Build Plan Year if the Project Status is Inactive, Pending, or Cancelled.
+
+Test Steps:
+
+1. Open the "Project Plan Change" modal.
+
+
+2. Set "Project Status" to Inactive, Pending, or Cancelled.
+
+
+3. Check the "Build Plan Year" field.
+
+
+
+Expected Result: The "Build Plan Year" field should be blank and disabled (not selectable).
+
+
+---
+
+Test Case 3: Verify Build Plan Year Selection for Active and On-Hold Status
+
+Test Summary: Ensure that users can only select a Build Plan Year greater than the current year when the Project Status is Active or On-Hold.
+
+Test Description: The system should restrict users from selecting a Build Plan Year that is less than or equal to the current year.
+
+Test Steps:
+
+1. Open the "Project Plan Change" modal.
+
+
+2. Set "Project Status" to Active or On-Hold.
+
+
+3. Click on "Build Plan Year" dropdown.
+
+
+4. Verify the available options.
+
+
+
+Expected Result: The dropdown should only allow selection of years greater than the current year.
+
+
+---
+
+Test Case 4: Verify Build Plan Year Selection for Completed Status
+
+Test Summary: Ensure that Build Plan Year selection follows specific rules when Project Status is Completed.
+
+Test Description: Depending on the current date, the system should allow specific selections.
+
+Test Steps:
+
+1. Open the "Project Plan Change" modal.
+
+
+2. Set "Project Status" to Completed.
+
+
+3. Click on "Build Plan Year" dropdown.
+
+
+4. Check the available options.
+
+
+
+Expected Result:
+
+If the current date is between Jan 1 and Feb 15, the user can select the current year or current year +1.
+
+Otherwise, the user can only select the current year.
+
+
+
+---
+
+Test Case 5: Verify POR Year Restriction for Inactive, Pending, and Cancelled Status
+
+Test Summary: Ensure that POR Year is automatically set to blank when Project Status is Inactive, Pending, or Cancelled.
+
+Test Description: Users should not be able to change POR Year in these statuses.
+
+Test Steps:
+
+1. Open the "Project Plan Change" modal.
+
+
+2. Set "Project Status" to Inactive, Pending, or Cancelled.
+
+
+3. Check the "POR Year" field.
+
+
+
+Expected Result: The "POR Year" field should be blank and disabled.
+
+
+---
+
+Test Case 6: Verify POR Year Selection for Active and On-Hold Status
+
+Test Summary: Ensure POR Year selection follows business rules when Project Status is Active or On-Hold.
+
+Test Description: Users should only be able to select POR Year values greater than the Build Plan Year or 0.
+
+Test Steps:
+
+1. Open the "Project Plan Change" modal.
+
+
+2. Set "Project Status" to Active or On-Hold.
+
+
+3. Select a Build Plan Year.
+
+
+4. Click on "POR Year" dropdown.
+
+
+5. Verify the available options.
+
+
+
+Expected Result: Users should only be able to select a POR Year greater than the Build Plan Year or 0.
+
+
+---
+
+Test Case 7: Verify Normal Users Cannot Change POR Year Into or Out of Current Year
+
+Test Summary: Ensure that normal users are restricted from modifying POR Year into or out of the current year.
+
+Test Description: Only users with "In-Building" privileges should be able to modify POR Year in this manner.
+
+Test Steps:
+
+1. Open the "Project Plan Change" modal as a normal user.
+
+
+2. Attempt to change the POR Year into or out of the current year.
+
+
+3. Check if the change is allowed.
+
+
+
+Expected Result: The system should prevent normal users from making this change and display an appropriate error message.
+
+
+---
+
+Test Case 8: Verify Continue Button Enablement
+
+Test Summary: Ensure that the Continue button is only enabled when all required fields are populated.
+
+Test Description: The system should not allow users to proceed unless all mandatory fields have values.
+
+Test Steps:
+
+1. Open the "Project Plan Change" modal.
+
+
+2. Leave some fields empty.
+
+
+3. Check if the "Continue" button is enabled.
+
+
+4. Fill in all required fields.
+
+
+5. Check if the "Continue" button becomes enabled.
+
+
+
+Expected Result:
+
+The "Continue" button should be disabled when required fields are missing.
+
+The "Continue" button should become enabled once all required
+
+
+
+
+
+
+
+
 
 1. Project Status
 
