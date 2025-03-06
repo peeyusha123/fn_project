@@ -1,3 +1,13 @@
+A new "Manual Switch Name" checkbox is added to the Site page and tracker (for single/multiple project edits).
+
+When checked, the Switch Name field becomes editable with values from the Switch Name Admin Screen (ignoring Atoll market restrictions).
+
+When checked, the system prevents the nightly logic from updating the switch name.
+
+When unchecked, the switch name updates as per nightly logic.
+
+
+
 Test Case 1: Verify Project Status Picklist Options
 
 Test Summary: Ensure that the correct project status options are available for selection.
