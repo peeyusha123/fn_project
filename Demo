@@ -1,3 +1,43 @@
+As a (PRIVILEGE NAME TO BE CREATED)user, I need an admin page to manage SARF SITE values so I can correct and update site information. Ensure this new priviledge is not visible from privelages management page in admin section. can only be added through the backend
+
+Page will allow users to search by initial build project ID - search results will bring all site IDs related to that project ID with a SARF site of YES/NO field for editing. If the project ID entered does not have project type = initial build, return an error to user that they can only search by initial build project ID. User will have the ability to select "YES/NO" for SARF site field for any site ID. Once user is complete with their actions, they must select an explicit "save" button.
+
+Upon save of the users changes, the below validations needs to be implemented. if validations fail, do not merge/save the data. If validation passes. show pop up to user to confirm the SARF site will be changed to the new site
+
+Only 1 site ID can == YES for SARF
+Only allow SARF SITE field changes where the initial build project creation date field is LESS than 7/14/2022
+Ensure user cannot leave any SARF SITE fields as empty - must be populated as YES or NO
+
+fields to include:
+
+SARF SITE - picklist field of yes, no, blank (whatever backend values are)
+Initial Build Project ID
+site id - read only but hyperlink to site page
+site name - read only
+MDG Location ID - read only
+market- read only
+sub-market- read only
+site status- read only
+site type- read only
+site sub-type- read only
+RK-1: Data security for sensitive site info.
+AS-1: GUI_SUPPORT role is defined.
+{}Technical Specifications{}: {"visuals":"NA","elementSpecifications":"\"Search field, Site ID, SARF SITE dropdown\"","interactiondesign":"\"Search, display results, edit and save\"","accessibilityConsiderations":"\"WCAG compliance\"","responsiveness":"\"All screen sizes\"","typography":"NA","colorPalette":"NA","animations":"NA","performanceExpectations":"NA","browserDeviceCompatibility":"\"Standard browsers\"","errorHandlingValidation":"\"Input validation\"","contentRequirements":"NA","dependencies":"NA","userFeedbackTesting":"NA"}
+Git URL:
+Code Detail:
+
+
+
+
+
+
+
+
+
+
+
+
+
 A new "Manual Switch Name" checkbox is added to the Site page and tracker (for single/multiple project edits).
 
 When checked, the Switch Name field becomes editable with values from the Switch Name Admin Screen (ignoring Atoll market restrictions).
