@@ -1,0 +1,259 @@
+1)Backend - Create an admin page for GUI_SUPPORT only that allows users to change the SARF SITE value on sites:-
+---getCandidateSites API helps to  find site details including the sarf Site value
+---updateSarfSite API allows  to change the sarf site values(yes/no)for any site
+---using userid and project id searches for site , fetches all details ,including sarf site status and mdg location id.
+---the api returns site details such as site id,site name,mdg location,sarf site value.
+API Used: getCandidateSites
+
+Request:
+
+{
+  "siteProjectsId": "2028099",
+  "status": "Proposed,Accepted,RE-Rejected,Deleted,Primary,Live"
+}
+
+Response:
+"The API returns site details such as Site ID, Site Name, MDG Location ID, and SARF SITE value. For example, the SARF SITE for site ID 616131219 is currently 'YES'."
+---"Before updating, I will check the current SARF SITE value in the database for this siteInfoId."
+
+Query:
+
+SELECT site_info_id, sarf_site, status, last_modified_by, last_modified_date  
+FROM fuze_copy1.site_info  
+WHERE site_info_id = 616131219;
+
+Result: "The database confirms that SARF SITE is currently 'YES'."
+
+---"Now, I will update the SARF SITE value from 'YES' to 'NO' using the updateSarfSite API."
+
+API Used: updateSarfSite
+
+Request:
+
+[
+  {
+    "siteInfoId": 616131219,
+    "sarfSite": "NO",
+    "lastModifiedBy": "kja2hhd"
+  }
+]
+
+After Update Check:
+
+SELECT site_info_id, sarf_site FROM fuze_copy1.site_info WHERE site_info_id = 616131219;
+
+"Now, the SARF SITE value is updated to 'NO' in the database."
+
+---"Next, I will update both the SARF SITE and site status at the same time."
+
+Request:
+
+[
+  {
+    "siteInfoId": 616131219,
+    "sarfSite": "YES",
+    "lastModifiedBy": "kja2hhd",
+    "status": "Primary"
+  }
+]
+
+Check in Database:
+
+SELECT site_info_id, sarf_site, status FROM fuze_copy1.site_info WHERE site_info_id = 616131219;
+
+"The SARF SITE is now 'YES' and the site status is 'Primary'."
+----Step 5: Bulk Update for Multiple Sites
+
+"Instead of updating one site at a time, I can update multiple sites in a single request."
+
+Request:
+
+[
+  {
+    "siteInfoId": 616131219,
+    "sarfSite": "YES",
+    "lastModifiedBy": "kja2hhd",
+    "status": "Live"
+  },
+  {
+    "siteInfoId": 377022,
+    "sarfSite": "YES",
+    "lastModifiedBy": "kja2hhd",
+    "status": "Primary"
+  }
+]
+
+Database Check:
+
+SELECT site_info_id, sarf_site, status FROM fuze_copy1.site_info WHERE site_info_id IN (616131219, 377022);
+
+"Now, both sites have been updated successfully."
+
+
+
+
+2)Backend - Create a new privilege for SARF Site visibility
+we have created new privileges to control sarf  site visibility. only users with spm_super_user privilege can see the sarf site value in api response.this
+ensures data security by restricting access to sensitive site information.
+
+
+3)frontend -Create an admin page for GUI_SUPPORT only that allows users to change the SARF SITE value on sites
+
+
+--TC_01: Only One Site ID Can Have SARF SITE = YES
+
+When updating the SARF SITE field, only one site within a project can have "YES" at a time.
+
+If an attempt is made to set more than one site to "YES," the system prevents the update and shows an error.
+
+
+
+---
+
+-- TC_02: Restriction on Projects Created After 7/14/2022
+
+The system does not allow SARF SITE updates for projects that were created after July 14, 2022.
+
+If an attempt is made to modify SARF SITE for such a project, the update will not be saved, and an error message will appear.
+
+
+
+---
+
+-- TC_03: Successful Update of SARF SITE to YES
+
+If all conditions are met (only one "YES" per project, valid project creation date), the system allows the update.
+
+A confirmation popup appears, asking for user approval before saving the changes.
+
+After confirmation, SARF SITE is successfully updated in the system.
+
+
+
+---
+
+-- TC_04: Error Handling for Invalid Project ID Search
+
+When searching for a project, the system only accepts Initial Build Project IDs.
+
+If a wrong project type is entered, the system displays an error message stating that only Initial Build Project IDs are allowed.
+
+
+
+---
+
+-- TC_05: SARF SITE Privilege is Hidden from Admin UI
+
+The new privilege for SARF SITE visibility is not displayed in the privileges management page in the admin section.
+
+This means the privilege cannot be assigned or modified through the UI and can only be added from the backend.
+
+
+
+
+4)Implement a validation that does not allow users to change the SPM site status on non SARF sites
+
+select * from fuze_sit1.site_info@fuze_uat_read;
+--Step 1: Checking if the Site is a SARF Site
+
+"First, I am going to enter a Site ID and check if it is a SARF site or not."
+
+If SARF_SITE = YES, the site can be updated.
+
+If SARF_SITE = NO, the site cannot be updated.
+
+
+
+---
+
+--Step 2: Updating Site Status for SARF Sites
+
+"Now, I am going to update the site status for a SARF site."
+
+Since this is a SARF site, the system allows the change.
+
+The update is saved successfully.
+
+
+
+---
+
+--Step 3: Trying to Update a Non-SARF Site
+
+"Next, I am going to try updating a site that is not a SARF site."
+
+The system blocks the update and shows an error message.
+
+The site status does not change.
+
+
+
+---
+
+--Step 4: Ensuring Only GUI_SUPPORT Users Can Update Status
+
+"Now, I am going to try updating the site status with a user who does not have the GUI_SUPPORT role."
+
+The system does not allow the update.
+
+Only users with GUI_SUPPORT role can change the site status.
+
+
+5)Create "Source Site" field on the Site Page
+
+--Step 1: Verifying "Source Site" Field on Site Page UI
+
+"I am opening the Site Page UI using the given UAT environment link to check if the Source Site field is displayed correctly under Site Status."
+
+Test Case Reference (TC_01):
+
+The Source Site field should be visible on the Site Page.
+
+It should be placed directly under the Site Status field.
+
+The field should display Yes/No or True/False based on the backend SARF SITE value.
+
+
+
+Expected Result: The Source Site field appears correctly under Site Status and shows the expected values.
+
+
+---
+
+---Step 2: Checking "Source Site" Field in the Tracker Module
+
+"Now, I am checking if the Source Site field is also available in the Tracker Module."
+
+Test Case Reference (TC_02):
+
+The Source Site field should be present in the site module in Tracker.
+
+The field should display the same Yes/No or True/False value as in the Site Page UI.
+
+The value should match the backend SARF SITE field.
+
+
+
+Expected Result: The Tracker Module correctly displays the Source Site field with the expected values, ensuring consistency with the Site Page UI.
+
+
+---
+
+--Step 3: Querying the Backend to Validate Source Site Data
+
+"Now, I am going to run a database query to check if the Source Site value is correctly stored in the backend."
+
+Query:
+
+SELECT site_id, site_status, sarf_site AS source_site  
+FROM fuze_copy.site_info@fuze_uat_read  
+WHERE site_id = 'SITE_ID';
+
+Expected Result:
+
+The Source Site field should match the SARF SITE value in the database.
+
+The Yes/No or True/False values displayed on the UI should be the same as the data retrieved from this query.
+
+
+
