@@ -1,148 +1,77 @@
-Here’s your demo script in the style you requested:
+Here is a simplified explanation of the five test cases from the SIT Evidence document in my own words:
 
 
 ---
 
-1. Introduction
+1. TC_01: Only One Site ID Can Have SARF SITE = YES
 
-"Hello everyone, today I will demonstrate the backend changes for updating the SARF SITE value. This update allows GUI SUPPORT users to search for site details and modify the SARF SITE field."
+When updating the SARF SITE field, only one site within a project can have "YES" at a time.
 
-
----
-
-2. Step-by-Step Demo
-
-Step 1: Fetching Site Details
-
-"First, I will search for a site using siteProjectsId and siteInfoId. This will return all site details, including SARF SITE."
-
-API Used: getCandidateSites
-
-Request:
-
-{
-  "siteProjectsId": "2028099",
-  "status": "Proposed,Accepted,RE-Rejected,Deleted,Primary,Live"
-}
-
-Response:
-"The API returns site details such as Site ID, Site Name, MDG Location ID, and SARF SITE value. For example, the SARF SITE for site ID 616131219 is currently 'YES'."
+If an attempt is made to set more than one site to "YES," the system prevents the update and shows an error.
 
 
 
 ---
 
-Step 2: Checking SARF SITE in Database
+2. TC_02: Restriction on Projects Created After 7/14/2022
 
-"Before updating, I will check the current SARF SITE value in the database for this siteInfoId."
+The system does not allow SARF SITE updates for projects that were created after July 14, 2022.
 
-Query:
-
-SELECT site_info_id, sarf_site, status, last_modified_by, last_modified_date  
-FROM fuze_copy1.site_info  
-WHERE site_info_id = 616131219;
-
-Result: "The database confirms that SARF SITE is currently 'YES'."
+If an attempt is made to modify SARF SITE for such a project, the update will not be saved, and an error message will appear.
 
 
 
 ---
 
-Step 3: Updating the SARF SITE Value
+3. TC_03: Successful Update of SARF SITE to YES
 
-"Now, I will update the SARF SITE value from 'YES' to 'NO' using the updateSarfSite API."
+If all conditions are met (only one "YES" per project, valid project creation date), the system allows the update.
 
-API Used: updateSarfSite
+A confirmation popup appears, asking for user approval before saving the changes.
 
-Request:
-
-[
-  {
-    "siteInfoId": 616131219,
-    "sarfSite": "NO",
-    "lastModifiedBy": "kja2hhd"
-  }
-]
-
-After Update Check:
-
-SELECT site_info_id, sarf_site FROM fuze_copy1.site_info WHERE site_info_id = 616131219;
-
-"Now, the SARF SITE value is updated to 'NO' in the database."
+After confirmation, SARF SITE is successfully updated in the system.
 
 
 
 ---
 
-Step 4: Updating SARF SITE & Site Status Together
+4. TC_04: Error Handling for Invalid Project ID Search
 
-"Next, I will update both the SARF SITE and site status at the same time."
+When searching for a project, the system only accepts Initial Build Project IDs.
 
-Request:
-
-[
-  {
-    "siteInfoId": 616131219,
-    "sarfSite": "YES",
-    "lastModifiedBy": "kja2hhd",
-    "status": "Primary"
-  }
-]
-
-Check in Database:
-
-SELECT site_info_id, sarf_site, status FROM fuze_copy1.site_info WHERE site_info_id = 616131219;
-
-"The SARF SITE is now 'YES' and the site status is 'Primary'."
+If a wrong project type is entered, the system displays an error message stating that only Initial Build Project IDs are allowed.
 
 
 
 ---
 
-Step 5: Bulk Update for Multiple Sites
+5. TC_05: SARF SITE Privilege is Hidden from Admin UI
 
-"Instead of updating one site at a time, I can update multiple sites in a single request."
+The new privilege for SARF SITE visibility is not displayed in the privileges management page in the admin section.
 
-Request:
-
-[
-  {
-    "siteInfoId": 616131219,
-    "sarfSite": "YES",
-    "lastModifiedBy": "kja2hhd",
-    "status": "Live"
-  },
-  {
-    "siteInfoId": 377022,
-    "sarfSite": "YES",
-    "lastModifiedBy": "kja2hhd",
-    "status": "Primary"
-  }
-]
-
-Database Check:
-
-SELECT site_info_id, sarf_site, status FROM fuze_copy1.site_info WHERE site_info_id IN (616131219, 377022);
-
-"Now, both sites have been updated successfully."
+This means the privilege cannot be assigned or modified through the UI and can only be added from the backend.
 
 
 
 ---
 
-3. Security & Validation
+Summary:
 
-"To ensure security, only authorized GUI SUPPORT users can make changes. All updates are logged for tracking and auditing."
-
-
----
-
-4. Conclusion
-
-"With this update, I can easily search for site details, update the SARF SITE value, and modify site status securely and efficiently. Thank you!"
+1. Only one site can have SARF SITE = YES.
 
 
----
+2. No updates for projects created after 7/14/2022.
 
-This version follows your style and makes it easy to explain. Let me know if you need any refinements!
+
+3. Updates show confirmation popups before saving.
+
+
+4. Only Initial Build Project IDs can be used for searching.
+
+
+5. The SARF SITE privilege is hidden from the admin panel.
+
+
+
+This is a clear and easy-to-explain summary of the test cases. Let me know if you need further simplifications!
 
