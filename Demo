@@ -1,411 +1,148 @@
-As a (PRIVILEGE NAME TO BE CREATED)user, I need an admin page to manage SARF SITE values so I can correct and update site information. Ensure this new priviledge is not visible from privelages management page in admin section. can only be added through the backend
-
-Page will allow users to search by initial build project ID - search results will bring all site IDs related to that project ID with a SARF site of YES/NO field for editing. If the project ID entered does not have project type = initial build, return an error to user that they can only search by initial build project ID. User will have the ability to select "YES/NO" for SARF site field for any site ID. Once user is complete with their actions, they must select an explicit "save" button.
-
-Upon save of the users changes, the below validations needs to be implemented. if validations fail, do not merge/save the data. If validation passes. show pop up to user to confirm the SARF site will be changed to the new site
-
-Only 1 site ID can == YES for SARF
-Only allow SARF SITE field changes where the initial build project creation date field is LESS than 7/14/2022
-Ensure user cannot leave any SARF SITE fields as empty - must be populated as YES or NO
-
-fields to include:
-
-SARF SITE - picklist field of yes, no, blank (whatever backend values are)
-Initial Build Project ID
-site id - read only but hyperlink to site page
-site name - read only
-MDG Location ID - read only
-market- read only
-sub-market- read only
-site status- read only
-site type- read only
-site sub-type- read only
-RK-1: Data security for sensitive site info.
-AS-1: GUI_SUPPORT role is defined.
-{}Technical Specifications{}: {"visuals":"NA","elementSpecifications":"\"Search field, Site ID, SARF SITE dropdown\"","interactiondesign":"\"Search, display results, edit and save\"","accessibilityConsiderations":"\"WCAG compliance\"","responsiveness":"\"All screen sizes\"","typography":"NA","colorPalette":"NA","animations":"NA","performanceExpectations":"NA","browserDeviceCompatibility":"\"Standard browsers\"","errorHandlingValidation":"\"Input validation\"","contentRequirements":"NA","dependencies":"NA","userFeedbackTesting":"NA"}
-Git URL:
-Code Detail:
+Here’s your demo script in the style you requested:
 
 
+---
+
+1. Introduction
+
+"Hello everyone, today I will demonstrate the backend changes for updating the SARF SITE value. This update allows GUI SUPPORT users to search for site details and modify the SARF SITE field."
 
 
+---
 
+2. Step-by-Step Demo
 
+Step 1: Fetching Site Details
 
+"First, I will search for a site using siteProjectsId and siteInfoId. This will return all site details, including SARF SITE."
 
+API Used: getCandidateSites
 
+Request:
 
+{
+  "siteProjectsId": "2028099",
+  "status": "Proposed,Accepted,RE-Rejected,Deleted,Primary,Live"
+}
 
-
-
-A new "Manual Switch Name" checkbox is added to the Site page and tracker (for single/multiple project edits).
-
-When checked, the Switch Name field becomes editable with values from the Switch Name Admin Screen (ignoring Atoll market restrictions).
-
-When checked, the system prevents the nightly logic from updating the switch name.
-
-When unchecked, the switch name updates as per nightly logic.
-
-
-
-Test Case 1: Verify Project Status Picklist Options
-
-Test Summary: Ensure that the correct project status options are available for selection.
-
-Test Description: The modal should display the predefined project status options to the user.
-
-Test Steps:
-
-1. Open the "Project Plan Change" modal.
-
-
-2. Click on the "Project Status" dropdown.
-
-
-3. Verify the available options.
-
-
-
-Expected Result: The dropdown should display the following options:
-
-Active
-
-On-Hold
-
-Pending
-
-Inactive
-
-Cancelled
-
-Completed
+Response:
+"The API returns site details such as Site ID, Site Name, MDG Location ID, and SARF SITE value. For example, the SARF SITE for site ID 616131219 is currently 'YES'."
 
 
 
 ---
 
-Test Case 2: Verify Build Plan Year Restriction for Inactive, Pending, and Cancelled Status
+Step 2: Checking SARF SITE in Database
 
-Test Summary: Ensure that Build Plan Year is automatically set to blank and cannot be changed when Project Status is Inactive, Pending, or Cancelled.
+"Before updating, I will check the current SARF SITE value in the database for this siteInfoId."
 
-Test Description: Users should not be able to select a Build Plan Year if the Project Status is Inactive, Pending, or Cancelled.
+Query:
 
-Test Steps:
+SELECT site_info_id, sarf_site, status, last_modified_by, last_modified_date  
+FROM fuze_copy1.site_info  
+WHERE site_info_id = 616131219;
 
-1. Open the "Project Plan Change" modal.
-
-
-2. Set "Project Status" to Inactive, Pending, or Cancelled.
-
-
-3. Check the "Build Plan Year" field.
-
-
-
-Expected Result: The "Build Plan Year" field should be blank and disabled (not selectable).
-
-
----
-
-Test Case 3: Verify Build Plan Year Selection for Active and On-Hold Status
-
-Test Summary: Ensure that users can only select a Build Plan Year greater than the current year when the Project Status is Active or On-Hold.
-
-Test Description: The system should restrict users from selecting a Build Plan Year that is less than or equal to the current year.
-
-Test Steps:
-
-1. Open the "Project Plan Change" modal.
-
-
-2. Set "Project Status" to Active or On-Hold.
-
-
-3. Click on "Build Plan Year" dropdown.
-
-
-4. Verify the available options.
-
-
-
-Expected Result: The dropdown should only allow selection of years greater than the current year.
-
-
----
-
-Test Case 4: Verify Build Plan Year Selection for Completed Status
-
-Test Summary: Ensure that Build Plan Year selection follows specific rules when Project Status is Completed.
-
-Test Description: Depending on the current date, the system should allow specific selections.
-
-Test Steps:
-
-1. Open the "Project Plan Change" modal.
-
-
-2. Set "Project Status" to Completed.
-
-
-3. Click on "Build Plan Year" dropdown.
-
-
-4. Check the available options.
-
-
-
-Expected Result:
-
-If the current date is between Jan 1 and Feb 15, the user can select the current year or current year +1.
-
-Otherwise, the user can only select the current year.
+Result: "The database confirms that SARF SITE is currently 'YES'."
 
 
 
 ---
 
-Test Case 5: Verify POR Year Restriction for Inactive, Pending, and Cancelled Status
+Step 3: Updating the SARF SITE Value
 
-Test Summary: Ensure that POR Year is automatically set to blank when Project Status is Inactive, Pending, or Cancelled.
+"Now, I will update the SARF SITE value from 'YES' to 'NO' using the updateSarfSite API."
 
-Test Description: Users should not be able to change POR Year in these statuses.
+API Used: updateSarfSite
 
-Test Steps:
+Request:
 
-1. Open the "Project Plan Change" modal.
+[
+  {
+    "siteInfoId": 616131219,
+    "sarfSite": "NO",
+    "lastModifiedBy": "kja2hhd"
+  }
+]
 
+After Update Check:
 
-2. Set "Project Status" to Inactive, Pending, or Cancelled.
+SELECT site_info_id, sarf_site FROM fuze_copy1.site_info WHERE site_info_id = 616131219;
 
+"Now, the SARF SITE value is updated to 'NO' in the database."
 
-3. Check the "POR Year" field.
-
-
-
-Expected Result: The "POR Year" field should be blank and disabled.
 
 
 ---
 
-Test Case 6: Verify POR Year Selection for Active and On-Hold Status
+Step 4: Updating SARF SITE & Site Status Together
 
-Test Summary: Ensure POR Year selection follows business rules when Project Status is Active or On-Hold.
+"Next, I will update both the SARF SITE and site status at the same time."
 
-Test Description: Users should only be able to select POR Year values greater than the Build Plan Year or 0.
+Request:
 
-Test Steps:
+[
+  {
+    "siteInfoId": 616131219,
+    "sarfSite": "YES",
+    "lastModifiedBy": "kja2hhd",
+    "status": "Primary"
+  }
+]
 
-1. Open the "Project Plan Change" modal.
+Check in Database:
 
+SELECT site_info_id, sarf_site, status FROM fuze_copy1.site_info WHERE site_info_id = 616131219;
 
-2. Set "Project Status" to Active or On-Hold.
+"The SARF SITE is now 'YES' and the site status is 'Primary'."
 
-
-3. Select a Build Plan Year.
-
-
-4. Click on "POR Year" dropdown.
-
-
-5. Verify the available options.
-
-
-
-Expected Result: Users should only be able to select a POR Year greater than the Build Plan Year or 0.
 
 
 ---
 
-Test Case 7: Verify Normal Users Cannot Change POR Year Into or Out of Current Year
+Step 5: Bulk Update for Multiple Sites
 
-Test Summary: Ensure that normal users are restricted from modifying POR Year into or out of the current year.
+"Instead of updating one site at a time, I can update multiple sites in a single request."
 
-Test Description: Only users with "In-Building" privileges should be able to modify POR Year in this manner.
+Request:
 
-Test Steps:
+[
+  {
+    "siteInfoId": 616131219,
+    "sarfSite": "YES",
+    "lastModifiedBy": "kja2hhd",
+    "status": "Live"
+  },
+  {
+    "siteInfoId": 377022,
+    "sarfSite": "YES",
+    "lastModifiedBy": "kja2hhd",
+    "status": "Primary"
+  }
+]
 
-1. Open the "Project Plan Change" modal as a normal user.
+Database Check:
 
+SELECT site_info_id, sarf_site, status FROM fuze_copy1.site_info WHERE site_info_id IN (616131219, 377022);
 
-2. Attempt to change the POR Year into or out of the current year.
+"Now, both sites have been updated successfully."
 
-
-3. Check if the change is allowed.
-
-
-
-Expected Result: The system should prevent normal users from making this change and display an appropriate error message.
 
 
 ---
 
-Test Case 8: Verify Continue Button Enablement
+3. Security & Validation
 
-Test Summary: Ensure that the Continue button is only enabled when all required fields are populated.
+"To ensure security, only authorized GUI SUPPORT users can make changes. All updates are logged for tracking and auditing."
 
-Test Description: The system should not allow users to proceed unless all mandatory fields have values.
 
-Test Steps:
+---
 
-1. Open the "Project Plan Change" modal.
+4. Conclusion
 
+"With this update, I can easily search for site details, update the SARF SITE value, and modify site status securely and efficiently. Thank you!"
 
-2. Leave some fields empty.
 
+---
 
-3. Check if the "Continue" button is enabled.
-
-
-4. Fill in all required fields.
-
-
-5. Check if the "Continue" button becomes enabled.
-
-
-
-Expected Result:
-
-The "Continue" button should be disabled when required fields are missing.
-
-The "Continue" button should become enabled once all required
-
-
-
-
-
-
-
-
-
-1. Project Status
-
-Users can select from: Active, On-Hold, Pending, Inactive, Cancelled, Completed.
-
-Existing picklist options will be displayed.
-
-
-2. Build Plan Year Rules
-
-If Project Status = Inactive, Pending, or Cancelled:
-
-Build Plan Year = blank (user cannot change).
-
-Exception: Users can set Build Plan Year for Transport Disconnect or Transport ETL/Disconnect projects.
-
-
-If Project Status = Active or On-Hold:
-
-Users can select a Build Plan Year > current year.
-
-
-If Project Status = Completed:
-
-Between Jan 1 - Feb 15: Can select current year or current year +1.
-
-After Feb 15: Can only select current year.
-
-
-
-3. POR Year Rules
-
-If Project Status = Inactive, Pending, or Cancelled:
-
-POR Year = blank (user cannot change).
-
-
-If Project Status = Active or On-Hold:
-
-POR Year must be greater than Build Plan Year or 0.
-
-
-If Project Status = Completed:
-
-POR Year must be greater than Build Plan Year.
-
-
-For Site Types "In-Building", "In-Building VBG", or "Venue":
-
-Normal users cannot change POR Year into or out of the current year.
-
-Only users with In-Building privilege can modify POR Year into or out of the current year.
-
-Exception: Allowed if Budget Code is IBSNP, 5GTT, FIBER, FTCCA, LENST, MCRWV, MCRCS, FTC3, FTCB, FTCT, 5GTR6.
-
-
-
-4. Change Summary Section
-
-Displays modifications to POR Site, Build Plan Year Status, and POR Status.
-
-Example messages:
-
-"Set POR Site to No from Yes."
-
-"Set Build Plan Year Status to POR from <blank>."
-
-
-
-5. Button Logic
-
-Continue Button:
-
-Disabled until all required fields are populated.
-
-Once clicked:
-
-Runs POR Site/Build Plan Year Status logic.
-
-Runs POR Status logic.
-
-
-
-Cancel Button:
-
-Always enabled.
-
-
-
-
-
-
-
-
-
-US-1-Send SPM details to NEPA Module
- Edit
- Add comment
-Assign
-More
-Ready For Test
-Share this issue
- Export
-Details
-Type:Icon: Story Story
-Resolution:Unresolved
-Component/s:
-Orchestration and Project Management
-Labels:
-F-5293 story_type:DATABASE sub_domain:Project_Management team:RE-15_FUZE-SPM-TEAM-1 workstream_name:Orchestration_and_Project_Management
-Priority Level:High
-Acceptance Criteria:
-AC-1: GIVEN the primary candidate selection (rf accept & ranking task) is completed
-WHEN the system queries the fuze NEPA table
-THEN if there is a match on base location IDs, the system sends the SPM project ID, Site ID, and Site name to fuze NEPA.AC-2: GIVEN The Submit Structure Form is completed
-WHEN the system queries the fuze NEPA table
-THEN if there is a match on base location IDs, the system sends the SPM project ID, Site ID, and Site name to fuze NEPA.AC-3: GIVEN the SPM project ID, Site ID, and Site name are sent to fuze NEPA
-WHEN the NEPA module processes the data
-THEN the NEPA module sends the “Bulk Analysis Approved?” value to SPM.AC-4: GIVEN the NEPA module sends the “Bulk Analysis Approved?” value to SPM
-WHEN the value is received
-THEN it is reflected in the Submit for NEPA task.
-Sprint:2025.01.02
-Story Points:3
-Description
-Upon completion of the primary candidate selection (rf accept & ranking task), the SPM system should query the fuze NEPA table. If there is a match on base location IDs, the system should send the SPM project ID, Site ID, and Site name to fuze NEPA to be populated in the MDU bulk analysis table. The NEPA module will then send the “Bulk Analysis Approved?” value to SPM to reflect in the Submit for NEPA task.
-RK-1: Performance issues with large datasets.,RK-2: Integration with existing Fuze NEPA functionalities.
-AS-1: Fuze NEPA database schema is available.,AS-2: Necessary database permissions are granted.
-*Technical Specifications*:
-
-{"affectedDatabaseTable":"\"Fuze NEPA database, new MDU Bulk Analysis table\"","schemaChanges":"\"Create new table with columns for Base Location ID, SPM Project ID, Site ID, Site Name, Bulk Analysis Approved, NEPA/NHPA Exclusion, Regulatory Approval Date, etc.\"","newAndUpdatedFields":"\"Base Location ID (INT, not null), SPM Project ID (INT), Site ID (INT), Site Name (VARCHAR), Bulk Analysis Approved (BOOLEAN), NEPA/NHPA Exclusion (VARCHAR), Regulatory Approval Date (DATE)\"","primaryAndForeignKeys":"\"Base Location ID as primary key, foreign key relationship with existing site table\"","indexes":"\"Index on Base Location ID for efficient lookup\"","dataMigrationRequirements":"\"No migration required for new table\"","constraints":"NA","storedProceduresAndTriggers":"\"Triggers to update related tables upon changes\"","performanceImpact":"\"Minimal impact expected\"","rollbackPlan":"\"SQL script to drop the table\"","securityConsiderations":"\"Standard database security measures\"","versioningAndReleaseNotes":"\"v1.0\"","backupRequirements":"\"Regular database backups\"","errorHandlingAndLogging":"NA"}
-Git URL:
-Code Detail:
+This version follows your style and makes it easy to explain. Let me know if you need any refinements!
 
