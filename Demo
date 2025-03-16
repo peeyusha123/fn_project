@@ -1,77 +1,68 @@
-Here is a simplified explanation of the five test cases from the SIT Evidence document in my own words:
+Demo Explanation in Simple Words
+
+1. Introduction
+
+"Hello everyone, today I am going to show how the system allows or blocks site status changes based on whether a site is a SARF site or not. Also, only users with the GUI_SUPPORT role can make these updates."
 
 
 ---
 
-1. TC_01: Only One Site ID Can Have SARF SITE = YES
+2. Step-by-Step Demo
 
-When updating the SARF SITE field, only one site within a project can have "YES" at a time.
+Step 1: Checking if the Site is a SARF Site
 
-If an attempt is made to set more than one site to "YES," the system prevents the update and shows an error.
+"First, I am going to enter a Site ID and check if it is a SARF site or not."
 
+If SARF_SITE = YES, the site can be updated.
 
-
----
-
-2. TC_02: Restriction on Projects Created After 7/14/2022
-
-The system does not allow SARF SITE updates for projects that were created after July 14, 2022.
-
-If an attempt is made to modify SARF SITE for such a project, the update will not be saved, and an error message will appear.
-
-
-
----
-
-3. TC_03: Successful Update of SARF SITE to YES
-
-If all conditions are met (only one "YES" per project, valid project creation date), the system allows the update.
-
-A confirmation popup appears, asking for user approval before saving the changes.
-
-After confirmation, SARF SITE is successfully updated in the system.
+If SARF_SITE = NO, the site cannot be updated.
 
 
 
 ---
 
-4. TC_04: Error Handling for Invalid Project ID Search
+Step 2: Updating Site Status for SARF Sites
 
-When searching for a project, the system only accepts Initial Build Project IDs.
+"Now, I am going to update the site status for a SARF site."
 
-If a wrong project type is entered, the system displays an error message stating that only Initial Build Project IDs are allowed.
+Since this is a SARF site, the system allows the change.
 
-
-
----
-
-5. TC_05: SARF SITE Privilege is Hidden from Admin UI
-
-The new privilege for SARF SITE visibility is not displayed in the privileges management page in the admin section.
-
-This means the privilege cannot be assigned or modified through the UI and can only be added from the backend.
+The update is saved successfully.
 
 
 
 ---
 
-Summary:
+Step 3: Trying to Update a Non-SARF Site
 
-1. Only one site can have SARF SITE = YES.
+"Next, I am going to try updating a site that is not a SARF site."
 
+The system blocks the update and shows an error message.
 
-2. No updates for projects created after 7/14/2022.
-
-
-3. Updates show confirmation popups before saving.
-
-
-4. Only Initial Build Project IDs can be used for searching.
-
-
-5. The SARF SITE privilege is hidden from the admin panel.
+The site status does not change.
 
 
 
-This is a clear and easy-to-explain summary of the test cases. Let me know if you need further simplifications!
+---
+
+Step 4: Ensuring Only GUI_SUPPORT Users Can Update Status
+
+"Now, I am going to try updating the site status with a user who does not have the GUI_SUPPORT role."
+
+The system does not allow the update.
+
+Only users with GUI_SUPPORT role can change the site status.
+
+
+
+---
+
+3. Conclusion
+
+"This validation makes sure that only SARF sites can be updated, and only authorized users can make changes. This keeps the system secure and prevents mistakes. Thank you!"
+
+
+---
+
+This version is very easy to explain. Let me know if you need any changes!
 
