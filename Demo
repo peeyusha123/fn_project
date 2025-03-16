@@ -1,57 +1,73 @@
-Demo Explanation in Simple Words
+Here’s the updated demo explanation, including the third test case.
+
+
+---
+
+Demo Explanation for "Source Site" Field on Site Page UI
 
 1. Introduction
 
-"Hello everyone, today I am going to show how the system allows or blocks site status changes based on whether a site is a SARF site or not. Also, only users with the GUI_SUPPORT role can make these updates."
+"Hello everyone, today I am going to demonstrate the addition of the "Source Site" field to the Site Page UI and the Tracker Module. This field corresponds to the backend SARF SITE field and displays either Yes/No or True/False. It has been placed under Site Status on the Site Page."
 
 
 ---
 
 2. Step-by-Step Demo
 
-Step 1: Checking if the Site is a SARF Site
+Step 1: Verifying "Source Site" Field on Site Page UI
 
-"First, I am going to enter a Site ID and check if it is a SARF site or not."
+"I am opening the Site Page UI using the given UAT environment link to check if the Source Site field is displayed correctly under Site Status."
 
-If SARF_SITE = YES, the site can be updated.
+Test Case Reference (TC_01):
 
-If SARF_SITE = NO, the site cannot be updated.
+The Source Site field should be visible on the Site Page.
+
+It should be placed directly under the Site Status field.
+
+The field should display Yes/No or True/False based on the backend SARF SITE value.
 
 
 
----
-
-Step 2: Updating Site Status for SARF Sites
-
-"Now, I am going to update the site status for a SARF site."
-
-Since this is a SARF site, the system allows the change.
-
-The update is saved successfully.
-
+Expected Result: The Source Site field appears correctly under Site Status and shows the expected values.
 
 
 ---
 
-Step 3: Trying to Update a Non-SARF Site
+Step 2: Checking "Source Site" Field in the Tracker Module
 
-"Next, I am going to try updating a site that is not a SARF site."
+"Now, I am checking if the Source Site field is also available in the Tracker Module."
 
-The system blocks the update and shows an error message.
+Test Case Reference (TC_02):
 
-The site status does not change.
+The Source Site field should be present in the site module in Tracker.
 
+The field should display the same Yes/No or True/False value as in the Site Page UI.
+
+The value should match the backend SARF SITE field.
+
+
+
+Expected Result: The Tracker Module correctly displays the Source Site field with the expected values, ensuring consistency with the Site Page UI.
 
 
 ---
 
-Step 4: Ensuring Only GUI_SUPPORT Users Can Update Status
+Step 3: Querying the Backend to Validate Source Site Data
 
-"Now, I am going to try updating the site status with a user who does not have the GUI_SUPPORT role."
+"Now, I am going to run a database query to check if the Source Site value is correctly stored in the backend."
 
-The system does not allow the update.
+Query:
 
-Only users with GUI_SUPPORT role can change the site status.
+SELECT site_id, site_status, sarf_site AS source_site  
+FROM fuze_copy.site_info@fuze_uat_read  
+WHERE site_id = 'SITE_ID';
+
+Expected Result:
+
+The Source Site field should match the SARF SITE value in the database.
+
+The Yes/No or True/False values displayed on the UI should be the same as the data retrieved from this query.
+
 
 
 
@@ -59,10 +75,10 @@ Only users with GUI_SUPPORT role can change the site status.
 
 3. Conclusion
 
-"This validation makes sure that only SARF sites can be updated, and only authorized users can make changes. This keeps the system secure and prevents mistakes. Thank you!"
+"With this update, the Source Site field is now available in both the Site Page UI and the Tracker Module. The backend data is correctly stored and reflected on the UI, ensuring proper tracking of SARF SITE information. Thank you!"
 
 
 ---
 
-This version is very easy to explain. Let me know if you need any changes!
+This version includes the third test case query and keeps it clear and easy to explain. Let me know if you need modifications!
 
