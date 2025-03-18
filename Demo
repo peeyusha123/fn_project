@@ -1,3 +1,49 @@
+Title: US-6-Upgrade Service to Java17 - Development, Configuration, & Deployment Jobs for Document Routing Service
+
+Description:
+This test verifies the functionality of the document routing service after upgrading to Java 17. It includes testing template creation, document upload, and visibility in the milestone and document routing section.
+
+Test Steps:
+
+1. Navigate to the Admin tab and create a new template with required details.
+
+
+2. Ensure the template appears in the template list.
+
+
+3. Go to the Modifications Project section and select the project associated with the created template.
+
+
+4. Upload documents to the selected project.
+
+
+5. Verify that the uploaded documents appear in the milestone section.
+
+
+6. Ensure the documents are visible in the Document Routing section.
+
+
+
+Expected Result:
+
+The template is successfully created and listed in the template list.
+
+The selected modifications project correctly reflects the template.
+
+Uploaded documents appear in the milestone section.
+
+Documents are visible in the Document Routing icon.
+
+
+Let me know if you need any modifications!
+
+
+
+
+
+
+
+
 Here’s the updated demo explanation, including the third test case.
 
 
