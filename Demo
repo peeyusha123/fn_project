@@ -1,3 +1,68 @@
+
+Here’s a more structured and grammatically refined version of your description:
+
+
+---
+
+Description:
+
+The user navigates to the Admin Page and selects Admin Operations. Within the Admin Operations section, the user selects Document Routing, where two options are available:
+
+1. Template List
+
+
+2. Create/Edit Template
+
+
+
+The user selects Create/Edit Template, fills in the required fields, and successfully creates a template. The created template is then verified in the Template List to ensure its visibility.
+
+Next, the user selects a Project ID, which opens the Project Page. Within the project, a specific Milestone is selected, and the user attempts to upload documents. After uploading, the user verifies that the document appears on the Milestone Page. Additionally, the Document Routing icon is checked to confirm whether the uploaded document is in Jeopardy status.
+
+
+---
+
+Acceptance Criteria:
+
+1. The user can navigate to the Admin Page and access the Document Routing section.
+
+
+2. The Create/Edit Template functionality allows users to input required fields and create a template successfully.
+
+
+3. The created template appears in the Template List after creation.
+
+
+4. The user can select a Project ID and access the Project Page.
+
+
+5. Within the Project Page, a Milestone can be selected to upload a document.
+
+
+6. The uploaded document is visible on the Milestone Page after a successful upload.
+
+
+7. The Document Routing icon correctly reflects the document’s Jeopardy status, if applicable.
+
+
+
+Let me know if you need any further refinements!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Title: US-6-Upgrade Service to Java17 - Development, Configuration, & Deployment Jobs for Document Routing Service
 
 Description:
