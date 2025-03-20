@@ -1,3 +1,111 @@
+Description:
+
+The Admin Page for GUI SUPPORT users enables users to search for a site, view its details, and update the SARF SITE value using a YES/NO dropdown. This functionality ensures data accuracy, security, and controlled access for managing SARF SITE information.
+
+The page includes the following fields:
+
+SARF SITE (Editable – Dropdown: YES/NO/Blank)
+
+Site ID (Read-Only – Hyperlinked to Site Page)
+
+Site Name (Read-Only)
+
+MDG Location ID (Read-Only)
+
+Market (Read-Only)
+
+Sub-Market (Read-Only)
+
+Site Status (Read-Only)
+
+Site Type (Read-Only)
+
+Site Sub-Type (Read-Only)
+
+
+Users can:
+
+1. Search for a site using Site ID and view the site details, including the SARF SITE value.
+
+
+2. Update the SARF SITE value from YES to NO or vice versa.
+
+
+3. Update both the SARF SITE and Site Status in a single request.
+
+
+4. Perform bulk updates on multiple sites at once.
+
+
+
+The system ensures:
+
+Proper authorization and role-based access control for GUI SUPPORT users.
+
+Data validation and integrity checks to prevent incorrect updates.
+
+Audit logging and monitoring of all SARF SITE changes.
+
+
+
+---
+
+Acceptance Criteria:
+
+1. Site Search Functionality:
+
+✅ GIVEN a GUI SUPPORT user, WHEN searching for a site using Site ID, THEN site details, including the SARF SITE value, are displayed.
+
+
+
+2. SARF SITE Value Update:
+
+✅ GIVEN a GUI SUPPORT user, WHEN updating the SARF SITE value from YES to NO, THEN the new value is saved and reflected in the database.
+
+
+
+3. Simultaneous Update of SARF SITE & Site Status:
+
+✅ GIVEN a GUI SUPPORT user, WHEN updating both the SARF SITE value and Site Status in a single request, THEN both values are updated successfully in the database.
+
+
+
+4. Bulk Update Functionality:
+
+✅ GIVEN a GUI SUPPORT user, WHEN updating multiple sites in one request, THEN all selected sites are updated successfully.
+
+
+
+5. Security & Access Control:
+
+✅ GIVEN a GUI SUPPORT user, WHEN performing site updates, THEN only authorized users can access and modify SARF SITE values.
+
+
+
+6. Data Validation & Integrity:
+
+✅ GIVEN an invalid or incorrect update request, WHEN submitted, THEN the system should return an appropriate error message without updating the data.
+
+
+
+
+
+---
+
+This version provides a clear description and acceptance criteria without a demo. Let me know if you need further modifications.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Here’s a more structured and grammatically refined version of your description:
 
