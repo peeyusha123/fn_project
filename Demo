@@ -1,3 +1,152 @@
+
+
+
+
+
+
+
+
+
+Detailed Description for SARF SITE Management Feature
+
+Objective
+
+The SARF SITE management feature enables GUI SUPPORT users to view and update SARF SITE values for different sites. This functionality is crucial for maintaining accurate site data and ensuring proper classification of sites within the system. Users can:
+
+Search for site details (including SARF SITE values).
+
+Update SARF SITE values for individual sites.
+
+Update both SARF SITE and site status together.
+
+Perform bulk updates to modify multiple sites in a single request.
+
+Ensure data security by restricting updates to authorized users only.
+
+
+This feature interacts with two key APIs:
+
+1. getCandidateSites API – Retrieves site details, including SARF SITE value.
+
+
+2. updateSarfSite API – Updates the SARF SITE value (YES/NO) and can modify the site status.
+
+
+
+
+---
+
+Feature Behavior
+
+1. Fetching Site Details
+
+The system allows users to search for sites using siteProjectsId and status.
+
+The API response includes Site ID, Site Name, MDG Location ID, Market, SARF SITE value, and other details.
+
+If a site exists, it returns the current SARF SITE value (YES/NO).
+
+If no matching site is found, the API responds with an appropriate message.
+
+
+
+2. Updating SARF SITE Value
+
+Users can modify SARF SITE from YES to NO or vice versa using the updateSarfSite API.
+
+The system updates the value in the database and confirms the change in the API response.
+
+Only authorized users with the GUI SUPPORT role can make changes.
+
+
+
+3. Updating SARF SITE and Site Status Together
+
+Users can modify both SARF SITE and site status in a single request.
+
+The system ensures that both values are updated in the database at the same time.
+
+The API response reflects the updated values.
+
+
+
+4. Bulk Updates for Multiple Sites
+
+Users can submit multiple site updates in a single request.
+
+The system processes all updates and returns a success or failure status for each site.
+
+If one or more updates fail, the API provides a partial success message detailing the affected sites.
+
+
+
+5. Security & Access Control
+
+Only users with the GUI SUPPORT role can modify SARF SITE values.
+
+Unauthorized access attempts result in a 403 Forbidden error.
+
+Sensitive site details are protected, and only necessary information is exposed in API responses.
+
+
+
+
+
+---
+
+Acceptance Criteria
+
+AC-1: Fetching Site Details
+
+✅ When a GUI SUPPORT user searches for a site using getCandidateSites, the API must return the correct site details, including SARF SITE value.
+✅ The API response must match the actual database records for the site.
+✅ If an invalid siteProjectsId is provided, the system must return an error message instead of incorrect data.
+
+AC-2: Updating SARF SITE Value
+
+✅ When a GUI SUPPORT user updates a site's SARF SITE value, the new value must be stored in the database and reflected in API responses.
+✅ The system must allow only valid SARF SITE values (YES/NO) and reject any invalid input.
+✅ If an unauthorized user attempts to update SARF SITE, the system must return a 403 Forbidden error.
+
+AC-3: Updating SARF SITE and Site Status Together
+
+✅ When a user updates both SARF SITE and site status, the system must process both changes simultaneously.
+✅ The database must accurately reflect the new SARF SITE and status values after the update.
+✅ If an invalid status value is provided, the update must fail with a validation error.
+
+AC-4: Bulk Updates for Multiple Sites
+
+✅ The system must allow users to update multiple sites in a single request.
+✅ The API response must indicate which updates were successful and which failed, with proper error messages.
+✅ The system must enforce a limit on maximum sites per bulk update request to prevent performance issues.
+
+AC-5: Data Security & Access Control
+
+✅ Only GUI SUPPORT users should be able to update SARF SITE values.
+✅ Unauthorized users attempting updates must receive a 403 Forbidden error.
+✅ The system must protect sensitive site information and ensure only relevant fields are returned in API responses.
+
+
+---
+
+This document provides a deep functional breakdown of the feature and defines strict acceptance criteria to ensure reliable testing and validation. Let me know if you need any refinements!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Description:
 
 The Admin Page for GUI SUPPORT users enables users to search for a site, view its details, and update the SARF SITE value using a YES/NO dropdown. This functionality ensures data accuracy, security, and controlled access for managing SARF SITE information.
