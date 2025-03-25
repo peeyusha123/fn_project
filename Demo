@@ -1,4 +1,40 @@
+As an Equipment Engineer, I want to receive real-time notifications about the status of the path creation process (Success, Failure, or Manual Intervention) so that I can track progress, take necessary actions, and ensure the smooth execution of workflows.
 
+The path creation process is triggered after the successful creation of equipment in the CND application. If the process completes successfully, a success notification is sent to the user. If the process encounters an error, a failure notification is sent with details. If manual intervention is required, a notification with a redirect link is provided for further action.
+
+The system should ensure that notifications are sent within 5 seconds of the workflow reaching a terminal state (Success, Failure, or Manual Intervention). Additionally, any failures should trigger automated retries where applicable.
+
+Acceptance Criteria
+
+AC-1 (Success Notification):
+
+Given the path creation process completes successfully,
+
+When the workflow finishes,
+
+Then the user receives a success notification within 5 seconds.
+
+
+AC-2 (Manual Intervention Notification):
+
+Given the workflow encounters a condition requiring manual intervention,
+
+When the system identifies this condition,
+
+Then the user receives a notification with a redirect link within 5 seconds.
+
+
+AC-3 (Failure Notification):
+
+Given the path creation process encounters an error,
+
+When the workflow fails,
+
+Then the user receives a failure notification with error details within 5 seconds.
+
+
+
+The system must ensure high reliability in API integration, minimize notification delays, and provide accurate status updates to maintain an efficient workflow for the Equipment Engineer.
 
 
 
