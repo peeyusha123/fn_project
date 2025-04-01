@@ -1,3 +1,44 @@
+Simplified Description and Acceptance Criteria
+
+Description
+
+Currently, when a new project is created, utility information is duplicated instead of being inherited from the site. Each new project entry creates a new utility ID, leading to unnecessary duplication.
+
+Expected behavior:
+
+The project's utility information should be the same as the site's utility information.
+
+Utilities should not be duplicated when a new project is created.
+
+If the site’s utility information is incomplete, an error should be shown when creating a new project.
+
+
+Acceptance Criteria
+
+AC-1:
+Given a new project is created,
+When the API request is made,
+Then the project's utility information should come from the site's utility data without duplication.
+
+AC-2:
+Given a site has incomplete utility information,
+When a new project is created,
+Then an error message should be displayed indicating missing utility information.
+
+This simplified version should help you generate clear test cases. Let me know if you need further refinements!
+
+
+
+
+
+
+
+
+
+
+
+
+
 As an Equipment Engineer, I want to receive real-time notifications about the status of the path creation process (Success, Failure, or Manual Intervention) so that I can track progress, take necessary actions, and ensure the smooth execution of workflows.
 
 The path creation process is triggered after the successful creation of equipment in the CND application. If the process completes successfully, a success notification is sent to the user. If the process encounters an error, a failure notification is sent with details. If manual intervention is required, a notification with a redirect link is provided for further action.
