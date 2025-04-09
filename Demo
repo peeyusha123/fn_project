@@ -1,4 +1,262 @@
 
+Here are detailed test cases covering the Build Plan Year Status Logic, POR Site Logic, and POR Status Logic:
+
+
+---
+
+Test Case 1: Build Plan Year Status Should Be Blank for Future Years
+
+Scenario Type: Functional
+
+Priority: High
+
+Summary: Ensure Build Plan Year Status is blank when Build Plan Year is greater than the current year.
+
+Description: If the Build Plan Year is set to a future year, the Build Plan Year Status should be automatically set to blank.
+
+Test Steps:
+
+1. Navigate to the project form.
+
+
+2. Set Build Plan Year to a future year (e.g., Current Year +1).
+
+
+3. Check the Build Plan Year Status field.
+
+
+
+Expected Result: The Build Plan Year Status should be blank.
+
+
+
+---
+
+Test Case 2: Build Plan Year Status Should Be Blank for Past Years
+
+Scenario Type: Functional
+
+Priority: High
+
+Summary: Ensure Build Plan Year Status is blank when Build Plan Year is less than the current year.
+
+Description: If the Build Plan Year is set to a past year, the Build Plan Year Status should be automatically set to blank.
+
+Test Steps:
+
+1. Navigate to the project form.
+
+
+2. Set Build Plan Year to a past year (e.g., Current Year -1).
+
+
+3. Check the Build Plan Year Status field.
+
+
+
+Expected Result: The Build Plan Year Status should be blank.
+
+
+
+---
+
+Test Case 3: Build Plan Year Status Should Be "POR" If Build Plan Year = Current Year and POR Year = Current Year
+
+Scenario Type: Functional
+
+Priority: High
+
+Summary: Ensure Build Plan Year Status is set to "POR" when both Build Plan Year and POR Year match the current year.
+
+Description: The system should automatically set Build Plan Year Status to "POR" when both Build Plan Year and POR Year are set to the current year.
+
+Test Steps:
+
+1. Navigate to the project form.
+
+
+2. Set Build Plan Year to the current year.
+
+
+3. Set POR Year to the current year.
+
+
+4. Check the Build Plan Year Status field.
+
+
+
+Expected Result: The Build Plan Year Status should be set to "POR".
+
+
+
+---
+
+Test Case 4: Build Plan Year Status Should Be "Watch" If POR Year = 8
+
+Scenario Type: Functional
+
+Priority: Medium
+
+Summary: Ensure Build Plan Year Status is set to "Watch" when POR Year is 8.
+
+Description: The system should automatically set Build Plan Year Status to "Watch" when POR Year is set to 8, regardless of the Build Plan Year.
+
+Test Steps:
+
+1. Navigate to the project form.
+
+
+2. Set POR Year to 8.
+
+
+3. Check the Build Plan Year Status field.
+
+
+
+Expected Result: The Build Plan Year Status should be set to "Watch".
+
+
+
+---
+
+Test Case 5: Build Plan Year Status Should Be "Stretch" If Build Plan Year = Current Year and POR Year = This Year
+
+Scenario Type: Functional
+
+Priority: Medium
+
+Summary: Ensure Build Plan Year Status is set to "Stretch" if both Build Plan Year and POR Year match the current year.
+
+Description: If the Build Plan Year is set to the current year and the POR Year is also the current year, the system should set Build Plan Year Status to "Stretch".
+
+Test Steps:
+
+1. Navigate to the project form.
+
+
+2. Set Build Plan Year to the current year.
+
+
+3. Set POR Year to the current year.
+
+
+4. Check the Build Plan Year Status field.
+
+
+
+Expected Result: The Build Plan Year Status should be set to "Stretch".
+
+
+
+---
+
+Test Case 6: POR Site Should Be "Yes" If POR Year = Current Year
+
+Scenario Type: Functional
+
+Priority: High
+
+Summary: Ensure POR Site is set to "Yes" when POR Year is the current year.
+
+Description: If POR Year is set to the current year, the system should automatically set POR Site to "Yes".
+
+Test Steps:
+
+1. Navigate to the project form.
+
+
+2. Set POR Year to the current year.
+
+
+3. Check the POR Site field.
+
+
+
+Expected Result: The POR Site should be set to "Yes".
+
+
+
+---
+
+Test Case 7: POR Site Should Be "No" If POR Year ≠ Current Year
+
+Scenario Type: Functional
+
+Priority: High
+
+Summary: Ensure POR Site is set to "No" when POR Year is not the current year.
+
+Description: If POR Year is not set to the current year, the system should automatically set POR Site to "No".
+
+Test Steps:
+
+1. Navigate to the project form.
+
+
+2. Set POR Year to any year other than the current year.
+
+
+3. Check the POR Site field.
+
+
+
+Expected Result: The POR Site should be set to "No".
+
+
+
+---
+
+Test Case 8: User Notification for Field Changes
+
+Scenario Type: Functional
+
+Priority: Medium
+
+Summary: Ensure the system notifies users when a field is changed automatically.
+
+Description: When the system updates a field based on the logic, it should inform the user about the changes.
+
+Test Steps:
+
+1. Navigate to the project form.
+
+
+2. Make a change that triggers automatic updates (e.g., update POR Year).
+
+
+3. Check for system notifications.
+
+
+
+Expected Result: The system should display a message such as:
+
+"Set POR Site to No from Yes."
+
+"Set POR Status to POR."
+
+
+
+
+---
+
+These test cases ensure the correct functioning of Build Plan Year Status Logic, POR Site Logic, and POR Status Logic while covering expected field updates and user notifications. Let me know if you need additional refinements!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Here are detailed test cases based on your POR Year requirements:
 
 
