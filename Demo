@@ -1,3 +1,180 @@
+Here are detailed test cases based on your requirements:
+
+
+---
+
+Test Case 1: Build Plan Year Should Be Blank for Inactive Projects
+
+Scenario Type: Functional
+
+Priority: High
+
+Summary: Ensure Build Plan Year is blank when Project Status is Inactive, Pending, or Cancelled.
+
+Description: When a user selects a Project Status of Inactive, Pending, or Cancelled, the Build Plan Year should be set to blank and should not be editable.
+
+Test Steps:
+
+1. Open the application and navigate to the project form.
+
+
+2. Set Project Status to "Inactive," "Pending," or "Cancelled."
+
+
+3. Check the Build Plan Year field.
+
+
+4. Try to modify the Build Plan Year.
+
+
+
+Expected Result: The Build Plan Year should be blank and should not be editable.
+
+
+
+---
+
+Test Case 2: Exception for Transport Disconnect Projects
+
+Scenario Type: Functional
+
+Priority: Medium
+
+Summary: Ensure users can populate the Build Plan Year for Transport Disconnect projects with Inactive status.
+
+Description: Even if the Project Status is Inactive, the user should be able to set a Build Plan Year for Transport Disconnect or Transport ETL/Disconnect projects.
+
+Test Steps:
+
+1. Navigate to the project form.
+
+
+2. Set Project Status to "Inactive."
+
+
+3. Set the project type to "Transport Disconnect" or "Transport ETL/Disconnect."
+
+
+4. Check if the Build Plan Year can be populated.
+
+
+
+Expected Result: The Build Plan Year should be editable and allow a valid year entry.
+
+
+
+---
+
+Test Case 3: Build Plan Year Should Be Greater Than or Equal to the Current Year for Active and On-Hold Projects
+
+Scenario Type: Functional
+
+Priority: High
+
+Summary: Ensure Build Plan Year selection is greater than or equal to the current year for Active and On-Hold projects.
+
+Description: Users should not be able to select a year earlier than the current year when the project is Active or On-Hold.
+
+Test Steps:
+
+1. Navigate to the project form.
+
+
+2. Set Project Status to "Active" or "On-Hold."
+
+
+3. Try to set a Build Plan Year earlier than the current year.
+
+
+4. Try to set a Build Plan Year equal to or greater than the current year.
+
+
+
+Expected Result: The application should prevent selection of past years and allow selection of the current year or future years.
+
+
+
+---
+
+Test Case 4: Build Plan Year Selection for Completed Projects (Before Feb 15)
+
+Scenario Type: Functional
+
+Priority: Medium
+
+Summary: Ensure Build Plan Year allows selection of the current year or current year -1 if today's date is before February 15.
+
+Description: If the project is Completed and today's date is between January 1 and February 15, the Build Plan Year should allow the current year or the previous year.
+
+Test Steps:
+
+1. Set today's date to a date before February 15.
+
+
+2. Navigate to the project form.
+
+
+3. Set Project Status to "Completed."
+
+
+4. Verify available Build Plan Year options.
+
+
+
+Expected Result: The Build Plan Year dropdown should allow selecting the current year or the previous year.
+
+
+
+---
+
+Test Case 5: Build Plan Year Selection for Completed Projects (After Feb 15)
+
+Scenario Type: Functional
+
+Priority: Medium
+
+Summary: Ensure Build Plan Year allows selection of only the current year if today's date is after February 15.
+
+Description: If the project is Completed and today's date is after February 15, the Build Plan Year should only allow the current year.
+
+Test Steps:
+
+1. Set today's date to a date after February 15.
+
+
+2. Navigate to the project form.
+
+
+3. Set Project Status to "Completed."
+
+
+4. Verify available Build Plan Year options.
+
+
+
+Expected Result: The Build Plan Year dropdown should allow only the current year.
+
+
+
+---
+
+These test cases cover all the major conditions specified in your requirements. Let me know if you need modifications or additional cases.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Simplified Description and Acceptance Criteria
 
 Description
