@@ -1,3 +1,223 @@
+
+Here are detailed test cases based on your POR Year requirements:
+
+
+---
+
+Test Case 1: POR Year Should Be Blank for Inactive, Pending, or Cancelled Projects
+
+Scenario Type: Functional
+
+Priority: High
+
+Summary: Ensure POR Year is automatically set to blank for Inactive, Pending, or Cancelled projects.
+
+Description: When the Project Status is Inactive, Pending, or Cancelled, the POR Year should be blank and non-editable.
+
+Test Steps:
+
+1. Navigate to the project form.
+
+
+2. Set Project Status to "Inactive," "Pending," or "Cancelled."
+
+
+3. Check the POR Year field.
+
+
+4. Attempt to modify the POR Year.
+
+
+
+Expected Result: The POR Year should be blank and non-editable.
+
+
+
+---
+
+Test Case 2: POR Year Selection Must Be Greater Than or Equal to Build Plan Year for Active or On-Hold Projects
+
+Scenario Type: Functional
+
+Priority: High
+
+Summary: Ensure POR Year is greater than or equal to Build Plan Year when Project Status is Active or On-Hold.
+
+Description: Users should not be able to select a POR Year that is less than the Build Plan Year for Active or On-Hold projects.
+
+Test Steps:
+
+1. Navigate to the project form.
+
+
+2. Set Project Status to "Active" or "On-Hold."
+
+
+3. Set the Build Plan Year to a future year (e.g., 2026).
+
+
+4. Try to set the POR Year to a year earlier than the Build Plan Year (e.g., 2025).
+
+
+5. Try to set the POR Year to the same or a later year (e.g., 2026 or 2027).
+
+
+
+Expected Result: The system should prevent selection of POR Year < Build Plan Year and allow selection of POR Year ≥ Build Plan Year.
+
+
+
+---
+
+Test Case 3: POR Year Selection for Completed Projects Must Be Greater Than Build Plan Year
+
+Scenario Type: Functional
+
+Priority: Medium
+
+Summary: Ensure POR Year is greater than Build Plan Year when Project Status is Completed.
+
+Description: Users should not be able to select a POR Year that is equal to or less than the Build Plan Year for Completed projects.
+
+Test Steps:
+
+1. Navigate to the project form.
+
+
+2. Set Project Status to "Completed."
+
+
+3. Set the Build Plan Year to a specific year (e.g., 2025).
+
+
+4. Try to set the POR Year to the same or an earlier year (e.g., 2025 or 2024).
+
+
+5. Try to set the POR Year to a future year (e.g., 2026).
+
+
+
+Expected Result: The system should only allow selection of POR Year > Build Plan Year.
+
+
+
+---
+
+Test Case 4: Normal Users Cannot Change POR Year Into or Out of the Current Year
+
+Scenario Type: Security
+
+Priority: High
+
+Summary: Ensure normal users cannot modify POR Year to include or exclude the current year.
+
+Description: Only users with the "In-Building" privilege should be able to modify POR Year to include or exclude the current year.
+
+Test Steps:
+
+1. Log in as a normal user.
+
+
+2. Navigate to the project form.
+
+
+3. Set the POR Year to a value that would move it into or out of the current year.
+
+
+4. Attempt to save the changes.
+
+
+
+Expected Result: The system should prevent the user from making changes and display an appropriate error message.
+
+
+
+---
+
+Test Case 5: Users with In-Building Privilege Can Change POR Year Into or Out of the Current Year
+
+Scenario Type: Security
+
+Priority: High
+
+Summary: Ensure users with the "In-Building" privilege can modify POR Year into or out of the current year.
+
+Description: Users with the "In-Building" privilege should be able to update the POR Year to include or exclude the current year.
+
+Test Steps:
+
+1. Log in as a user with "In-Building" privilege.
+
+
+2. Navigate to the project form.
+
+
+3. Modify the POR Year to a value that includes or excludes the current year.
+
+
+4. Save the changes.
+
+
+
+Expected Result: The system should allow the update without errors.
+
+
+
+---
+
+Test Case 6: Exception Handling for Budget Codes
+
+Scenario Type: Functional
+
+Priority: Medium
+
+Summary: Ensure POR Year modifications are allowed for specific Budget Codes.
+
+Description: If the Budget Code is IBSNP, 5GTT, FIBER, FTCCA, IENST, MCRWV, MCRCS, FTC3, Verizon, FTCT, or 5GTR6, the restriction on modifying POR Year into or out of the current year should not apply.
+
+Test Steps:
+
+1. Navigate to the project form.
+
+
+2. Set a Budget Code to one of the allowed exceptions (e.g., FIBER).
+
+
+3. Modify the POR Year into or out of the current year.
+
+
+4. Save the changes.
+
+
+
+Expected Result: The system should allow the update without restriction.
+
+
+
+---
+
+These test cases cover the key restrictions and exceptions for POR Year based on Project Status, Build Plan Year, user privileges, and Budget Codes. Let me know if you need additional scenarios!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Here are detailed test cases based on your requirements:
 
 
