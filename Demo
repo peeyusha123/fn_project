@@ -1,4 +1,46 @@
 
+P2P Link STL Site Decommissioning & Relocation Guidelines
+
+The P2P Link STL site installations are used to meet and maintain the license compliance requirements for our market-based licenses.  When a P2P link STL installation is decommissioned from a site, it must be restored within the same license boundary* within 180 days of the decommissioning to maintain Safe Harbor license compliance for the license
+
+P2P Link STL site decommissioning guidance
+SPM List of Active 28GHz P2P STL Sites
+Please ensure the P2P STL link is included in the build design of the new site or shelter relocation
+Reach out to the Aviat or Ericsson vendor contact below to schedule the new installation of the relocated P2P Link STL site
+Aviat - Sam Hall - Sam.Hall@aviatnet.com
+Ericsson - Tom Matney - thomas.matney@ericsson.com
+MW ISA project will need to be submitted via the MW FUZE module for the new P2P Link STL site 
+Vendor must provide the NRC License Compliance team with a MW data sheet once the new P2P Link STL site is activated  
+Notify via e-mail the NRC License Compliance team of the planned P2P Link STL site decommissioning
+In the notification,  identify the planned site for the new installation, including details such as Fuze Site ID, SPM proj ID, County & State, and timeline for new P2P Link STL site activation
+Whenever possible, activate the new P2P Link STL site before decommissioning the existing P2P Link STL site to avoid a Loss of Safe Harbor Compliance for the license
+If an outage of the existing P2P Link STL site longer than 15 days will occur, notify via e-mail the NRC License Compliance team of the planned P2P Link STL site outage as well as the date of existing P2P Link STL site decommissioning
+P2P STL link outages must be less than 180 days in order to maintain Safe Harbor license compliance.  Failure to meet this requirement will result in the loss of Safe Harbor expedited renewal process and incur an exhaustive and rigorous logging of all future outages of the P2P Link STL sites in the county for as long as Verizon holds the license.
+What this means:
+Consistent P2P Link STL site decommissioning processes across all markets and spectrum types
+Accurate records of P2P Link STL site decommissioning for Safe Harbor license compliance maintenance   
+
+Please contact LicensingCompliance@verizonwireless.com if you have any questions.
+
+*28GHz license boundaries are the county of the current P2P Link STL site location.  39GHz & C-Band license boundaries are at the PEA level.  Please reach out to the NRC License Compliance team if you are unsure of the license boundary for the P2P Link STL site that is being decommissioned.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 Objective: Bring visibility to sites that have Point-to-Point (P2P) Save the License (STL) paths installed at them to mitigate scenarios where markets are dismantling or relocating these sites without activating the path at the new site. Prevent possible loss of license by not meeting FCC build out numbers.
