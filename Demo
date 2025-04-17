@@ -1,3 +1,60 @@
+
+
+
+Objective: Bring visibility to sites that have Point-to-Point (P2P) Save the License (STL) paths installed at them to mitigate scenarios where markets are dismantling or relocating these sites without activating the path at the new site. Prevent possible loss of license by not meeting FCC build out numbers.
+
+iNSPIRE Initiative ID: I-1693
+iNSPIRE MVP ID: M-3120
+
+Requirements:
+Create a new read-only site level field (available in tracker and SPM Site Page) called “P2P STL” that will consist of “yes” only values
+This field will be read only except for allowing editing by only the “FAA SUPER USER” role (existing role)
+
+Populate this field with YES if:
+A budget code of “5GSTL” is detected on any project under the site where the project status != cancelled (this would include future projects as created)
+Retrofit - this field needs to be retrofitted with “yes” values for all sites that meet the above condition
+Anytime a dismantlement mod project is created under a site where “P2P STL” field = YES, display a banner within the SPM dismantlement project that states:
+There is a P2P STL path or paths at this site to protect mmWave license(s). Please ensure that this P2P path(s) is/are moved and activated to the relocation site. Please refer to the guidance P2P Link STL Site Decommissioning & Relocation Guidelines 
+Anytime a High Rent Relo or Relocation relationship exists on a site where “P2P STL” field = YES, display a banner in the child project ID (replacement site) which states:
+The site you are relocating has a current P2P STL path or paths to protect mmWave license(s). Please ensure that path(s) is/are installed and activated under this relocation project.  Please refer to the guidance P2P Link STL Site Decommissioning & Relocation Guidelines 
+Once the P2P Link is established and operational at its new site location (this will be known when the vendor sends the datasheet), the NRC License Compliance team will manually set the P2P STL site field to ‘Yes’. 
+Automatically set the dismantlement site P2P STL field to ‘Decommissioned’ when the Construction Completed MS of the dismantlement mod project is completed.
+The 5G STL MW Links_rev1 (site custom field) counts will be manually updated by the NRC License Compliance team.
+
+*HQ Spectrum Team can create a tracker to have visibility into any P2P sites that are pending a relo or dismantlement
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Here are detailed test cases for the POR Status calculation logic, based on different combinations of Project Status, POR Year, and Build Plan Year.
 
 
