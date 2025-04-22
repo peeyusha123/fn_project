@@ -1,3 +1,48 @@
+Implement new site level field 'P2P STL' in Tracker and Site details
+ Edit
+ Add comment
+Assign
+More
+Ready For Test
+Share this issue
+ Export
+Details
+Type:Icon: Story Story
+Resolution:Unresolved
+Fix Version/s:None
+Affects Version/s:None
+Component/s:
+Orchestration and Project Management
+Labels:
+TechM_DC3 story_type:DATABASE sub_domain:Project_Management workstream_name:Orchestration_and_Project_Management
+Priority Level:High
+Impacted Applications(VAST):(FUAV) - FUZE - NSIT - Moorthi Subbarayan
+Acceptance Criteria:
+AC-1: GIVEN a site has a project with '5GSTL' budget code, WHEN the site is viewed, THEN the 'P2P STL' field displays 'YES'.AC-2: GIVEN a site has no project with '5GSTL' budget code, WHEN the site is viewed, THEN the 'P2P STL' field displays 'NO'.
+Sprint:2025.DC-3.1
+Story Points:8
+Description
+As a Network Planner, I want a new read-only site-level field called 'P2P STL' in the tracker and SPM Site details page so I can easily identify sites with P2P STL paths.
+
+This field will be read only except for allowing editing by only the “FAA SUPER USER” role (existing role)
+
+Data Population logic (by system) :
+
+Populate this field with YES if: A budget code of “5GSTL” is detected on any project under the site where the project status != cancelled (this would include future projects as created)
+Automatically set the site P2P STL field(only if the existing value is YES) to ‘Decommissioned’ when the Construction Completed MS of the dismantlement mod project is completed.
+RK-1: Data migration might cause downtime.
+AS-1: Database schema allows for the addition of a new column.
+
+
+
+
+
+
+
+
+
+
+
 
 P2P Link STL Site Decommissioning & Relocation Guidelines
 
