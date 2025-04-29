@@ -1,3 +1,156 @@
+Test Case 1
+
+Scenario Type: Positive
+
+Priority: High
+
+Summary: Ensure no "Add New Record" button appears when "AC Utility Install" is selected
+
+Description: Verify that when "AC Utility Install" is selected as Power Upgrade type, the "Add New Record" button is hidden.
+
+Test Steps:
+
+1. Start creating a project.
+
+
+2. Select "AC Utility Install" as the Power Upgrade type.
+
+
+3. Check the Utility Information task screen.
+
+
+
+Expected Result:
+The "Add New Record" button should not be visible.
+
+
+
+---
+
+Test Case 2
+
+Scenario Type: Positive
+
+Priority: High
+
+Summary: Auto-add an Electric record if none exists
+
+Description: Verify that a new Electric utility record is automatically created if no such record already exists when "AC Utility Install" is selected.
+
+Test Steps:
+
+1. Create a new project with no Electric utility record at the site.
+
+
+2. Select "AC Utility Install" during setup.
+
+
+3. Open the Utility Information task.
+
+
+
+Expected Result:
+An Electric record should be auto-created and populated with default or site-level data.
+
+
+
+---
+
+Test Case 3
+
+Scenario Type: Positive
+
+Priority: High
+
+Summary: Use existing Electric record if it already exists
+
+Description: Verify that if an Electric utility record exists, no new record is created and existing data is used.
+
+Test Steps:
+
+1. Ensure a site already has an Electric utility record.
+
+
+2. Create a project and select "AC Utility Install".
+
+
+3. Check the Utility Information task.
+
+
+
+Expected Result:
+The existing Electric record should appear pre-filled. No new record is added.
+
+
+
+---
+
+Test Case 4
+
+Scenario Type: Negative
+
+Priority: High
+
+Summary: Validation error when Electric record fields are missing
+
+Description: Verify that validation errors are thrown if Electric utility fields are incomplete.
+
+Test Steps:
+
+1. Create a project with "AC Utility Install".
+
+
+2. Leave Electric utility fields empty or incomplete.
+
+
+3. Try to finalize the Utility Information task.
+
+
+
+Expected Result:
+Validation errors should appear, preventing finalization until all required fields are filled.
+
+
+
+---
+
+Test Case 5
+
+Scenario Type: Positive
+
+Priority: Medium
+
+Summary: Finalize utility information if all Electric details are filled
+
+Description: Verify that if all required Electric utility fields are completed, the Utility task can be finalized without any errors.
+
+Test Steps:
+
+1. Create a project and select "AC Utility Install".
+
+
+2. Fill all required Electric utility fields.
+
+
+3. Try to finalize the Utility Information task.
+
+
+
+Expected Result:
+The Utility task should finalize successfully without errors.
+
+
+
+
+
+
+
+
+
+
+
+
+
 Implement new site level field 'P2P STL' in Tracker and Site details
  Edit
  Add comment
